@@ -1,7 +1,9 @@
 import { Router } from 'express'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import multer from 'multer'
-import pdfParse from 'pdf-parse/lib/pdf-parse.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const pdfParse = require('pdf-parse')
 
 const router = Router()
 
