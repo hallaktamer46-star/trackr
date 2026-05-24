@@ -1,7 +1,38 @@
 import { Router } from 'express'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import multer from 'multer'
+import pdfParse from 'pdf-parse/lib/pdf-parse.js'
 
 const router = Router()
+
+// File upload — memory storage, 5MB max, PDF and TXT only
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (['application/pdf', 'text/plain'].includes(file.mimetype)) cb(null, true)
+    else cb(new Error('Only PDF and TXT files are supported'))
+  },
+})
+
+// Parse a CV file → return extracted text
+router.post('/parse-cv', upload.single('file'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
+  try {
+    let text
+    if (req.file.mimetype === 'application/pdf') {
+      const data = await pdfParse(req.file.buffer)
+      text = data.text
+    } else {
+      text = req.file.buffer.toString('utf-8')
+    }
+    if (!text?.trim()) return res.status(400).json({ error: 'Could not extract text from file' })
+    res.json({ text })
+  } catch (err) {
+    console.error('File parse error:', err)
+    res.status(500).json({ error: 'Failed to read file: ' + err.message })
+  }
+})
 
 function getModel() {
   if (!process.env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY is not set in .env')

@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react'
-import { Upload, FileText, Loader2, Star, TrendingUp, TrendingDown, ChevronDown, ChevronUp } from 'lucide-react'
+import { Upload, FileText, Loader2, Star, TrendingUp, TrendingDown, ChevronDown, ChevronUp, X } from 'lucide-react'
 import { cn } from '../../lib/cn'
 
 export default function CVReviewer() {
   const [cvText, setCvText] = useState('')
+  const [fileName, setFileName] = useState(null)
+  const [fileLoading, setFileLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
@@ -12,12 +14,35 @@ export default function CVReviewer() {
   const handleFile = async (e) => {
     const file = e.target.files[0]
     if (!file) return
-    if (file.type === 'text/plain') {
-      const text = await file.text()
-      setCvText(text)
-    } else {
-      setError('Please paste your CV text directly — PDF parsing requires a server-side setup.')
+    setError(null)
+    setFileLoading(true)
+    setFileName(file.name)
+
+    try {
+      if (file.type === 'text/plain') {
+        const text = await file.text()
+        setCvText(text)
+      } else if (file.type === 'application/pdf') {
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await fetch('/api/ai/parse-cv', { method: 'POST', body: formData })
+        if (!res.ok) throw new Error((await res.json()).error)
+        const { text } = await res.json()
+        setCvText(text)
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to read file.')
+      setFileName(null)
+    } finally {
+      setFileLoading(false)
+      e.target.value = ''
     }
+  }
+
+  const clearFile = () => {
+    setFileName(null)
+    setCvText('')
+    setResult(null)
   }
 
   const handleAnalyse = async () => {
@@ -51,19 +76,33 @@ export default function CVReviewer() {
       {/* Input */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-slate-700">Paste your CV text</label>
+          <label className="text-sm font-semibold text-slate-700">Paste your CV text or upload a file</label>
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium"
+            disabled={fileLoading}
+            className="flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-800 font-medium disabled:opacity-50"
           >
-            <Upload size={13} /> Upload .txt
+            {fileLoading ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+            Upload PDF or TXT
           </button>
-          <input ref={fileRef} type="file" accept=".txt" className="hidden" onChange={handleFile} />
+          <input ref={fileRef} type="file" accept=".pdf,.txt,application/pdf,text/plain" className="hidden" onChange={handleFile} />
         </div>
+
+        {/* File badge */}
+        {fileName && (
+          <div className="flex items-center gap-2 bg-sky-50 border border-sky-200 rounded-lg px-3 py-2">
+            <FileText size={14} className="text-sky-500 shrink-0" />
+            <span className="text-sm text-sky-700 font-medium truncate flex-1">{fileName}</span>
+            <button onClick={clearFile} className="text-sky-400 hover:text-sky-700">
+              <X size={14} />
+            </button>
+          </div>
+        )}
+
         <textarea
           value={cvText}
-          onChange={e => setCvText(e.target.value)}
-          placeholder="Paste your entire CV / resume here..."
+          onChange={e => { setCvText(e.target.value); if (fileName) setFileName(null) }}
+          placeholder="Paste your entire CV / resume here, or upload a PDF / TXT file above..."
           rows={12}
           className="w-full p-3 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 bg-slate-50 focus:outline-none focus:border-sky-400 focus:bg-white resize-none"
         />

@@ -125,7 +125,9 @@ export function ApplicationProvider({ children }) {
     }
   }, [])
 
-  const isPaidUser = user?.user_metadata?.is_paid || !isSupabaseConfigured
+  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL
+  const isAdmin = adminEmail && user?.email === adminEmail
+  const isPaidUser = isAdmin || user?.user_metadata?.is_paid || !isSupabaseConfigured
   const canAddMore = !isSupabaseConfigured || isPaidUser || applications.length < 10
 
   return (
