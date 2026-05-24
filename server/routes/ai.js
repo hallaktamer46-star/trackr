@@ -1,11 +1,18 @@
 import { Router } from 'express'
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import Groq from 'groq-sdk'
 import multer from 'multer'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const pdfParse = require('pdf-parse')
 
 const router = Router()
+
+const MODEL = 'llama-3.3-70b-versatile'
+
+function getGroq() {
+  if (!process.env.GROQ_API_KEY) throw new Error('GROQ_API_KEY is not set in .env')
+  return new Groq({ apiKey: process.env.GROQ_API_KEY })
+}
 
 // File upload — memory storage, 5MB max, PDF and TXT only
 const upload = multer({
@@ -36,10 +43,14 @@ router.post('/parse-cv', upload.single('file'), async (req, res) => {
   }
 })
 
-function getModel() {
-  if (!process.env.GEMINI_API_KEY) throw new Error('GEMINI_API_KEY is not set in .env')
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+async function ask(prompt) {
+  const groq = getGroq()
+  const response = await groq.chat.completions.create({
+    model: MODEL,
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.4,
+  })
+  return response.choices[0].message.content.trim()
 }
 
 // CV / Resume Review
@@ -48,27 +59,37 @@ router.post('/cv-review', async (req, res) => {
   if (!cvText?.trim()) return res.status(400).json({ error: 'cvText is required' })
 
   try {
-    const model = getModel()
-    const prompt = `You are an expert career coach and ATS specialist. Analyse this CV/resume and return a JSON object with exactly this shape:
+    const raw = await ask(`You are a senior recruiter and career coach with 15+ years hiring for top tech companies. Analyse this CV with brutal honesty and actionable precision.
+
+Return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
 {
   "score": <integer 1-10>,
-  "summary": "<one sentence overall verdict>",
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "weaknesses": ["<weakness 1>", "<weakness 2>", "<weakness 3>"],
+  "summary": "<2-3 sentence honest verdict: what kind of candidate this is, what role level they suit, and the single biggest thing holding them back>",
+  "strengths": [
+    "<specific strength WITH evidence from the CV — e.g. 'Quantified impact: mentions 40% performance improvement, which immediately signals results-oriented thinking to recruiters'>",
+    "<specific strength 2>",
+    "<specific strength 3>"
+  ],
+  "weaknesses": [
+    "<specific weakness WITH explanation of recruiter impact — e.g. 'No measurable achievements in the last role: bullet points like 'responsible for X' without numbers get skipped by ATS and ignored by hiring managers'>",
+    "<specific weakness 2>",
+    "<specific weakness 3>"
+  ],
   "suggestions": [
-    { "line": "<quote or paraphrase a short line from the CV>", "suggestion": "<specific rewrite or improvement>" },
+    {
+      "line": "<exact phrase or bullet copied from the CV>",
+      "suggestion": "<a ready-to-use rewrite of that exact line, stronger, quantified, and ATS-optimised — not generic advice, a real replacement they can paste in>"
+    },
+    { "line": "...", "suggestion": "..." },
+    { "line": "...", "suggestion": "..." },
     { "line": "...", "suggestion": "..." },
     { "line": "...", "suggestion": "..." }
   ]
 }
 
-Respond ONLY with the raw JSON object. No markdown, no code fences, no explanation.
-
-CV:
-${cvText}`
-
-    const result = await model.generateContent(prompt)
-    const text = result.response.text().trim().replace(/^```json\n?/, '').replace(/\n?```$/, '')
+CV TO ANALYSE:
+${cvText}`)
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
     res.json(JSON.parse(text))
   } catch (err) {
     console.error('CV review error:', err)
@@ -84,18 +105,13 @@ router.post('/cover-letter-review', async (req, res) => {
   }
 
   try {
-    const model = getModel()
-    const prompt = `You are an expert hiring manager and cover letter coach. Analyse this cover letter against the job description and return a JSON object with exactly this shape:
+    const raw = await ask(`You are an expert hiring manager and cover letter coach. Analyse this cover letter against the job description and return a JSON object with exactly this shape:
 {
   "relevance_score": <integer 1-10>,
   "tone": "<e.g. Professional, Confident, Formal, Warm, Generic>",
   "missing": ["<missing element 1>", "<missing element 2>", "<missing element 3>"],
   "rewrites": [
-    {
-      "original": "<a short quoted phrase from the cover letter>",
-      "rewrite": "<a stronger version of that phrase>",
-      "reason": "<one sentence explaining why>"
-    },
+    { "original": "<quoted phrase>", "rewrite": "<stronger version>", "reason": "<one sentence why>" },
     { "original": "...", "rewrite": "...", "reason": "..." },
     { "original": "...", "rewrite": "...", "reason": "..." }
   ]
@@ -107,10 +123,8 @@ JOB DESCRIPTION:
 ${jobDescription}
 
 COVER LETTER:
-${coverLetter}`
-
-    const result = await model.generateContent(prompt)
-    const text = result.response.text().trim().replace(/^```json\n?/, '').replace(/\n?```$/, '')
+${coverLetter}`)
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
     res.json(JSON.parse(text))
   } catch (err) {
     console.error('Cover letter error:', err)
@@ -133,8 +147,7 @@ router.post('/follow-up', async (req, res) => {
   }
 
   try {
-    const model = getModel()
-    const prompt = `Write a professional, warm, and concise follow-up email for a job seeker who is ${scenarioMap[scenario] || scenario}.
+    const email = await ask(`Write a professional, warm, and concise follow-up email for a job seeker who is ${scenarioMap[scenario] || scenario}.
 
 Company: ${company}
 Job Title: ${jobTitle}
@@ -147,10 +160,8 @@ Requirements:
 - Ready to send with minimal editing
 - Do not use [placeholder] brackets
 
-Return ONLY the email text (subject line then body). No commentary, no markdown.`
-
-    const result = await model.generateContent(prompt)
-    res.json({ email: result.response.text().trim() })
+Return ONLY the email text (subject line then body). No commentary, no markdown.`)
+    res.json({ email })
   } catch (err) {
     console.error('Follow-up error:', err)
     res.status(500).json({ error: err.message })
