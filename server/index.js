@@ -1,0 +1,44 @@
+import 'dotenv/config'
+import express from 'express'
+import cors from 'cors'
+import rateLimit from 'express-rate-limit'
+import aiRouter from './routes/ai.js'
+import stripeRouter from './routes/stripe.js'
+
+const app = express()
+const PORT = process.env.PORT || 3001
+
+app.use(cors({ origin: process.env.APP_URL || 'http://localhost:5173' }))
+app.use(express.json({ limit: '4mb' }))
+
+// General limit — all API routes: 100 requests per 15 minutes per IP
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests, please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+// Strict limit — AI routes: 20 requests per hour per IP
+// Protects your Gemini free quota from abuse
+const aiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 20,
+  message: { error: 'AI request limit reached (20/hour). Please wait before trying again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+app.use('/api', generalLimiter)
+app.use('/api/ai', aiLimiter)
+
+app.use('/api/ai', aiRouter)
+app.use('/api/stripe', stripeRouter)
+
+app.get('/api/health', (_req, res) => res.json({ ok: true }))
+
+app.listen(PORT, () => {
+  console.log(`Trackr API server running on http://localhost:${PORT}`)
+  console.log(`Rate limits: 100 req/15min (general), 20 req/hour (AI)`)
+})
