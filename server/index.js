@@ -13,6 +13,9 @@ const allowedOrigins = [
   'https://trackr-taupe.vercel.app',
 ]
 app.use(cors({ origin: (origin, cb) => cb(null, !origin || allowedOrigins.includes(origin)) }))
+
+// Stripe webhooks need the raw body for signature verification — must come before express.json()
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }))
 app.use(express.json({ limit: '4mb' }))
 
 // General limit — all API routes: 100 requests per 15 minutes per IP

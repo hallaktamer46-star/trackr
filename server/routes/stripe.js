@@ -1,12 +1,18 @@
 import { Router } from 'express'
 import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
 const router = Router()
 
-// Stripe is initialised lazily so the server starts even without the key
 function getStripe() {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error('STRIPE_SECRET_KEY is not set')
   return new Stripe(process.env.STRIPE_SECRET_KEY)
+}
+
+function getSupabaseAdmin() {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY)
+    throw new Error('Supabase admin credentials not configured')
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 }
 
 // Create a Stripe Checkout session for the Pro subscription
@@ -43,8 +49,8 @@ router.post('/create-checkout', async (req, res) => {
   }
 })
 
-// Webhook — update user metadata in Supabase when payment succeeds
-router.post('/webhook', express_raw_body_middleware(), async (req, res) => {
+// Webhook — raw body is applied in index.js before express.json()
+router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature']
   if (!process.env.STRIPE_WEBHOOK_SECRET) return res.status(400).send('Webhook secret not configured')
 
@@ -54,8 +60,14 @@ router.post('/webhook', express_raw_body_middleware(), async (req, res) => {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
-      console.log(`Payment succeeded for user ${session.metadata?.userId}`)
-      // TODO: update user is_paid = true in Supabase via service role key
+      const userId = session.metadata?.userId
+      if (userId) {
+        const supabase = getSupabaseAdmin()
+        await supabase.auth.admin.updateUserById(userId, {
+          user_metadata: { is_paid: true },
+        })
+        console.log(`User ${userId} upgraded to Pro`)
+      }
     }
 
     res.json({ received: true })
@@ -64,17 +76,5 @@ router.post('/webhook', express_raw_body_middleware(), async (req, res) => {
     res.status(400).send(`Webhook Error: ${err.message}`)
   }
 })
-
-// Raw body middleware for Stripe webhooks
-function express_raw_body_middleware() {
-  return (req, res, next) => {
-    const chunks = []
-    req.on('data', chunk => chunks.push(chunk))
-    req.on('end', () => {
-      req.body = Buffer.concat(chunks)
-      next()
-    })
-  }
-}
 
 export default router

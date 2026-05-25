@@ -1,16 +1,29 @@
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { Plus, CheckCircle2, X } from 'lucide-react'
 import KanbanBoard from '../components/Board/KanbanBoard'
 import ApplicationModal from '../components/Modals/ApplicationModal'
 import FollowUpsBanner from '../components/Dashboard/FollowUpsBanner'
 import StatsPanel from '../components/Dashboard/StatsPanel'
 import { useApplications } from '../contexts/ApplicationContext'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 export default function Dashboard() {
   const { applications, addApplication, updateApplication, deleteApplication, canAddMore } = useApplications()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingApp, setEditingApp] = useState(null)
   const [defaultStatus, setDefaultStatus] = useState('wishlist')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [successBanner, setSuccessBanner] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('checkout') === 'success') {
+      setSuccessBanner(true)
+      setSearchParams({}, { replace: true })
+      // Refresh session so updated user_metadata (is_paid) is reflected immediately
+      if (isSupabaseConfigured) supabase.auth.refreshSession()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const openAdd = (status = 'wishlist') => {
     setEditingApp(null)
@@ -27,7 +40,6 @@ export default function Dashboard() {
     if (data.id) {
       await updateApplication(data.id, data)
     } else {
-      // Use the status chosen in the modal form; fall back to the column's default
       await addApplication({ ...data, status: data.status || defaultStatus })
     }
   }
@@ -36,7 +48,16 @@ export default function Dashboard() {
 
   return (
     <div>
-      {/* Page header */}
+      {successBanner && (
+        <div className="mb-5 flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800">
+          <CheckCircle2 size={18} className="text-emerald-500 shrink-0" />
+          <span className="flex-1 font-medium">Welcome to Trackr Pro! All AI features are now unlocked.</span>
+          <button onClick={() => setSuccessBanner(false)} className="text-emerald-400 hover:text-emerald-600">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Your Applications</h1>
@@ -56,7 +77,7 @@ export default function Dashboard() {
       {!canAddMore && (
         <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-sm text-amber-800">
           You've reached the 10-application limit on the free plan.{' '}
-          <a href="#upgrade" className="font-semibold underline">Upgrade to Trackr Pro</a> for unlimited applications and AI features.
+          <a href="/ai/cv" className="font-semibold underline">Upgrade to Trackr Pro</a> for unlimited applications and AI features.
         </div>
       )}
 
