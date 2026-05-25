@@ -1,34 +1,27 @@
 import { useState } from 'react'
-import { Briefcase, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 export default function Auth() {
   const { signIn, signUp } = useAuth()
-  const [mode, setMode] = useState('login')
-  const [email, setEmail] = useState('')
+  const [mode, setMode]       = useState('signin')
+  const [email, setEmail]     = useState('')
   const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError]     = useState(null)
   const [success, setSuccess] = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
-
+    setLoading(true); setError(null); setSuccess(null)
     try {
-      const { error } = mode === 'login'
+      const { error } = mode === 'signin'
         ? await signIn(email, password)
         : await signUp(email, password)
-
       if (error) throw error
-
-      if (mode === 'signup' && isSupabaseConfigured) {
+      if (mode === 'signup' && isSupabaseConfigured)
         setSuccess('Check your email to confirm your account!')
-      }
     } catch (err) {
       setError(err.message || 'Something went wrong.')
     } finally {
@@ -37,95 +30,142 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 via-white to-slate-50 px-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen w-full grid md:grid-cols-2 bg-white">
+
+      {/* Left – brand panel */}
+      <div className="hidden md:flex flex-col justify-between p-10 bg-slate-900 border-r border-slate-800 relative overflow-hidden">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-sky-500 mb-4 shadow-lg shadow-sky-200">
-            <Briefcase size={26} className="text-white" />
+        <div className="flex items-center gap-3 z-10">
+          <div className="w-8 h-8 bg-sky-500 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.5)] grid place-items-center">
+            <div className="w-4 h-4 border-2 border-white rounded-sm" />
           </div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Trackr</h1>
-          <p className="text-slate-500 text-sm mt-1">Your smarter job search companion</p>
+          <span className="font-extrabold text-xl tracking-tighter font-mono text-white">TRACKR</span>
         </div>
 
-        {!isSupabaseConfigured && (
-          <div className="mb-4 bg-sky-50 border border-sky-200 rounded-xl p-3.5 text-sm text-sky-800">
-            <strong>Demo mode:</strong> Supabase isn't configured — data will be stored locally in your browser.
-          </div>
-        )}
+        {/* Tagline + stats */}
+        <div className="z-10 space-y-6">
+          <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-400 font-bold">
+            v1.0.0 / Q1 RELEASE
+          </p>
+          <h1 className="text-5xl font-extrabold tracking-tighter leading-[1.05] text-white">
+            Your job search,<br />
+            <span className="text-slate-500">finally engineered.</span>
+          </h1>
+          <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
+            A pipeline for your applications. Precision tooling for follow-ups, interviews and
+            offers. No spreadsheets. No chaos.
+          </p>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/80 border border-slate-100 p-7">
-          {/* Tabs */}
-          <div className="flex bg-slate-100 rounded-xl p-1 mb-6">
-            {['login', 'signup'].map(m => (
-              <button
-                key={m}
-                onClick={() => { setMode(m); setError(null); setSuccess(null) }}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  mode === m ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                }`}
-              >
-                {m === 'login' ? 'Sign in' : 'Create account'}
-              </button>
+          <div className="grid grid-cols-3 gap-px bg-slate-800 max-w-md">
+            {[['Kanban', 'Pipeline'], ['AI', 'Coaching'], ['Email', 'Reminders']].map(([n, l]) => (
+              <div key={l} className="bg-slate-900 p-4">
+                <p className="text-2xl font-extrabold font-mono text-white">{n}</p>
+                <p className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">{l}</p>
+              </div>
             ))}
           </div>
+        </div>
+
+        <p className="text-[10px] font-mono text-slate-600 z-10">
+          © {new Date().getFullYear()} Trackr · Free up to 10 apps · Pro $15/mo
+        </p>
+
+        {/* Glow */}
+        <div className="pointer-events-none absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-sky-500/10 blur-3xl" />
+      </div>
+
+      {/* Right – form */}
+      <div className="flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-sm">
+
+          {!isSupabaseConfigured && (
+            <div className="mb-6 bg-sky-50 border border-sky-200 rounded-xl p-3.5 text-xs text-sky-800">
+              <strong>Demo mode:</strong> data stored locally in your browser.
+            </div>
+          )}
+
+          <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-3">
+            {mode === 'signin' ? 'Authenticate' : 'Create Account'}
+          </p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+            {mode === 'signin' ? 'Welcome back' : 'Start your pipeline'}
+          </h2>
+          <p className="text-sm text-slate-400 mb-8">
+            {mode === 'signin'
+              ? 'Sign in to your Trackr workspace.'
+              : 'Track applications with precision.'}
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+            <Field label="Email">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:bg-white transition-colors"
+                className="auth-input"
               />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Password</label>
-              <div className="relative">
-                <input
-                  type={showPw ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  minLength={6}
-                  className="w-full px-3.5 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-sky-400 focus:bg-white transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPw(v => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                >
-                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
+            </Field>
+            <Field label="Password">
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                minLength={6}
+                className="auth-input"
+              />
+            </Field>
 
-            {error   && <p className="text-sm text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{error}</p>}
-            {success && <p className="text-sm text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">{success}</p>}
+            {error   && <p className="text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{error}</p>}
+            {success && <p className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">{success}</p>}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-sky-500 hover:bg-sky-600 disabled:bg-sky-300 text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 mt-2"
+              className="w-full h-11 bg-slate-900 hover:bg-slate-800 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2 mt-2"
             >
               {loading
-                ? <><Loader2 size={16} className="animate-spin" /> Please wait…</>
-                : mode === 'login' ? 'Sign in' : 'Create account'
+                ? <><Loader2 size={14} className="animate-spin" /> Please wait…</>
+                : <>{mode === 'signin' ? 'Sign in' : 'Create account'} →</>
               }
             </button>
           </form>
-        </div>
 
-        {/* Pricing hint */}
-        <p className="text-center text-xs text-slate-400 mt-5">
-          Free: up to 10 applications · Pro: $15/mo — unlimited + AI coaching
-        </p>
+          <div className="mt-6 flex items-center gap-3">
+            <div className="flex-1 h-px bg-slate-200" />
+            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-mono">or</span>
+            <div className="flex-1 h-px bg-slate-200" />
+          </div>
+
+          <p className="text-xs text-slate-400 mt-6 text-center">
+            {mode === 'signin' ? 'No account yet?' : 'Already have an account?'}{' '}
+            <button
+              onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setSuccess(null) }}
+              className="text-sky-500 font-medium hover:underline"
+            >
+              {mode === 'signin' ? 'Create one' : 'Sign in'}
+            </button>
+          </p>
+        </div>
       </div>
+
+      <style>{`
+        .auth-input{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#0f172a;background:#f8fafc;outline:none;transition:all 0.15s;}
+        .auth-input:focus{border-color:#38bdf8;background:white;box-shadow:0 0 0 3px rgba(56,189,248,0.1);}
+        .auth-input::placeholder{color:#94a3b8;}
+      `}</style>
+    </div>
+  )
+}
+
+function Field({ label, children }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-[10px] uppercase tracking-widest text-slate-400 font-mono font-semibold">{label}</label>
+      {children}
     </div>
   )
 }
