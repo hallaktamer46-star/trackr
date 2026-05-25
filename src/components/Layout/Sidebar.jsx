@@ -1,98 +1,84 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, BarChart2, Brain, FileText, Mail, X, LogOut, Briefcase } from 'lucide-react'
+import { LayoutGrid, BarChart3, Sparkles, X } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
+import { useApplications } from '../../contexts/ApplicationContext'
 import { cn } from '../../lib/cn'
 
-const navItems = [
-  { to: '/',       icon: LayoutDashboard, label: 'Board' },
-  { to: '/stats',  icon: BarChart2,       label: 'Stats' },
+const nav = [
+  { to: '/',      label: 'Board',    icon: LayoutGrid, end: true },
+  { to: '/stats', label: 'Stats',    icon: BarChart3  },
+  { to: '/ai/cv', label: 'AI Tools', icon: Sparkles   },
 ]
-
-const aiItems = [
-  { to: '/ai/cv',           icon: FileText, label: 'CV Reviewer'        },
-  { to: '/ai/cover-letter', icon: Brain,    label: 'Cover Letter'       },
-  { to: '/ai/follow-up',    icon: Mail,     label: 'Follow-up Generator' },
-]
-
-function NavItem({ to, icon: Icon, label, end, onClick }) {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      onClick={onClick}
-      className={({ isActive }) =>
-        cn(
-          'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-          isActive
-            ? 'bg-sky-50 text-sky-700'
-            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-        )
-      }
-    >
-      <Icon size={18} />
-      {label}
-    </NavLink>
-  )
-}
 
 export default function Sidebar({ open, onClose }) {
   const { signOut } = useAuth()
+  const { isPaidUser } = useApplications()
   const navigate = useNavigate()
 
-  const handleSignOut = async () => {
-    await signOut()
-    navigate('/auth')
-  }
+  const handleSignOut = async () => { await signOut(); navigate('/auth') }
 
   return (
-    <aside
-      className={cn(
-        'fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200',
-        'lg:translate-x-0',
-        open ? 'translate-x-0' : '-translate-x-full'
-      )}
-    >
+    <aside className={cn(
+      'fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 border-r border-slate-800 flex flex-col transition-transform duration-200',
+      'lg:translate-x-0',
+      open ? 'translate-x-0' : '-translate-x-full'
+    )}>
+
       {/* Logo */}
-      <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center">
-            <Briefcase size={16} className="text-white" />
+      <div className="flex items-center justify-between h-16 px-5 border-b border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-sky-500 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.5)] grid place-items-center">
+            <div className="w-4 h-4 border-2 border-white rounded-sm" />
           </div>
-          <span className="font-bold text-slate-900 text-lg tracking-tight">Trackr</span>
+          <span className="font-extrabold text-xl tracking-tighter font-mono text-white">TRACKR</span>
         </div>
-        <button
-          className="lg:hidden text-slate-400 hover:text-slate-600"
-          onClick={onClose}
-        >
+        <button className="lg:hidden text-slate-500 hover:text-slate-300" onClick={onClose}>
           <X size={20} />
         </button>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map(item => (
-          <NavItem key={item.to} {...item} end={item.to === '/'} onClick={onClose} />
+        {nav.map(({ to, label, icon: Icon, end }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            onClick={onClose}
+            className={({ isActive }) => cn(
+              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-slate-800 text-white'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+            )}
+          >
+            {({ isActive }) => (
+              <>
+                <span className={cn(
+                  'w-1.5 h-1.5 rounded-full transition-all',
+                  isActive ? 'bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]' : 'bg-transparent'
+                )} />
+                <Icon size={16} className="opacity-70" />
+                {label}
+              </>
+            )}
+          </NavLink>
         ))}
-
-        <div className="pt-4">
-          <p className="px-3 mb-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">
-            AI Coaching
-          </p>
-          {aiItems.map(item => (
-            <NavItem key={item.to} {...item} onClick={onClose} />
-          ))}
-        </div>
       </nav>
 
-      {/* Sign out */}
-      <div className="px-3 py-4 border-t border-slate-100">
-        <button
-          onClick={handleSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
-        >
-          <LogOut size={18} />
-          Sign out
-        </button>
+      {/* Account tier card */}
+      <div className="p-4 border-t border-slate-800">
+        <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">
+          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold font-mono mb-1">
+            Account Tier
+          </p>
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-mono text-sky-400 uppercase">
+              {isPaidUser ? 'Pro' : 'Free'} Plan
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono">v1.0.0</span>
+          </div>
+        </div>
       </div>
     </aside>
   )

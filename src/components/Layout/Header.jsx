@@ -1,10 +1,21 @@
-import { Menu, Bell } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
+import { Bell } from 'lucide-react'
 import { useApplications } from '../../contexts/ApplicationContext'
 import { isToday, isPast, parseISO } from 'date-fns'
 import ProfileDropdown from './ProfileDropdown'
 
+const ROUTE_LABELS = {
+  '/':             { section: 'APPLICATIONS', page: 'PIPELINE'       },
+  '/stats':        { section: 'ANALYTICS',    page: 'OVERVIEW'       },
+  '/ai/cv':        { section: 'ASSIST',       page: 'AI TOOLKIT'     },
+  '/ai/cover-letter': { section: 'ASSIST',    page: 'AI TOOLKIT'     },
+  '/ai/follow-up': { section: 'ASSIST',       page: 'AI TOOLKIT'     },
+}
+
 export default function Header({ onMenuClick }) {
+  const { pathname } = useLocation()
   const { applications } = useApplications()
+  const meta = ROUTE_LABELS[pathname] ?? { section: 'TRACKR', page: '' }
 
   const dueCount = applications.filter(a => {
     if (!a.reminder_date) return false
@@ -13,23 +24,32 @@ export default function Header({ onMenuClick }) {
   }).length
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-6">
-      <button
-        className="lg:hidden text-slate-500 hover:text-slate-700"
-        onClick={onMenuClick}
-      >
-        <Menu size={22} />
-      </button>
+    <header className="h-16 border-b border-slate-200 flex items-center justify-between px-6 bg-white/80 backdrop-blur-md sticky top-0 z-10">
 
-      <div className="hidden lg:block" />
+      {/* Mobile menu + breadcrumb */}
+      <div className="flex items-center gap-4">
+        <button className="lg:hidden text-slate-500 hover:text-slate-700" onClick={onMenuClick}>
+          <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="3" y1="6"  x2="17" y2="6"  />
+            <line x1="3" y1="12" x2="17" y2="12" />
+            <line x1="3" y1="18" x2="17" y2="18" />
+          </svg>
+        </button>
+        <h1 className="text-xs font-semibold font-mono text-slate-400 hidden sm:block">
+          {meta.section}{meta.page && <> / <span className="text-slate-700">{meta.page}</span></>}
+        </h1>
+      </div>
 
-      <div className="flex items-center gap-3">
-        {dueCount > 0 && (
-          <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-3 py-1 text-xs font-medium">
-            <Bell size={13} />
-            {dueCount} follow-up{dueCount > 1 ? 's' : ''} due
-          </div>
-        )}
+      {/* Right side */}
+      <div className="flex items-center gap-5">
+        <div className="relative">
+          <button aria-label="Notifications" className="text-slate-400 hover:text-slate-700 transition-colors">
+            <Bell size={18} />
+          </button>
+          {dueCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white" />
+          )}
+        </div>
         <ProfileDropdown />
       </div>
     </header>
