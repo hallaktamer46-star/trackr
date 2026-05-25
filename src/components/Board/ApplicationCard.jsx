@@ -1,106 +1,164 @@
 import { Draggable } from '@hello-pangea/dnd'
-import { Calendar, ExternalLink, Bell, Trash2, Edit2 } from 'lucide-react'
+import { Bell, Edit2, Trash2, ExternalLink } from 'lucide-react'
 import { format, parseISO, isPast, isToday } from 'date-fns'
-import { cn } from '../../lib/cn'
-
-const STATUS_CARD_STYLE = {
-  wishlist:  'border-slate-200  bg-white',
-  applied:   'border-sky-200    bg-sky-50/40',
-  interview: 'border-violet-200 bg-violet-50/40',
-  offer:     'border-emerald-200 bg-emerald-50/40',
-  rejected:  'border-rose-200   bg-rose-50/40',
-}
-
-const STATUS_BADGE = {
-  wishlist:  'bg-slate-100  text-slate-600',
-  applied:   'bg-sky-100    text-sky-700',
-  interview: 'bg-violet-100 text-violet-700',
-  offer:     'bg-emerald-100 text-emerald-700',
-  rejected:  'bg-rose-100   text-rose-700',
-}
 
 export default function ApplicationCard({ application, index, onEdit, onDelete }) {
-  const reminderDue = application.reminder_date && (
-    isToday(parseISO(application.reminder_date)) || isPast(parseISO(application.reminder_date))
+  const app = application
+  const reminderDue = app.reminder_date && (
+    isToday(parseISO(app.reminder_date)) || isPast(parseISO(app.reminder_date))
   )
+  const shortDate = app.date_applied
+    ? format(parseISO(app.date_applied), 'MMM d')
+    : null
 
   return (
-    <Draggable draggableId={application.id} index={index}>
+    <Draggable draggableId={app.id} index={index}>
       {(provided, snapshot) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className={cn(
-            'rounded-xl border p-3.5 mb-2.5 cursor-grab active:cursor-grabbing transition-shadow',
-            STATUS_CARD_STYLE[application.status],
-            snapshot.isDragging ? 'shadow-lg rotate-1' : 'shadow-sm hover:shadow-md',
-          )}
+          onClick={() => onEdit(app)}
+          style={{ ...provided.draggableProps.style, opacity: snapshot.isDragging ? 0.4 : 1 }}
+          className="mb-2.5 cursor-grab active:cursor-grabbing"
         >
-          {/* Company + actions */}
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <div className="min-w-0">
-              <p className="font-semibold text-slate-900 text-sm truncate">{application.company}</p>
-              <p className="text-slate-500 text-xs truncate mt-0.5">{application.job_title}</p>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onPointerDown={e => e.stopPropagation()}
-                onClick={e => { e.stopPropagation(); onEdit(application) }}
-                className="p-1 rounded text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors"
-              >
-                <Edit2 size={13} />
-              </button>
-              <button
-                onPointerDown={e => e.stopPropagation()}
-                onClick={e => { e.stopPropagation(); onDelete(application.id) }}
-                className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          </div>
-
-          {/* Meta */}
-          <div className="flex flex-wrap items-center gap-2 mt-2">
-            {application.date_applied && (
-              <span className="flex items-center gap-1 text-xs text-slate-400">
-                <Calendar size={11} />
-                {format(parseISO(application.date_applied), 'MMM d')}
-              </span>
-            )}
-            {application.url && (
-              <a
-                href={application.url}
-                target="_blank"
-                rel="noreferrer"
-                onPointerDown={e => e.stopPropagation()}
-                onClick={e => e.stopPropagation()}
-                className="flex items-center gap-1 text-xs text-sky-500 hover:text-sky-700"
-              >
-                <ExternalLink size={11} />
-                Job post
-              </a>
-            )}
-            {application.salary_range && (
-              <span className="text-xs text-emerald-600 font-medium">{application.salary_range}</span>
-            )}
-          </div>
-
-          {/* Reminder badge */}
-          {reminderDue && (
-            <div className="mt-2 flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1">
-              <Bell size={11} />
-              Follow-up due
-            </div>
-          )}
-
-          {/* Notes snippet */}
-          {application.notes && (
-            <p className="mt-2 text-xs text-slate-400 line-clamp-2">{application.notes}</p>
+          {app.status === 'offer' && <OfferCard app={app} onEdit={onEdit} onDelete={onDelete} />}
+          {app.status === 'rejected' && <RejectedCard app={app} onEdit={onEdit} onDelete={onDelete} />}
+          {!['offer', 'rejected'].includes(app.status) && (
+            <DefaultCard app={app} onEdit={onEdit} onDelete={onDelete} shortDate={shortDate} reminderDue={reminderDue} />
           )}
         </div>
       )}
     </Draggable>
+  )
+}
+
+function OfferCard({ app, onEdit, onDelete }) {
+  return (
+    <div className="bg-white border-2 border-emerald-300/60 p-5 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.08)]">
+      <div className="flex justify-between items-start mb-3">
+        <h3 className="font-bold tracking-tight text-base text-slate-900">{app.company}</h3>
+        <div className="flex items-center gap-1">
+          {app.salary_range && (
+            <span className="text-[10px] font-mono text-emerald-600 font-bold">{app.salary_range}</span>
+          )}
+          <CardActions app={app} onEdit={onEdit} onDelete={onDelete} />
+        </div>
+      </div>
+      <p className="text-sm text-slate-500 mb-5">{app.job_title}</p>
+      <div className="w-full py-2 bg-emerald-500 text-white font-bold text-[10px] uppercase tracking-widest rounded-lg text-center">
+        View Offer Details
+      </div>
+    </div>
+  )
+}
+
+function RejectedCard({ app, onEdit, onDelete }) {
+  return (
+    <div className="bg-white border border-slate-200 p-4 rounded-xl opacity-60 hover:opacity-80 transition-opacity">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="font-bold tracking-tight text-sm text-slate-500">{app.company}</h3>
+          <p className="text-xs text-slate-400">{app.job_title}</p>
+        </div>
+        <CardActions app={app} onEdit={onEdit} onDelete={onDelete} />
+      </div>
+    </div>
+  )
+}
+
+function DefaultCard({ app, onEdit, onDelete, shortDate, reminderDue }) {
+  const accentBorder =
+    app.status === 'applied'
+      ? 'border-sky-200/60'
+      : app.status === 'interview'
+        ? 'border-violet-200/60 ring-1 ring-violet-100'
+        : 'border-slate-200'
+
+  return (
+    <div className={`bg-white border ${accentBorder} p-4 rounded-xl hover:border-slate-300 transition-all relative overflow-hidden shadow-sm hover:shadow-md`}>
+      {app.status === 'applied' && (
+        <div className="absolute top-0 right-0 w-8 h-8 bg-sky-400/10 rotate-45 translate-x-4 -translate-y-4" />
+      )}
+
+      <div className="flex justify-between items-start mb-1">
+        <h3 className="font-bold tracking-tight text-sm text-slate-900">{app.company}</h3>
+        <div className="flex items-center gap-1 shrink-0">
+          {app.salary_range && (
+            <span className={`text-[10px] font-mono font-semibold ${
+              app.status === 'applied' ? 'text-sky-600' : app.status === 'interview' ? 'text-violet-600' : 'text-slate-500'
+            }`}>
+              {app.salary_range}
+            </span>
+          )}
+          <CardActions app={app} onEdit={onEdit} onDelete={onDelete} />
+        </div>
+      </div>
+
+      <p className="text-xs text-slate-500 mb-4">{app.job_title}</p>
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          {shortDate && (
+            <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded font-mono text-slate-500">
+              {shortDate}
+            </span>
+          )}
+          {app.url && (
+            <a
+              href={app.url}
+              target="_blank"
+              rel="noreferrer"
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => e.stopPropagation()}
+              className="text-[10px] text-sky-500 hover:text-sky-700 flex items-center gap-0.5"
+            >
+              <ExternalLink size={10} /> Link
+            </a>
+          )}
+        </div>
+        {app.status === 'interview' && (
+          <span className="text-[10px] bg-violet-50 text-violet-600 px-2 py-0.5 rounded font-mono">
+            Interviewing
+          </span>
+        )}
+        {app.status === 'applied' && (
+          <span className="text-[9px] uppercase tracking-tighter text-slate-400 px-2 py-0.5 border border-slate-200 rounded">
+            Pending
+          </span>
+        )}
+      </div>
+
+      {reminderDue && (
+        <div className="mt-3 flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">
+          <Bell size={11} /> Follow-up due
+        </div>
+      )}
+
+      {app.notes && (
+        <p className="mt-2 text-xs text-slate-400 line-clamp-2">{app.notes}</p>
+      )}
+    </div>
+  )
+}
+
+function CardActions({ app, onEdit, onDelete }) {
+  return (
+    <div className="flex items-center gap-0.5 ml-1">
+      <button
+        onPointerDown={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); onEdit(app) }}
+        className="p-1 rounded text-slate-300 hover:text-sky-500 hover:bg-sky-50 transition-colors"
+      >
+        <Edit2 size={12} />
+      </button>
+      <button
+        onPointerDown={e => e.stopPropagation()}
+        onClick={e => { e.stopPropagation(); onDelete(app.id) }}
+        className="p-1 rounded text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+      >
+        <Trash2 size={12} />
+      </button>
+    </div>
   )
 }
