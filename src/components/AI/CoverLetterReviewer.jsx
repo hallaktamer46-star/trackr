@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Loader2, Mail, Target, MessageSquare, Lightbulb } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { apiFetch } from '../../lib/api'
 
 export default function CoverLetterReviewer() {
   const [coverLetter, setCoverLetter] = useState('')
@@ -15,7 +16,7 @@ export default function CoverLetterReviewer() {
     setResult(null)
     setError(null)
     try {
-      const res = await fetch('/api/ai/cover-letter-review', {
+      const res = await apiFetch('/api/ai/cover-letter-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ coverLetter, jobDescription }),

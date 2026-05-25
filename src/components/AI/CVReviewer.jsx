@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { Upload, Loader2, X, FileText, CheckCircle2, XCircle, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '../../lib/cn'
+import { apiFetch } from '../../lib/api'
 
 export default function CVReviewer() {
   const [cvText, setCvText]       = useState('')
@@ -23,7 +24,7 @@ export default function CVReviewer() {
       } else if (file.type === 'application/pdf') {
         const fd = new FormData()
         fd.append('file', file)
-        const res = await fetch('/api/ai/parse-cv', { method: 'POST', body: fd })
+        const res = await apiFetch('/api/ai/parse-cv', { method: 'POST', body: fd })
         if (!res.ok) throw new Error((await res.json()).error)
         setCvText((await res.json()).text)
       }
@@ -42,7 +43,7 @@ export default function CVReviewer() {
     if (!cvText.trim()) return
     setLoading(true); setResult(null); setError(null)
     try {
-      const res = await fetch('/api/ai/cv-review', {
+      const res = await apiFetch('/api/ai/cv-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cvText }),

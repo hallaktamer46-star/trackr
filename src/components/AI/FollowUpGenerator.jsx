@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Loader2, Send, Copy, Check, ChevronDown } from 'lucide-react'
 import { useApplications } from '../../contexts/ApplicationContext'
+import { apiFetch } from '../../lib/api'
 
 const SCENARIOS = [
   { value: 'after_applying',       label: 'Following up after applying'       },
@@ -26,7 +27,7 @@ export default function FollowUpGenerator() {
     setEmail('')
     setError(null)
     try {
-      const res = await fetch('/api/ai/follow-up', {
+      const res = await apiFetch('/api/ai/follow-up', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ company: app.company, jobTitle: app.job_title, scenario }),

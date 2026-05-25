@@ -8,7 +8,11 @@ import stripeRouter from './routes/stripe.js'
 const app = express()
 const PORT = process.env.PORT || 3001
 
-app.use(cors({ origin: process.env.APP_URL || 'http://localhost:5173' }))
+const allowedOrigins = [
+  process.env.APP_URL || 'http://localhost:5173',
+  'https://trackr-taupe.vercel.app',
+]
+app.use(cors({ origin: (origin, cb) => cb(null, !origin || allowedOrigins.includes(origin)) }))
 app.use(express.json({ limit: '4mb' }))
 
 // General limit — all API routes: 100 requests per 15 minutes per IP
