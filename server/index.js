@@ -46,6 +46,20 @@ app.use('/api/stripe', stripeRouter)
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
+// Temporary test route — trigger reminders manually
+app.post('/api/reminders/test', async (req, res) => {
+  if (req.headers['x-test-secret'] !== 'trackr-test-2024') {
+    return res.status(401).json({ error: 'Unauthorized' })
+  }
+  try {
+    const { sendReminders } = await import('./reminders.js')
+    await sendReminders()
+    res.json({ ok: true, message: 'Reminders triggered — check your email and server logs' })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`Trackr API server running on http://localhost:${PORT}`)
   console.log(`Rate limits: 100 req/15min (general), 20 req/hour (AI)`)
