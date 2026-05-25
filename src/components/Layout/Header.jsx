@@ -1,10 +1,9 @@
 import { Menu, Bell } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
 import { useApplications } from '../../contexts/ApplicationContext'
 import { isToday, isPast, parseISO } from 'date-fns'
+import ProfileDropdown from './ProfileDropdown'
 
 export default function Header({ onMenuClick }) {
-  const { user } = useAuth()
   const { applications } = useApplications()
 
   const dueCount = applications.filter(a => {
@@ -31,9 +30,7 @@ export default function Header({ onMenuClick }) {
             {dueCount} follow-up{dueCount > 1 ? 's' : ''} due
           </div>
         )}
-        <div className="w-8 h-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-sm font-semibold">
-          {user?.email?.[0]?.toUpperCase() ?? 'U'}
-        </div>
+        <ProfileDropdown />
       </div>
     </header>
   )
