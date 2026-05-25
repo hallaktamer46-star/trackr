@@ -4,6 +4,7 @@ import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import aiRouter from './routes/ai.js'
 import stripeRouter from './routes/stripe.js'
+import { startReminderCron } from './reminders.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -48,4 +49,5 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }))
 app.listen(PORT, () => {
   console.log(`Trackr API server running on http://localhost:${PORT}`)
   console.log(`Rate limits: 100 req/15min (general), 20 req/hour (AI)`)
+  startReminderCron()
 })
