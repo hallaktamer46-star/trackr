@@ -7,7 +7,7 @@ import { format, parseISO, subWeeks, startOfWeek, endOfWeek, isWithinInterval } 
 import { useApplications } from '../contexts/ApplicationContext'
 
 const STATUS_COLORS = {
-  wishlist:  '#94a3b8',
+  wishlist:  '#475569',
   applied:   '#38bdf8',
   interview: '#a78bfa',
   offer:     '#34d399',
@@ -79,7 +79,7 @@ export default function Stats() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {totals.map(t => (
           <div key={t.label} className="bg-white border border-slate-200 rounded-xl p-5">
-            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-mono mb-2">{t.label}</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-600 font-mono mb-2">{t.label}</p>
             <p className="text-3xl font-extrabold font-mono text-slate-900">{t.value}</p>
           </div>
         ))}
@@ -89,7 +89,7 @@ export default function Stats() {
       <div className="grid md:grid-cols-3 gap-4">
         <div className="md:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-400">
+            <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600">
               Activity Over Time
             </h2>
             <span className="text-[10px] font-mono text-sky-500">apps / week</span>
@@ -102,9 +102,9 @@ export default function Stats() {
                   <stop offset="100%" stopColor="#38bdf8" stopOpacity={0}   />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} axisLine={false} tickLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} axisLine={false} tickLine={false} />
+              <CartesianGrid stroke="#cbd5e1" strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="month" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
+              <YAxis stroke="#475569" fontSize={11} allowDecimals={false} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={TOOLTIP_STYLE} />
               <Area type="monotone" dataKey="count" stroke="#38bdf8" strokeWidth={2} fill="url(#aGrad)" />
             </AreaChart>
@@ -112,7 +112,7 @@ export default function Stats() {
         </div>
 
         <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-400 mb-4">
+          <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 mb-4">
             Status Breakdown
           </h2>
           <ResponsiveContainer width="100%" height={160}>
@@ -128,7 +128,7 @@ export default function Stats() {
               <div key={d.name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full" style={{ background: d.color }} />
-                  <span className="text-slate-500">{d.name}</span>
+                  <span className="text-slate-700">{d.name}</span>
                 </div>
                 <span className="font-mono text-slate-700">{d.value}</span>
               </div>
@@ -139,14 +139,14 @@ export default function Stats() {
 
       {/* Bar chart */}
       <div className="bg-white border border-slate-200 rounded-xl p-5">
-        <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-400 mb-4">
+        <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 mb-4">
           Applications by Status
         </h2>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={byStatus}>
-            <CartesianGrid stroke="#f1f5f9" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} axisLine={false} tickLine={false} />
-            <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} axisLine={false} tickLine={false} />
+            <CartesianGrid stroke="#cbd5e1" strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
+            <YAxis stroke="#475569" fontSize={11} allowDecimals={false} axisLine={false} tickLine={false} />
             <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: '#f8fafc' }} />
             <Bar dataKey="value" radius={[4, 4, 0, 0]}>
               {byStatus.map(d => <Cell key={d.name} fill={d.color} />)}
