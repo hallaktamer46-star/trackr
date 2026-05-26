@@ -72,24 +72,24 @@ export default function Stats() {
       {/* Page header */}
       <div>
         <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-1">Analytics</p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Activity Overview</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Activity Overview</h1>
       </div>
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {totals.map(t => (
-          <div key={t.label} className="bg-white border border-slate-200 rounded-xl p-5">
-            <p className="text-[10px] uppercase tracking-widest text-slate-600 font-mono mb-2">{t.label}</p>
-            <p className="text-3xl font-extrabold font-mono text-slate-900">{t.value}</p>
+          <div key={t.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+            <p className="text-[10px] uppercase tracking-widest text-slate-600 dark:text-slate-300 font-mono mb-2">{t.label}</p>
+            <p className="text-3xl font-extrabold font-mono text-slate-900 dark:text-slate-100">{t.value}</p>
           </div>
         ))}
       </div>
 
       {/* Area + Pie row */}
       <div className="grid md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white border border-slate-200 rounded-xl p-5">
+        <div className="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600">
+            <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 dark:text-slate-300">
               Activity Over Time
             </h2>
             <span className="text-[10px] font-mono text-sky-500">apps / week</span>
@@ -111,8 +111,8 @@ export default function Stats() {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-5">
-          <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 mb-4">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+          <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 dark:text-slate-300 mb-4">
             Status Breakdown
           </h2>
           <ResponsiveContainer width="100%" height={160}>
@@ -128,9 +128,9 @@ export default function Stats() {
               <div key={d.name} className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full" style={{ background: d.color }} />
-                  <span className="text-slate-700">{d.name}</span>
+                  <span className="text-slate-700 dark:text-slate-200">{d.name}</span>
                 </div>
-                <span className="font-mono text-slate-700">{d.value}</span>
+                <span className="font-mono text-slate-700 dark:text-slate-200">{d.value}</span>
               </div>
             ))}
           </div>
@@ -138,8 +138,8 @@ export default function Stats() {
       </div>
 
       {/* Bar chart */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5">
-        <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 mb-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 dark:text-slate-300 mb-4">
           Applications by Status
         </h2>
         <ResponsiveContainer width="100%" height={200}>

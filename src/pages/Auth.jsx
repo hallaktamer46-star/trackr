@@ -30,7 +30,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen w-full grid md:grid-cols-2 bg-white">
+    <div className="min-h-screen w-full grid md:grid-cols-2 bg-white dark:bg-slate-950">
 
       {/* Left – brand panel */}
       <div className="hidden md:flex flex-col justify-between p-10 bg-slate-900 border-r border-slate-800 relative overflow-hidden">
@@ -75,11 +75,11 @@ export default function Auth() {
       </div>
 
       {/* Right – form */}
-      <div className="flex items-center justify-center p-8 bg-white">
+      <div className="flex items-center justify-center p-8 bg-white dark:bg-slate-950">
         <div className="w-full max-w-sm">
 
           {!isSupabaseConfigured && (
-            <div className="mb-6 bg-sky-50 border border-sky-200 rounded-xl p-3.5 text-xs text-sky-800">
+            <div className="mb-6 bg-sky-50 dark:bg-sky-950 border border-sky-200 dark:border-sky-800 rounded-xl p-3.5 text-xs text-sky-800 dark:text-sky-300">
               <strong>Demo mode:</strong> data stored locally in your browser.
             </div>
           )}
@@ -87,10 +87,10 @@ export default function Auth() {
           <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-3">
             {mode === 'signin' ? 'Authenticate' : 'Create Account'}
           </p>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mb-2">
             {mode === 'signin' ? 'Welcome back' : 'Start your pipeline'}
           </h2>
-          <p className="text-sm text-slate-400 mb-8">
+          <p className="text-sm text-slate-400 dark:text-slate-500 mb-8">
             {mode === 'signin'
               ? 'Sign in to your Trackr workspace.'
               : 'Track applications with precision.'}
@@ -125,7 +125,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-11 bg-slate-900 hover:bg-slate-800 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2 mt-2"
+              className="w-full h-11 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2 mt-2"
             >
               {loading
                 ? <><Loader2 size={14} className="animate-spin" /> Please wait…</>
@@ -135,12 +135,12 @@ export default function Auth() {
           </form>
 
           <div className="mt-6 flex items-center gap-3">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-mono">or</span>
-            <div className="flex-1 h-px bg-slate-200" />
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+            <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 font-mono">or</span>
+            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
           </div>
 
-          <p className="text-xs text-slate-400 mt-6 text-center">
+          <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 text-center">
             {mode === 'signin' ? 'No account yet?' : 'Already have an account?'}{' '}
             <button
               onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setSuccess(null) }}
@@ -156,6 +156,9 @@ export default function Auth() {
         .auth-input{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#0f172a;background:#f8fafc;outline:none;transition:all 0.15s;}
         .auth-input:focus{border-color:#38bdf8;background:white;box-shadow:0 0 0 3px rgba(56,189,248,0.1);}
         .auth-input::placeholder{color:#94a3b8;}
+        .dark .auth-input{background:#1e293b;color:#f1f5f9;border-color:#334155;}
+        .dark .auth-input:focus{background:#1e293b;border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,0.15);}
+        .dark .auth-input::placeholder{color:#475569;}
       `}</style>
     </div>
   )

@@ -52,14 +52,14 @@ export default function AITools() {
         <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-2">
           Trackr Assist
         </p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">AI Toolkit</h1>
-        <p className="text-sm text-slate-400 mt-2 max-w-xl">
+        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">AI Toolkit</h1>
+        <p className="text-sm text-slate-400 dark:text-slate-500 mt-2 max-w-xl">
           Precision feedback on your materials. Each tool is tuned to the role, not generic AI fluff.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-slate-100 border border-slate-200 p-1 rounded-xl w-fit">
+      <div className="flex gap-1 mb-6 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 rounded-xl w-fit">
         {TOOLS.map(t => {
           const Icon = t.icon
           const isActive = t.key === tool
@@ -70,8 +70,8 @@ export default function AITools() {
               className={cn(
                 'flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-mono uppercase tracking-wider font-semibold transition-all',
                 isActive
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               )}
             >
               <Icon size={13} /> {t.label}
@@ -85,32 +85,32 @@ export default function AITools() {
 
       {/* Paywall overlay */}
       {!isPaidUser && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-md grid place-items-center p-8 rounded-2xl">
-          <div className="bg-white border border-slate-200 rounded-2xl p-8 max-w-md text-center shadow-2xl">
-            <div className="w-12 h-12 rounded-full bg-sky-50 grid place-items-center mx-auto mb-5">
+        <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/85 backdrop-blur-md grid place-items-center p-8 rounded-2xl">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 max-w-md text-center shadow-2xl">
+            <div className="w-12 h-12 rounded-full bg-sky-50 dark:bg-sky-900/30 grid place-items-center mx-auto mb-5">
               <Lock size={20} className="text-sky-500" />
             </div>
             <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-2">
               Pro Feature
             </p>
-            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 mb-2">
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mb-2">
               Unlock AI Tools
             </h2>
-            <p className="text-sm text-slate-400 mb-6">
+            <p className="text-sm text-slate-400 dark:text-slate-500 mb-6">
               Tailored CV reviews, cover letter critiques and follow-up drafts. Triple your interview rate.
             </p>
             {checkoutError && <p className="text-xs text-rose-600 mb-4">{checkoutError}</p>}
             <button
               onClick={handleUpgrade}
               disabled={checkoutLoading}
-              className="w-full h-11 bg-slate-900 hover:bg-slate-800 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full h-11 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               {checkoutLoading
                 ? <><Loader2 size={14} className="animate-spin" /> Opening checkout…</>
                 : <><Crown size={14} /> Upgrade to Pro · $15/mo</>
               }
             </button>
-            <p className="text-[10px] text-slate-400 mt-3 font-mono">Cancel anytime</p>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-3 font-mono">Cancel anytime</p>
           </div>
         </div>
       )}

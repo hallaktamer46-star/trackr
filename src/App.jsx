@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ApplicationProvider } from './contexts/ApplicationContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import Layout from './components/Layout/Layout'
 import Dashboard from './pages/Dashboard'
 import AITools from './pages/AITools'
@@ -57,9 +58,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }

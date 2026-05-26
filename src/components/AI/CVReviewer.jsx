@@ -61,14 +61,14 @@ export default function CVReviewer() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">CV Reviewer</h1>
-        <p className="text-slate-500 text-sm mt-1">Get brutally honest, recruiter-level feedback on your resume.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">CV Reviewer</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Get brutally honest, recruiter-level feedback on your resume.</p>
       </div>
 
       {/* Upload card */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold text-slate-700">Paste your CV or upload a file</p>
+          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Paste your CV or upload a file</p>
           <button
             onClick={() => fileRef.current?.click()}
             disabled={fileLoading}
@@ -93,13 +93,13 @@ export default function CVReviewer() {
           onChange={e => { setCvText(e.target.value); if (fileName) setFileName(null) }}
           placeholder="Paste your entire CV / resume here, or upload a PDF / TXT above..."
           rows={10}
-          className="w-full p-4 border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 bg-slate-50 focus:outline-none focus:border-sky-400 focus:bg-white transition-colors resize-none leading-relaxed"
+          className="w-full p-4 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-sky-400 focus:bg-white dark:focus:bg-slate-800 transition-colors resize-none leading-relaxed"
         />
 
         <button
           onClick={handleAnalyse}
           disabled={loading || !cvText.trim()}
-          className="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm shadow-sky-200"
+          className="w-full py-3 rounded-xl bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-400 dark:disabled:text-slate-500 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm shadow-sky-200"
         >
           {loading
             ? <><Loader2 size={16} className="animate-spin" /> Analysing your CV…</>
@@ -128,7 +128,7 @@ function ScoreRing({ score }) {
   return (
     <div className="relative w-28 h-28 shrink-0">
       <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-        <circle cx="50" cy="50" r={r} fill="none" stroke="#f1f5f9" strokeWidth="10" />
+        <circle cx="50" cy="50" r={r} fill="none" stroke="currentColor" strokeWidth="10" className="text-slate-100 dark:text-slate-800" />
         <circle
           cx="50" cy="50" r={r} fill="none"
           stroke={color} strokeWidth="10"
@@ -138,8 +138,8 @@ function ScoreRing({ score }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-black text-slate-900">{score}</span>
-        <span className="text-xs text-slate-400 font-medium">/ 10</span>
+        <span className="text-3xl font-black text-slate-900 dark:text-slate-100">{score}</span>
+        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">/ 10</span>
       </div>
     </div>
   )
@@ -157,26 +157,26 @@ function CVResult({ result }) {
     <div className="space-y-5">
 
       {/* Score + summary */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 flex gap-6 items-center">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 flex gap-6 items-center">
         <ScoreRing score={score} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <span className={cn('text-xs font-bold px-2.5 py-1 rounded-full border', labelColor)}>{label}</span>
           </div>
-          <p className="text-slate-700 text-sm leading-relaxed">{result.summary}</p>
+          <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{result.summary}</p>
         </div>
       </div>
 
       {/* Strengths + Weaknesses */}
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl border border-slate-200 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
           <div className="flex items-center gap-2 mb-4">
             <CheckCircle2 size={18} className="text-emerald-500" />
-            <h3 className="font-bold text-slate-900 text-sm">What's Working</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">What's Working</h3>
           </div>
           <ul className="space-y-3">
             {(result.strengths || []).map((s, i) => (
-              <li key={i} className="flex gap-2.5 text-sm text-slate-700">
+              <li key={i} className="flex gap-2.5 text-sm text-slate-700 dark:text-slate-300">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                 {s}
               </li>
@@ -184,14 +184,14 @@ function CVResult({ result }) {
           </ul>
         </div>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5">
           <div className="flex items-center gap-2 mb-4">
             <XCircle size={18} className="text-rose-400" />
-            <h3 className="font-bold text-slate-900 text-sm">Holding You Back</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Holding You Back</h3>
           </div>
           <ul className="space-y-3">
             {(result.weaknesses || []).map((w, i) => (
-              <li key={i} className="flex gap-2.5 text-sm text-slate-700">
+              <li key={i} className="flex gap-2.5 text-sm text-slate-700 dark:text-slate-300">
                 <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-rose-400 shrink-0" />
                 {w}
               </li>
@@ -202,35 +202,35 @@ function CVResult({ result }) {
 
       {/* Suggestions */}
       {result.suggestions?.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-          <div className="flex items-center gap-2 px-6 py-4 border-b border-slate-100">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div className="flex items-center gap-2 px-6 py-4 border-b border-slate-100 dark:border-slate-800">
             <Lightbulb size={18} className="text-amber-400" />
-            <h3 className="font-bold text-slate-900 text-sm">Rewrite Suggestions</h3>
-            <span className="ml-auto text-xs text-slate-400">{result.suggestions.length} improvements</span>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm">Rewrite Suggestions</h3>
+            <span className="ml-auto text-xs text-slate-400 dark:text-slate-500">{result.suggestions.length} improvements</span>
           </div>
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
             {result.suggestions.map((s, i) => (
               <div key={i}>
                 <button
                   onClick={() => setOpenIdx(openIdx === i ? null : i)}
-                  className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
                 >
                   <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center shrink-0">
                     {i + 1}
                   </span>
-                  <p className="text-sm text-slate-600 italic flex-1 truncate">"{s.line}"</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 italic flex-1 truncate">"{s.line}"</p>
                   {openIdx === i ? <ChevronUp size={15} className="text-slate-400 shrink-0" /> : <ChevronDown size={15} className="text-slate-400 shrink-0" />}
                 </button>
 
                 {openIdx === i && (
                   <div className="px-6 pb-5 space-y-3">
-                    <div className="rounded-xl bg-rose-50 border border-rose-100 px-4 py-3">
+                    <div className="rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/50 px-4 py-3">
                       <p className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-1">Original</p>
-                      <p className="text-sm text-slate-700 italic">"{s.line}"</p>
+                      <p className="text-sm text-slate-700 dark:text-slate-300 italic">"{s.line}"</p>
                     </div>
-                    <div className="rounded-xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+                    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/50 px-4 py-3">
                       <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wide mb-1">Suggested rewrite</p>
-                      <p className="text-sm text-slate-800 font-medium">{s.suggestion}</p>
+                      <p className="text-sm text-slate-800 dark:text-slate-200 font-medium">{s.suggestion}</p>
                     </div>
                   </div>
                 )}

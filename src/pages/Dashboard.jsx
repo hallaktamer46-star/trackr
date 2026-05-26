@@ -38,7 +38,7 @@ export default function Dashboard() {
 
       {/* Checkout success banner */}
       {successBanner && (
-        <div className="mb-5 flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm text-emerald-800">
+        <div className="mb-5 flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-xl px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
           <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
           <span className="flex-1 font-medium">Welcome to Trackr Pro! All AI features are now unlocked.</span>
           <button onClick={() => setSuccessBanner(false)} className="text-emerald-400 hover:text-emerald-600"><X size={15} /></button>
@@ -47,7 +47,7 @@ export default function Dashboard() {
 
       {/* Limit banner */}
       {!canAddMore && (
-        <div className="mb-4 bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-sm text-amber-800">
+        <div className="mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3.5 text-sm text-amber-800 dark:text-amber-300">
           You've reached the 10-application limit.{' '}
           <a href="/ai/cv" className="font-semibold underline">Upgrade to Pro</a> for unlimited applications.
         </div>
@@ -65,7 +65,7 @@ export default function Dashboard() {
       {canAddMore && (
         <button
           onClick={() => openAdd()}
-          className="fixed bottom-8 right-8 h-12 pl-4 pr-5 gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-full shadow-2xl flex items-center justify-center group hover:scale-[1.02] transition-all font-medium text-sm z-40"
+          className="fixed bottom-8 right-8 h-12 pl-4 pr-5 gap-2 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 text-white rounded-full shadow-2xl flex items-center justify-center group hover:scale-[1.02] transition-all font-medium text-sm z-40"
         >
           <Plus size={16} className="transition-transform group-hover:rotate-90" />
           Add Application
@@ -86,17 +86,17 @@ export default function Dashboard() {
 function EmptyState({ onAdd }) {
   return (
     <div className="flex flex-col items-center justify-center py-32 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-5">
-        <Plus size={28} className="text-slate-400" />
+      <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-5">
+        <Plus size={28} className="text-slate-400 dark:text-slate-500" />
       </div>
       <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-2">Pipeline Empty</p>
-      <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 mb-2">Your job search starts here.</h2>
-      <p className="text-slate-400 text-sm max-w-xs mb-8">
+      <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mb-2">Your job search starts here.</h2>
+      <p className="text-slate-400 dark:text-slate-500 text-sm max-w-xs mb-8">
         Add your first application and start tracking your hunt in one organised place.
       </p>
       <button
         onClick={onAdd}
-        className="h-11 pl-4 pr-5 gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-full shadow-lg flex items-center justify-center font-medium text-sm transition-all hover:scale-[1.02]"
+        className="h-11 pl-4 pr-5 gap-2 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 text-white rounded-full shadow-lg flex items-center justify-center font-medium text-sm transition-all hover:scale-[1.02]"
       >
         <Plus size={15} /> Add your first application
       </button>
