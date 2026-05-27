@@ -11,6 +11,7 @@ const ROUTE_LABELS = {
   '/ai/cv':           { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/ai/cover-letter': { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/ai/follow-up':    { section: 'ASSIST',        page: 'AI TOOLKIT' },
+  '/jobs':            { section: 'MARKETPLACE',   page: 'JOB BOARD'  },
 }
 
 export default function Header({ onMenuClick }) {
