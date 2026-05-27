@@ -53,7 +53,7 @@ const MOCK_JOBS = [
     requirements: ['React', 'CSS mastery', 'Figma', 'Motion design'],
     responsibilities: [
       'Design and implement UI components for vercel.com and internal tools',
-      'Define and maintain Vercel's design system',
+      "Define and maintain Vercel's design system",
       'Work closely with marketing and product on new launches',
       'Prototype interactions and micro-animations',
     ],
@@ -83,7 +83,7 @@ const MOCK_JOBS = [
     title: 'Backend Engineer', type: 'Full-time',
     location: 'New York, NY', salaryMin: 120000, salaryMax: 160000,
     currency: '$', rateType: 'yr', posted: '2026-05-25',
-    description: 'Build the infrastructure that powers Notion for millions of users. You'll work on scalable, distributed systems that handle enormous data volumes with low latency.',
+    description: "Build the infrastructure that powers Notion for millions of users. You'll work on scalable, distributed systems that handle enormous data volumes with low latency.",
     requirements: ['Node.js', 'PostgreSQL', 'AWS', '4+ yrs exp'],
     responsibilities: [
       'Design and build scalable backend services',
@@ -99,7 +99,7 @@ const MOCK_JOBS = [
     title: 'UX Researcher', type: 'Full-time',
     location: 'Remote', salaryMin: 90000, salaryMax: 125000,
     currency: '$', rateType: 'yr', posted: '2026-05-24',
-    description: 'Help Figma understand how designers and developers use collaborative design tools. You'll run studies, synthesise insights, and directly shape the product roadmap.',
+    description: "Help Figma understand how designers and developers use collaborative design tools. You'll run studies, synthesise insights, and directly shape the product roadmap.",
     requirements: ['Mixed methods', '3+ yrs UX research', 'Usability testing', 'Survey design'],
     responsibilities: [
       'Plan and execute qualitative and quantitative user research',
@@ -115,7 +115,7 @@ const MOCK_JOBS = [
     title: 'iOS Engineer', type: 'Full-time',
     location: 'Toronto, Canada', salaryMin: 110000, salaryMax: 145000,
     currency: '$', rateType: 'yr', posted: '2026-05-20',
-    description: 'Build world-class iOS experiences for Shopify merchants. You'll own features end-to-end, working with designers and PMs to ship polished apps loved by millions.',
+    description: "Build world-class iOS experiences for Shopify merchants. You'll own features end-to-end, working with designers and PMs to ship polished apps loved by millions.",
     requirements: ['Swift', 'SwiftUI', '3+ yrs iOS', 'MVVM/TCA'],
     responsibilities: [
       'Build new features for the Shopify mobile app',
@@ -147,7 +147,7 @@ const MOCK_JOBS = [
     title: 'Marketing Manager', type: 'Part-time',
     location: 'London, UK', salaryMin: 40000, salaryMax: 55000,
     currency: '£', rateType: 'yr', posted: '2026-05-21',
-    description: 'Join Bolt's marketing team on a flexible part-time basis to drive growth in the UK & Ireland market. Own campaigns, content strategy, and brand partnerships.',
+    description: "Join Bolt's marketing team on a flexible part-time basis to drive growth in the UK & Ireland market. Own campaigns, content strategy, and brand partnerships.",
     requirements: ['Digital marketing', '3+ yrs exp', 'Analytics tools', 'Content creation'],
     responsibilities: [
       'Plan and execute multi-channel marketing campaigns',
@@ -179,7 +179,7 @@ const MOCK_JOBS = [
     title: 'Data Analyst', type: 'Full-time',
     location: 'Remote', salaryMin: 95000, salaryMax: 125000,
     currency: '$', rateType: 'yr', posted: '2026-05-18',
-    description: 'Loom is scaling fast and needs a sharp data analyst to turn user behaviour into product insights. You'll partner directly with product teams to influence roadmap decisions.',
+    description: "Loom is scaling fast and needs a sharp data analyst to turn user behaviour into product insights. You'll partner directly with product teams to influence roadmap decisions.",
     requirements: ['SQL', 'dbt', 'Python', 'Looker or Tableau'],
     responsibilities: [
       'Build and maintain dashboards for product and leadership',
