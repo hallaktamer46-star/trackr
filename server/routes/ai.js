@@ -168,4 +168,84 @@ Return ONLY the email text (subject line then body). No commentary, no markdown.
   }
 })
 
+// Interview Prep
+router.post('/interview-prep', async (req, res) => {
+  const { jobDescription, candidateContext } = req.body
+  if (!jobDescription?.trim()) return res.status(400).json({ error: 'jobDescription is required' })
+
+  try {
+    const raw = await ask(`You are an elite interview coach who has prepared hundreds of candidates for FAANG and top-tier companies. Your job is to predict the exact questions this interviewer will ask and give model answers tailored to this specific role.
+
+Analyse the job description and return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
+{
+  "role": "<inferred job title>",
+  "company_type": "<Startup / Scale-up / Enterprise — inferred from JD>",
+  "difficulty": "<Junior / Mid-level / Senior / Staff — inferred from requirements>",
+  "categories": [
+    {
+      "name": "Behavioral",
+      "icon": "users",
+      "description": "Past situations that reveal how you work",
+      "questions": [
+        {
+          "q": "<specific interview question>",
+          "why": "<one sentence insider tip: the real thing the interviewer is testing — be specific and tactical>",
+          "answer": "<a strong, ready-to-use model answer (4-6 sentences) written in first person, STAR format where relevant, references specific skills/tools from the JD, concrete and un-generic>"
+        }
+      ]
+    },
+    {
+      "name": "Technical",
+      "icon": "code",
+      "description": "Hard skills and role-specific knowledge",
+      "questions": [
+        { "q": "...", "why": "...", "answer": "..." },
+        { "q": "...", "why": "...", "answer": "..." },
+        { "q": "...", "why": "...", "answer": "..." }
+      ]
+    },
+    {
+      "name": "Motivation",
+      "icon": "target",
+      "description": "Why you, why this role, why this company",
+      "questions": [
+        { "q": "...", "why": "...", "answer": "..." },
+        { "q": "...", "why": "...", "answer": "..." },
+        { "q": "...", "why": "...", "answer": "..." }
+      ]
+    },
+    {
+      "name": "Situational",
+      "icon": "lightbulb",
+      "description": "Hypothetical scenarios to test your judgement",
+      "questions": [
+        { "q": "...", "why": "...", "answer": "..." },
+        { "q": "...", "why": "...", "answer": "..." },
+        { "q": "...", "why": "...", "answer": "..." }
+      ]
+    }
+  ]
+}
+
+Critical rules:
+- Exactly 4 questions per category (16 total)
+- Every question MUST be tailored to the specific role, team, and tech stack in the JD — never generic
+- Model answers must reference actual technologies, skills, and requirements from the JD
+- The "why" must be an insider tip that would make a candidate think "I never would have guessed that"
+- Answers should be confident and specific, not hedge-filled
+- Do not repeat the question in the answer
+
+${candidateContext ? `Candidate context to personalise answers: ${candidateContext}` : ''}
+
+JOB DESCRIPTION:
+${jobDescription}`)
+
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Interview prep error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router

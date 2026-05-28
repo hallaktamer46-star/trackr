@@ -10,7 +10,8 @@ const ROUTE_LABELS = {
   '/stats':           { section: 'ANALYTICS',    page: 'OVERVIEW'   },
   '/ai/cv':           { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/ai/cover-letter': { section: 'ASSIST',        page: 'AI TOOLKIT' },
-  '/ai/follow-up':    { section: 'ASSIST',        page: 'AI TOOLKIT' },
+  '/ai/follow-up':      { section: 'ASSIST',        page: 'AI TOOLKIT' },
+  '/ai/interview-prep': { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/jobs':            { section: 'MARKETPLACE',   page: 'JOB BOARD'  },
 }
 

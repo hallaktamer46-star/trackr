@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { FileText, Mail, Send, Lock, Crown, Loader2 } from 'lucide-react'
+import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen } from 'lucide-react'
 import CVReviewer from '../components/AI/CVReviewer'
 import CoverLetterReviewer from '../components/AI/CoverLetterReviewer'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
+import InterviewPrep from '../components/AI/InterviewPrep'
 import { useApplications } from '../contexts/ApplicationContext'
 import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../lib/api'
 import { cn } from '../lib/cn'
 
 const TOOLS = [
-  { key: 'cv',           path: '/ai/cv',           label: 'CV Reviewer', icon: FileText,  component: CVReviewer          },
-  { key: 'cover-letter', path: '/ai/cover-letter', label: 'Cover Letter', icon: Mail,     component: CoverLetterReviewer },
-  { key: 'follow-up',    path: '/ai/follow-up',    label: 'Follow-up',   icon: Send,      component: FollowUpGenerator   },
+  { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',    icon: FileText,  component: CVReviewer          },
+  { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',   icon: Mail,      component: CoverLetterReviewer },
+  { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',      icon: Send,      component: FollowUpGenerator   },
+  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', icon: BookOpen,  component: InterviewPrep, hot: true },
 ]
 
 export default function AITools() {
@@ -59,7 +61,7 @@ export default function AITools() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 rounded-xl w-fit">
+      <div className="flex flex-wrap gap-1 mb-6 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 rounded-xl w-fit">
         {TOOLS.map(t => {
           const Icon = t.icon
           const isActive = t.key === tool
@@ -68,13 +70,18 @@ export default function AITools() {
               key={t.key}
               to={t.path}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-mono uppercase tracking-wider font-semibold transition-all',
+                'relative flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-mono uppercase tracking-wider font-semibold transition-all',
                 isActive
                   ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               )}
             >
               <Icon size={13} /> {t.label}
+              {t.hot && (
+                <span className="absolute -top-1.5 -right-1.5 text-[8px] font-extrabold bg-sky-500 text-white px-1 py-0.5 leading-none tracking-wide uppercase">
+                  NEW
+                </span>
+              )}
             </NavLink>
           )
         })}
