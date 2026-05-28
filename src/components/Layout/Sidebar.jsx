@@ -67,19 +67,15 @@ export default function Sidebar({ open, onClose }) {
         ))}
       </nav>
 
-      {/* Account tier card */}
-      <div className="p-4 border-t border-slate-800">
-        <div className="bg-slate-800/60 rounded-lg p-3 border border-slate-700">
-          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold font-mono mb-1">
-            Account Tier
-          </p>
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-mono text-sky-400 uppercase">
-              {isPaidUser ? 'Pro' : 'Free'} Plan
-            </span>
-            <span className="text-[10px] text-slate-500 font-mono">v1.0.0</span>
-          </div>
-        </div>
+      {/* Plan indicator */}
+      <div className="px-5 py-4 border-t border-slate-800 flex items-center justify-between">
+        <span className="font-extrabold text-sm tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className={isPaidUser ? 'text-sky-400' : 'text-slate-300'}>
+            {isPaidUser ? 'PRO' : 'FREE'}
+          </span>
+          <span className="text-slate-600 font-normal text-xs ml-1">PLAN</span>
+        </span>
+        <span className="text-[10px] font-mono text-slate-700">v1.0.0</span>
       </div>
     </aside>
   )
