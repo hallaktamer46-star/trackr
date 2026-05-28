@@ -16,7 +16,7 @@ export default function KanbanBoard({ onAddCard, onEditCard, onDeleteCard }) {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4 min-h-[60vh]">
+      <div className="grid grid-cols-5 gap-2" style={{ minHeight: 'calc(100vh - 11rem)' }}>
         {STATUSES.map(status => (
           <KanbanColumn
             key={status}
