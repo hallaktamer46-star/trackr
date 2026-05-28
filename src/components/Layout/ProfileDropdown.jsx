@@ -46,20 +46,17 @@ export default function ProfileDropdown() {
   return (
     <div className="relative" ref={ref}>
 
-      {/* Trigger — name + avatar */}
+      {/* Trigger — first name + avatar */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-3 group outline-none"
+        className="flex items-center gap-2.5 group outline-none"
       >
-        <div className="text-right hidden sm:block">
-          {displayName && (
-            <p className="text-xs font-semibold text-slate-700 leading-tight">{displayName}</p>
-          )}
-          <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono leading-tight truncate max-w-[140px]">
-            {user?.email}
-          </p>
-        </div>
-        <div className="w-9 h-9 rounded-full bg-slate-100 ring-1 ring-slate-200 group-hover:ring-sky-400 transition-all grid place-items-center text-xs font-bold font-mono text-slate-700">
+        {firstName && (
+          <span className="hidden sm:block text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+            {firstName}
+          </span>
+        )}
+        <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-sky-400 transition-all grid place-items-center text-xs font-bold font-mono text-slate-700 dark:text-slate-200">
           {initials}
         </div>
       </button>
