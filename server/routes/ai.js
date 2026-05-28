@@ -502,4 +502,106 @@ Critical rules:
   }
 })
 
+// LinkedIn Profile Reviewer
+router.post('/linkedin-review', async (req, res) => {
+  const { headline, about, targetRole } = req.body
+  if (!headline?.trim() && !about?.trim()) {
+    return res.status(400).json({ error: 'Provide at least a headline or About section' })
+  }
+
+  try {
+    const raw = await ask(`You are a senior LinkedIn optimisation specialist and recruiter with 10+ years of experience hiring across tech, finance, and consulting. You know exactly how LinkedIn's search algorithm works and what makes a recruiter stop scrolling.
+
+Analyse this LinkedIn profile and return a full optimisation report.
+
+Current Headline: ${headline || 'Not provided'}
+About Section: ${about || 'Not provided'}
+Target Role/Industry: ${targetRole || 'Not specified — infer from the profile content'}
+
+Return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
+{
+  "visibility_score": <integer 0–100 representing how likely this profile is to appear in recruiter searches — be honest and rigorous>,
+  "visibility_verdict": "<2–3 sentences: what's holding the score back and what it would take to reach 80+>",
+  "headline_score": <integer 0–100>,
+  "headline_issues": [
+    "<specific issue with the current headline — e.g. 'No keywords: recruiters search by skill, not job title alone'>",
+    "<issue 2 if any>",
+    "<issue 3 if any>"
+  ],
+  "headline_rewrites": [
+    {
+      "text": "<rewritten headline option 1 — the best one, keyword-rich, under 220 chars, includes role + top skills + value prop>",
+      "reasoning": "<1 sentence: why this version outperforms the current one>"
+    },
+    {
+      "text": "<option 2 — different angle, e.g. results-focused or industry-specific>",
+      "reasoning": "<why>"
+    },
+    {
+      "text": "<option 3 — more concise version>",
+      "reasoning": "<why>"
+    }
+  ],
+  "about_score": <integer 0–100 or null if no about was provided>,
+  "about_feedback": [
+    { "type": "good",    "text": "<something the About section does well>" },
+    { "type": "bad",     "text": "<a specific weakness — missing hook, no metrics, passive voice, etc.>" },
+    { "type": "bad",     "text": "<another weakness>" },
+    { "type": "suggest", "text": "<a specific improvement suggestion>" },
+    { "type": "suggest", "text": "<another suggestion>" }
+  ],
+  "about_rewrite": "<full rewritten About section — starts with a strong hook, uses active voice, includes 2–3 quantified achievements, ends with a clear call to action or open-to-work signal. Match the tone of the original but elevate it significantly. Max 2,600 characters>",
+  "missing_keywords": [
+    "<keyword recruiters search for that's absent from both headline and about — specific skills, tools, certifications, or job titles>",
+    "<keyword 2>",
+    "<keyword 3>",
+    "<keyword 4>",
+    "<keyword 5>",
+    "<keyword 6>"
+  ],
+  "keywords_present": [
+    "<keyword already present in the profile that's valuable for recruiter search>",
+    "<keyword 2>",
+    "<keyword 3>"
+  ],
+  "quick_wins": [
+    "<highest-impact fix that takes under 5 minutes — be specific, e.g. 'Add Python, SQL, and Tableau to your Skills section to appear in 3x more searches'>",
+    "<quick win 2>",
+    "<quick win 3>",
+    "<quick win 4>",
+    "<quick win 5>"
+  ],
+  "profile_checklist": [
+    { "label": "Professional headshot",            "done": <true/false based on what you can infer>, "impact": "21x more views" },
+    { "label": "Custom banner image",              "done": false, "impact": "Brand signal" },
+    { "label": "Headline optimised",               "done": <true if current headline is strong>, "impact": "40% more clicks" },
+    { "label": "About section written",            "done": <true if about was provided and has content>, "impact": "High" },
+    { "label": "Featured section used",            "done": false, "impact": "Showcases work" },
+    { "label": "5+ experience entries",            "done": null, "impact": "Completeness" },
+    { "label": "Skills section populated",         "done": null, "impact": "Keyword ranking" },
+    { "label": "500+ connections",                 "done": null, "impact": "Algorithm boost" },
+    { "label": "Open to Work enabled",             "done": null, "impact": "4x more recruiter views" },
+    { "label": "Education section complete",       "done": null, "impact": "Completeness" },
+    { "label": "Recommendations received",         "done": null, "impact": "Trust signal" },
+    { "label": "Regular activity / posting",       "done": null, "impact": "SSI score" }
+  ]
+}
+
+Critical rules:
+- visibility_score must be brutally honest — most profiles score 25–50, only truly optimised ones reach 75+
+- headline_rewrites must be immediately usable, not templates with [BRACKETS] to fill in
+- about_rewrite must be a complete, polished, copy-pasteable section — not a draft with placeholders
+- missing_keywords must be role-specific and based on what recruiters actually search in LinkedIn Recruiter
+- quick_wins must be concrete actions, not generic advice like 'optimise your profile'
+- For profile_checklist items where you cannot know (connections count, etc.), set done to null — this renders as 'unknown'
+- Infer target role from the profile content if not specified`)
+
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('LinkedIn review error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
