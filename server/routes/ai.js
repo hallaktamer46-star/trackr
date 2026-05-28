@@ -322,4 +322,115 @@ Critical rules:
   }
 })
 
+// Market Analysis
+router.post('/market-analysis', async (req, res) => {
+  const { currentRole, yearsExperience, targetGoal, appContext } = req.body
+  if (!currentRole?.trim()) return res.status(400).json({ error: 'currentRole is required' })
+
+  const appContext_str = appContext
+    ? `User's tracked job application data (use this to personalise the analysis):
+- Roles applied to: ${appContext.titles?.join(', ') || 'N/A'}
+- Salary ranges seen: ${appContext.salaries?.join(', ') || 'N/A'}
+- Companies applied to: ${appContext.companies?.join(', ') || 'N/A'}
+- Total applications: ${appContext.total}, Interviews: ${appContext.interviews}, Offers: ${appContext.offers}
+- Interview rate: ${appContext.total > 0 ? Math.round((appContext.interviews / appContext.total) * 100) : 0}%`
+    : ''
+
+  try {
+    const raw = await ask(`You are a senior career strategist and labour market analyst with deep knowledge of 2025–2026 job market trends, compensation data, and career development paths. Produce a comprehensive, honest, and actionable market analysis report.
+
+Current Role: ${currentRole}
+Years of Experience: ${yearsExperience}
+User's Goal: ${targetGoal || 'Not specified — infer from context'}
+${appContext_str}
+
+Return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
+{
+  "health_check": {
+    "role": "<cleaned job title>",
+    "demand_score": <integer 1–10 representing market demand for this exact role right now>,
+    "market_status": "<one of: Hot / Growing / Stable / Declining / Shrinking>",
+    "salary_ceiling": "<realistic top-of-market annual salary, e.g. '$180k' or '£120k'>",
+    "summary": "<3–4 sentences: honest market reality for this role in 2025–2026. Which sectors are growing vs cutting. What types of companies pay best. What makes the top 10% different from the average>",
+    "top_industries": ["<industry 1>", "<industry 2>", "<industry 3>", "<industry 4>"],
+    "ai_impact": "<2–3 sentences: specifically how AI and automation are affecting this role — which tasks are being automated, which are becoming MORE valuable, and what this means for job security and required skills in the next 2–3 years>",
+    "warning": "<if there is a genuine concern (declining demand, saturation, structural shift), state it bluntly in 1–2 sentences. If market is healthy, set this to null>"
+  },
+  "skills_gap": {
+    "target_role": "<the role they should be aiming for given their experience and goal>",
+    "quick_win": "<1–2 sentences: the single most impactful skill to learn FIRST — the one that unlocks salary jumps, new opportunities, or bridges the biggest gap. Be specific about the skill AND why it's the keystone>",
+    "gap_skills": [
+      {
+        "skill": "<specific skill, tool, or certification>",
+        "priority": 1,
+        "pay_delta": "<realistic salary increase, e.g. '+$12k' or '+18%'>",
+        "time_to_learn": "<realistic time estimate, e.g. '4–6 weeks' or '3 months'>",
+        "demand": "<Very High / High / Moderate>",
+        "why": "<1 sentence: why this specific skill pays off for THIS role, not a generic reason>"
+      },
+      { "skill": "...", "priority": 2, "pay_delta": "...", "time_to_learn": "...", "demand": "...", "why": "..." },
+      { "skill": "...", "priority": 3, "pay_delta": "...", "time_to_learn": "...", "demand": "...", "why": "..." },
+      { "skill": "...", "priority": 4, "pay_delta": "...", "time_to_learn": "...", "demand": "...", "why": "..." },
+      { "skill": "...", "priority": 5, "pay_delta": "...", "time_to_learn": "...", "demand": "...", "why": "..." }
+    ]
+  },
+  "career_paths": {
+    "paths": [
+      {
+        "type": "Safe",
+        "role": "<the logical next-step role title>",
+        "timeline": "<realistic timeframe, e.g. '6–12 months'>",
+        "salary_jump": "<expected salary increase, e.g. '+20–30%'>",
+        "difficulty": "Low",
+        "description": "<2–3 sentences: why this is the safe path, what it involves, and who it's best for>",
+        "steps": [
+          "<concrete step 1 — specific action, not vague advice>",
+          "<concrete step 2>",
+          "<concrete step 3>",
+          "<concrete step 4>"
+        ],
+        "work_style": "<what work/life looks like on this path, e.g. 'Remote-friendly · Stable hours · Less pressure than senior IC roles'>"
+      },
+      {
+        "type": "Fast",
+        "role": "<adjacent hot role that leverages their existing skills>",
+        "timeline": "<e.g. '8–14 months'>",
+        "salary_jump": "<e.g. '+35–50%'>",
+        "difficulty": "Medium",
+        "description": "<2–3 sentences: the pivot this requires, what's transferable, and why the salary jump is worth it. Be specific about what adjacent skills they already have that make this viable>",
+        "steps": ["...", "...", "...", "..."],
+        "work_style": "<e.g. 'High remote availability · Intense but short project cycles'>"
+      },
+      {
+        "type": "Bold",
+        "role": "<ambitious longer-term target — a different level or function>",
+        "timeline": "<e.g. '2–3 years'>",
+        "salary_jump": "<e.g. '+60–100%'>",
+        "difficulty": "High",
+        "description": "<2–3 sentences: what makes this bold, what sacrifices it requires, and what the payoff looks like. Be honest about the difficulty — don't just hype it>",
+        "steps": ["...", "...", "...", "..."],
+        "work_style": "<e.g. 'High pressure · Equity potential · Often requires relocation or company switch'>"
+      }
+    ]
+  }
+}
+
+Critical rules:
+- Everything must be SPECIFIC to this exact role and experience level — no generic career advice
+- Salary figures must be realistic for the role and current market (not aspirational)
+- The Fast path must be a genuine lateral pivot that someone with their background could make — not a fantasy
+- The Bold path must be achievable in the stated timeline with extreme effort — not impossible
+- Skills gap should reflect what hiring managers actually look for in job descriptions TODAY, not 3 years ago
+- If the user's app context shows a low interview rate, acknowledge it tactfully in the health check or skills gap
+- All 4 steps per path must be concrete actions (e.g. 'Complete AWS Solutions Architect cert' not 'Learn cloud')
+- work_style should specifically address remote availability and working hours where relevant to the role`)
+
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Market analysis error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
