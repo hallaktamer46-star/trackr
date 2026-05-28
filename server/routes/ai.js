@@ -248,4 +248,78 @@ ${jobDescription}`)
   }
 })
 
+// Salary Intelligence
+router.post('/salary-intelligence', async (req, res) => {
+  const { jobTitle, location, experienceLevel } = req.body
+  if (!jobTitle?.trim()) return res.status(400).json({ error: 'jobTitle is required' })
+
+  const expMap = {
+    entry:  'Entry Level (0–2 years experience)',
+    mid:    'Mid Level (3–5 years experience)',
+    senior: 'Senior (6–10 years experience)',
+    staff:  'Staff / Lead (10+ years experience)',
+  }
+  const expLabel = expMap[experienceLevel] || expMap.mid
+
+  try {
+    const raw = await ask(`You are a compensation analyst with access to salary databases (Glassdoor, Levels.fyi, LinkedIn Salary, Payscale, and government labour statistics). Provide a detailed, accurate salary intelligence report for the following role.
+
+Role: ${jobTitle}
+Location: ${location || 'Global / Remote'}
+Experience Level: ${expLabel}
+
+Return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
+{
+  "role": "<cleaned job title>",
+  "location_label": "<city/region or 'Global / Remote'>",
+  "currency": "<$ or £ or € depending on location>",
+  "p25": <integer annual salary at 25th percentile>,
+  "median": <integer annual salary at median>,
+  "p75": <integer annual salary at 75th percentile>,
+  "p90": <integer annual salary at 90th percentile>,
+  "yoy_change": <integer percentage year-over-year change, e.g. 5 for +5% or -3 for -3%>,
+  "remote_delta": "<e.g. '+8% vs. on-site average' or '-5% vs. office roles'>",
+  "open_roles_estimate": "<e.g. 'Very High (10,000+ openings)' or 'Moderate'>",
+  "demand_level": "<one of: Very High / High / Moderate / Low>",
+  "market_verdict": "<one of: High Demand / Growing / Stable / Declining / Oversaturated>",
+  "market_summary": "<3-4 sentences explaining the current market reality for this role: supply/demand, key industries hiring, how AI/automation is impacting it, what makes top earners stand out>",
+  "top_companies": [
+    { "name": "<company name>", "range": "<e.g. $120k–$180k>", "type": "<Remote / Hybrid / On-site>" },
+    { "name": "...", "range": "...", "type": "..." },
+    { "name": "...", "range": "...", "type": "..." },
+    { "name": "...", "range": "...", "type": "..." },
+    { "name": "...", "range": "...", "type": "..." }
+  ],
+  "skills_premium": [
+    { "skill": "<high-value skill for this role>", "delta": "<e.g. 15% or $12k>" },
+    { "skill": "...", "delta": "..." },
+    { "skill": "...", "delta": "..." },
+    { "skill": "...", "delta": "..." },
+    { "skill": "...", "delta": "..." }
+  ],
+  "negotiation_tips": [
+    "<specific, tactical negotiation tip tailored to this exact role and level>",
+    "<tip 2>",
+    "<tip 3>",
+    "<tip 4>"
+  ]
+}
+
+Critical rules:
+- All salary figures must be realistic annual base salaries for the specific location and experience level
+- If location is US, use $ and US market rates. If UK, use £. If EU, use €. If global/remote, use $ and note it
+- The p90 figure should represent top-of-market (FAANG, top startups, finance) NOT outliers
+- Top companies should be real, well-known employers who genuinely pay well for this role
+- Skills premium should be specific technologies or certifications that truly move the needle for salary
+- Negotiation tips must be tactical and role-specific, not generic ("know your worth" is not acceptable)
+- market_summary should mention the CURRENT year context (2025–2026) and be honest about market conditions`)
+
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Salary intelligence error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
