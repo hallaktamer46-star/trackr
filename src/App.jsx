@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import AITools from './pages/AITools'
 import Stats from './pages/Stats'
 import Jobs from './pages/Jobs'
+import Blog from './pages/Blog'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -56,6 +57,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Jobs />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/blog" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <Blog />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

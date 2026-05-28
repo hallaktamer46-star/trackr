@@ -15,6 +15,7 @@ const ROUTE_LABELS = {
   '/ai/company':        { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/ai/linkedin':       { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/jobs':            { section: 'MARKETPLACE',   page: 'JOB BOARD'  },
+  '/blog':            { section: 'COMMUNITY',     page: 'THE FEED'   },
 }
 
 export default function Header({ onMenuClick }) {
