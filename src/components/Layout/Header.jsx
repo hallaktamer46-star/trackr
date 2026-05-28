@@ -12,6 +12,7 @@ const ROUTE_LABELS = {
   '/ai/interview-prep': { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/ai/salary':         { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/ai/market':         { section: 'ASSIST',        page: 'AI TOOLKIT' },
+  '/ai/company':        { section: 'ASSIST',        page: 'AI TOOLKIT' },
   '/jobs':            { section: 'MARKETPLACE',   page: 'JOB BOARD'  },
 }
 

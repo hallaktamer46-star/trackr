@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2 } from 'lucide-react'
+import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2 } from 'lucide-react'
 import CVReviewer from '../components/AI/CVReviewer'
 import CoverLetterReviewer from '../components/AI/CoverLetterReviewer'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
 import InterviewPrep from '../components/AI/InterviewPrep'
 import SalaryIntelligence from '../components/AI/SalaryIntelligence'
 import MarketAnalysis from '../components/AI/MarketAnalysis'
+import CompanyResearch from '../components/AI/CompanyResearch'
 import { useApplications } from '../contexts/ApplicationContext'
 import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../lib/api'
@@ -19,6 +20,7 @@ const TOOLS = [
   { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', icon: BookOpen,    component: InterviewPrep,       hot: true },
   { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',   icon: DollarSign,  component: SalaryIntelligence,  hot: true },
   { key: 'market',         path: '/ai/market',         label: 'Market Intel',   icon: BarChart2,   component: MarketAnalysis,      hot: true },
+  { key: 'company',        path: '/ai/company',        label: 'Company Brief',  icon: Building2,   component: CompanyResearch,     hot: true },
 ]
 
 export default function AITools() {

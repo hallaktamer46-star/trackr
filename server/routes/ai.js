@@ -433,4 +433,73 @@ Critical rules:
   }
 })
 
+// Company Research Brief
+router.post('/company-research', async (req, res) => {
+  const { companyName, jobTitle } = req.body
+  if (!companyName?.trim()) return res.status(400).json({ error: 'companyName is required' })
+
+  try {
+    const raw = await ask(`You are a senior corporate intelligence analyst. A job candidate is about to interview at a company and needs a fast, accurate briefing — the kind a recruiter or headhunter would prepare. Research the following company and return everything they need to walk in prepared.
+
+Company: ${companyName}
+Role they applied for: ${jobTitle || 'Not specified'}
+
+Return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
+{
+  "company": "<cleaned official company name>",
+  "tagline": "<what the company actually does in one sharp sentence>",
+  "founded": "<year>",
+  "headquarters": "<city, country>",
+  "stage": "<one of: Pre-seed / Seed / Series A / Series B / Series C / Series D+ / Public / Bootstrapped / PE-backed>",
+  "total_funding": "<e.g. '$240M' or 'Publicly traded (NASDAQ: XXXX)' or 'Undisclosed'>",
+  "last_round": "<e.g. 'Series B · $80M · March 2024' or null>",
+  "headcount": "<approximate employee count, e.g. '800–1,000'>",
+  "headcount_trend": "<one of: Rapid growth / Steady growth / Flat / Layoffs reported / Significant layoffs>",
+  "headcount_note": "<1 sentence: context on the trend>",
+  "business_model": "<one of: SaaS / Marketplace / E-commerce / Enterprise / Consumer / Agency / Hardware / Fintech / Other>",
+  "key_products": ["<product 1>", "<product 2>", "<product 3>"],
+  "main_competitors": ["<competitor 1>", "<competitor 2>", "<competitor 3>"],
+  "competitive_edge": "<what genuinely sets this company apart — be specific, not marketing speak>",
+  "glassdoor_sentiment": "<one of: Very Positive / Positive / Mixed / Negative / Very Negative / No data>",
+  "glassdoor_score": "<e.g. '3.8/5' or 'N/A'>",
+  "culture_summary": "<3–4 sentences: what it's actually like to work there — pace, management style, remote policy, what employees praise and what they complain about. Be honest, not promotional>",
+  "interview_culture": "<2–3 sentences: what the interview process is typically like — number of rounds, style (technical/behavioural/case), how fast they move, any known quirks or red flags>",
+  "recent_news": [
+    { "headline": "<news item 1 — product launch, funding, acquisition, layoff, partnership>", "date": "<approximate date or 'Recent'>", "sentiment": "<Positive / Neutral / Negative>" },
+    { "headline": "<news item 2>", "date": "...", "sentiment": "..." },
+    { "headline": "<news item 3>", "date": "...", "sentiment": "..." }
+  ],
+  "financial_health": "<one of: Strong / Healthy / Uncertain / Struggling / Unknown>",
+  "financial_note": "<1–2 sentences: honest take on their financial position — burn rate concerns, path to profitability, recent revenue milestones, or why it's unclear>",
+  "red_flags": ["<genuine concern if any — layoffs, leadership churn, funding drought, bad press>"],
+  "green_flags": ["<genuine positive signal — strong growth, top-tier investors, market leadership>", "<signal 2>", "<signal 3>"],
+  "role_fit_note": "<2–3 sentences specifically about what this company looks for in a ${jobTitle || 'candidate'} — what skills they emphasise, what type of person thrives there, and one thing the candidate should specifically prepare to discuss>",
+  "talk_about": [
+    "<specific thing to bring up — e.g. 'Their recent Series C and expansion into APAC — shows you follow their growth'>",
+    "<thing 2 — specific and current, not generic>",
+    "<thing 3>"
+  ],
+  "avoid": [
+    "<thing to handle carefully — e.g. 'The 2024 layoffs — don't bring up unless asked, but have a thoughtful response ready'>",
+    "<thing 2 if relevant, otherwise use null>"
+  ]
+}
+
+Critical rules:
+- Be honest about red flags — candidates need to know before they join, not after
+- culture_summary must reflect real employee sentiment, not the company's own marketing copy
+- interview_culture should include realistic round counts and known process quirks
+- talk_about items must be specific and current — 'show enthusiasm' is not acceptable
+- If you lack reliable data on a field, say 'Limited public data' rather than fabricating
+- financial_health and headcount_trend are the two most decision-critical fields — be accurate
+- role_fit_note must be tailored to ${jobTitle || 'the specific role'} at this exact company`)
+
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Company research error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
