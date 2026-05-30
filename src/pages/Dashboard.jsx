@@ -61,16 +61,6 @@ export default function Dashboard() {
         <KanbanBoard onAddCard={openAdd} onEditCard={openEdit} onDeleteCard={deleteApplication} />
       )}
 
-      {/* Floating Add button */}
-      {canAddMore && (
-        <button
-          onClick={() => openAdd()}
-          className="fixed bottom-8 right-8 h-12 pl-4 pr-5 gap-2 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 text-white rounded-full shadow-2xl flex items-center justify-center group hover:scale-[1.02] transition-all font-medium text-sm z-40"
-        >
-          <Plus size={16} className="transition-transform group-hover:rotate-90" />
-          Add Application
-        </button>
-      )}
 
       <ApplicationModal
         open={modalOpen}
@@ -86,9 +76,9 @@ export default function Dashboard() {
 function EmptyState({ onAdd }) {
   return (
     <div className="flex flex-col items-center justify-center py-32 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-5">
+      <button onClick={onAdd} className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center mb-5 transition-all hover:scale-105">
         <Plus size={28} className="text-slate-400 dark:text-slate-500" />
-      </div>
+      </button>
       <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-2">Pipeline Empty</p>
       <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mb-2">Your job search starts here.</h2>
       <p className="text-slate-400 dark:text-slate-500 text-sm max-w-xs mb-8">
