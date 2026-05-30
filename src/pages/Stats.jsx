@@ -7,34 +7,63 @@ import { format, parseISO, subWeeks, startOfWeek, endOfWeek, isWithinInterval } 
 import { useApplications } from '../contexts/ApplicationContext'
 
 const STATUS_COLORS = {
-  wishlist:  '#475569',
-  applied:   '#38bdf8',
-  interview: '#a78bfa',
-  offer:     '#34d399',
-  rejected:  '#fb7185',
+  wishlist:  '#8a919f',
+  applied:   '#a3c9ff',
+  interview: '#ffb689',
+  offer:     '#4edea3',
+  rejected:  '#ffb4ab',
 }
 
 const STATUS_LABELS = {
   wishlist: 'Wishlist', applied: 'Applied', interview: 'Interview', offer: 'Offer', rejected: 'Rejected',
 }
 
-const TOOLTIP_STYLE = {
-  backgroundColor: '#1e293b',
-  border: '1px solid #334155',
-  borderRadius: 6,
-  fontSize: 12,
-  color: '#f1f5f9',
+const TIP = {
+  contentStyle: {
+    background: '#1e2024',
+    border: '0.5px solid rgba(138,145,159,0.3)',
+    borderRadius: 0,
+    fontSize: 11,
+    color: '#e2e2e8',
+    fontFamily: 'Geist Mono, monospace',
+  },
+  labelStyle: { color: '#8a919f', fontSize: 10 },
+  cursor: { fill: 'rgba(138,145,159,0.06)' },
+}
+
+const CARD = {
+  background: 'rgba(30,32,36,0.7)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '0.5px solid rgba(138,145,159,0.2)',
+  padding: 16,
+}
+
+const LABEL = {
+  fontFamily: 'Geist Mono, monospace',
+  fontSize: 9,
+  fontWeight: 600,
+  letterSpacing: '0.1em',
+  color: '#8a919f',
+  textTransform: 'uppercase',
 }
 
 export default function Stats() {
   const { applications } = useApplications()
 
-  const total      = applications.length
-  const active     = applications.filter(a => ['applied', 'interview'].includes(a.status)).length
-  const offers     = applications.filter(a => a.status === 'offer').length
-  const responded  = applications.filter(a => ['interview', 'offer', 'rejected'].includes(a.status)).length
-  const applied    = applications.filter(a => a.status !== 'wishlist').length
+  const total       = applications.length
+  const active      = applications.filter(a => ['applied', 'interview'].includes(a.status)).length
+  const offers      = applications.filter(a => a.status === 'offer').length
+  const responded   = applications.filter(a => ['interview', 'offer', 'rejected'].includes(a.status)).length
+  const applied     = applications.filter(a => a.status !== 'wishlist').length
   const responseRate = applied > 0 ? Math.round((responded / applied) * 100) + '%' : '0%'
+
+  const kpis = [
+    { label: 'Total',         value: total,        color: '#e2e2e8', bar: '#8a919f' },
+    { label: 'Active',        value: active,       color: '#a3c9ff', bar: '#a3c9ff' },
+    { label: 'Offers',        value: offers,       color: '#4edea3', bar: '#4edea3' },
+    { label: 'Response Rate', value: responseRate, color: '#ffb689', bar: '#ffb689' },
+  ]
 
   const byStatus = useMemo(() =>
     Object.keys(STATUS_COLORS).map(s => ({
@@ -44,93 +73,90 @@ export default function Stats() {
     })), [applications])
 
   const activity = useMemo(() => {
-    const weeks = Array.from({ length: 8 }, (_, i) => {
+    return Array.from({ length: 8 }, (_, i) => {
       const anchor = subWeeks(new Date(), 7 - i)
       const start  = startOfWeek(anchor, { weekStartsOn: 1 })
       const end    = endOfWeek(anchor,   { weekStartsOn: 1 })
       return {
-        month: format(start, 'MMM d'),
+        week: format(start, 'MMM d'),
         count: applications.filter(a => {
           if (!a.date_applied) return false
           return isWithinInterval(parseISO(a.date_applied), { start, end })
         }).length,
       }
     })
-    return weeks
   }, [applications])
 
-  const totals = [
-    { label: 'Total',         value: total        },
-    { label: 'Active',        value: active       },
-    { label: 'Offers',        value: offers       },
-    { label: 'Response Rate', value: responseRate },
-  ]
-
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-5 max-w-5xl" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
 
       {/* Page header */}
-      <div>
-        <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-1">Analytics</p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Activity Overview</h1>
+      <div className="pt-1">
+        <p style={{ ...LABEL, color: '#a3c9ff', marginBottom: 2 }}>Analytics</p>
+        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15 }}>
+          Activity Overview
+        </h1>
       </div>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {totals.map(t => (
-          <div key={t.label} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-            <p className="text-[10px] uppercase tracking-widest text-slate-600 dark:text-slate-300 font-mono mb-2">{t.label}</p>
-            <p className="text-3xl font-extrabold font-mono text-slate-900 dark:text-slate-100">{t.value}</p>
-          </div>
-        ))}
-      </div>
+      {/* KPI strip — same flush grid as Home stats */}
+      <section className="grid grid-cols-4 gap-px" style={{ background: 'rgba(138,145,159,0.15)' }}>
+        {kpis.map(({ label, value, color, bar }) => {
+          const isEmpty = value === 0 || value === '0%'
+          return (
+            <div key={label} style={{ background: '#111318', padding: '10px 14px' }}>
+              <p style={{ ...LABEL, marginBottom: 6 }}>{label}</p>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: isEmpty ? 'rgba(138,145,159,0.2)' : color }}>
+                {value}
+              </p>
+              <div style={{ marginTop: 8, height: 2, background: isEmpty ? 'rgba(138,145,159,0.1)' : bar, opacity: isEmpty ? 1 : 0.5 }} />
+            </div>
+          )
+        })}
+      </section>
 
-      {/* Area + Pie row */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 dark:text-slate-300">
-              Activity Over Time
-            </h2>
-            <span className="text-[10px] font-mono text-sky-500">apps / week</span>
+      {/* Area + Pie */}
+      <div className="grid md:grid-cols-3 gap-px" style={{ background: 'rgba(138,145,159,0.15)' }}>
+
+        <div className="md:col-span-2" style={CARD}>
+          <div className="flex items-center justify-between mb-5">
+            <span style={LABEL}>Activity Over Time</span>
+            <span style={{ ...LABEL, color: '#a3c9ff' }}>apps / week</span>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={activity}>
               <defs>
                 <linearGradient id="aGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor="#38bdf8" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="#38bdf8" stopOpacity={0}   />
+                  <stop offset="0%"   stopColor="#a3c9ff" stopOpacity={0.25} />
+                  <stop offset="100%" stopColor="#a3c9ff" stopOpacity={0}    />
                 </linearGradient>
               </defs>
-              <CartesianGrid stroke="#cbd5e1" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="month" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
-              <YAxis stroke="#475569" fontSize={11} allowDecimals={false} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
-              <Area type="monotone" dataKey="count" stroke="#38bdf8" strokeWidth={2} fill="url(#aGrad)" />
+              <CartesianGrid stroke="rgba(138,145,159,0.1)" strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="week" tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#8a919f' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#8a919f' }} allowDecimals={false} axisLine={false} tickLine={false} width={24} />
+              <Tooltip {...TIP} />
+              <Area type="monotone" dataKey="count" stroke="#a3c9ff" strokeWidth={1.5} fill="url(#aGrad)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-          <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 dark:text-slate-300 mb-4">
-            Status Breakdown
-          </h2>
-          <ResponsiveContainer width="100%" height={160}>
+        <div style={CARD}>
+          <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>Status Breakdown</span>
+          <ResponsiveContainer width="100%" height={150}>
             <PieChart>
-              <Pie data={byStatus} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2} stroke="white">
-                {byStatus.map(d => <Cell key={d.name} fill={d.color} />)}
+              <Pie data={byStatus} dataKey="value" nameKey="name" innerRadius={42} outerRadius={65} paddingAngle={2} stroke="none">
+                {byStatus.map(d => <Cell key={d.name} fill={d.color} opacity={d.value === 0 ? 0.15 : 1} />)}
               </Pie>
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Tooltip {...TIP} />
             </PieChart>
           </ResponsiveContainer>
           <div className="space-y-1.5 mt-3">
             {byStatus.map(d => (
-              <div key={d.name} className="flex items-center justify-between text-xs">
+              <div key={d.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full" style={{ background: d.color }} />
-                  <span className="text-slate-700 dark:text-slate-200">{d.name}</span>
+                  <span className="w-1.5 h-1.5" style={{ background: d.color, opacity: d.value === 0 ? 0.25 : 1 }} />
+                  <span style={{ fontSize: 11, color: d.value === 0 ? '#404753' : '#c0c7d5' }}>{d.name}</span>
                 </div>
-                <span className="font-mono text-slate-700 dark:text-slate-200">{d.value}</span>
+                <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 11, color: d.value === 0 ? '#404753' : d.color }}>{d.value}</span>
               </div>
             ))}
           </div>
@@ -138,18 +164,16 @@ export default function Stats() {
       </div>
 
       {/* Bar chart */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
-        <h2 className="text-[10px] uppercase tracking-[0.2em] font-bold font-mono text-slate-600 dark:text-slate-300 mb-4">
-          Applications by Status
-        </h2>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={byStatus}>
-            <CartesianGrid stroke="#cbd5e1" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
-            <YAxis stroke="#475569" fontSize={11} allowDecimals={false} axisLine={false} tickLine={false} />
-            <Tooltip contentStyle={TOOLTIP_STYLE} cursor={{ fill: '#f8fafc' }} />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-              {byStatus.map(d => <Cell key={d.name} fill={d.color} />)}
+      <div style={CARD}>
+        <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>Applications by Status</span>
+        <ResponsiveContainer width="100%" height={180}>
+          <BarChart data={byStatus} barSize={24}>
+            <CartesianGrid stroke="rgba(138,145,159,0.1)" strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#8a919f' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#8a919f' }} allowDecimals={false} axisLine={false} tickLine={false} width={24} />
+            <Tooltip {...TIP} />
+            <Bar dataKey="value" radius={[0, 0, 0, 0]}>
+              {byStatus.map(d => <Cell key={d.name} fill={d.color} opacity={d.value === 0 ? 0.15 : 0.8} />)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
