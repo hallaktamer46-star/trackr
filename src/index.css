@@ -38,6 +38,11 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
+/* Strip all border-radius inside AI Tools page, keep circles intact */
+.ai-sharp *:not(.rounded-full) {
+  border-radius: 0 !important;
+}
+
 /* Hide scrollbars globally */
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; -ms-overflow-style: none; }

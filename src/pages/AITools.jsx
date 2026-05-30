@@ -55,7 +55,7 @@ export default function AITools() {
   const ActiveComponent = active.component
 
   return (
-    <div className="max-w-4xl mx-auto relative">
+    <div className="ai-sharp max-w-4xl mx-auto relative">
 
       {/* Header */}
       <div className="mb-8">
