@@ -143,7 +143,7 @@ export default function Stats() {
           <span style={{ ...LABEL, display: 'block', marginBottom: 16 }}>Status Breakdown</span>
           <ResponsiveContainer width="100%" height={150}>
             <PieChart>
-              <Pie data={byStatus} dataKey="value" nameKey="name" innerRadius={42} outerRadius={65} paddingAngle={2} stroke="none">
+              <Pie data={byStatus} dataKey="value" nameKey="name" innerRadius={42} outerRadius={65} paddingAngle={byStatus.filter(d => d.value > 0).length > 1 ? 2 : 0} stroke="none">
                 {byStatus.map(d => <Cell key={d.name} fill={d.color} opacity={d.value === 0 ? 0.15 : 1} />)}
               </Pie>
               <Tooltip {...TIP} />
