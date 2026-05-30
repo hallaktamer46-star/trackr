@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
 import { Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, Mic } from 'lucide-react'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
+import InterviewPrep from '../components/AI/InterviewPrep'
 import InterviewCoach from '../components/AI/InterviewCoach'
 import SalaryIntelligence from '../components/AI/SalaryIntelligence'
 import MarketAnalysis from '../components/AI/MarketAnalysis'
@@ -14,7 +15,8 @@ import { apiFetch } from '../lib/api'
 
 const TOOLS = [
   { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',       desc: 'Chase with confidence',       icon: Send,       component: FollowUpGenerator,    accent: '#ffb689' },
-  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Coach', desc: 'Live mock interview + scorecard', icon: Mic,     component: InterviewCoach,       accent: '#ffb4ab', pro: true },
+  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep',  desc: 'Question bank for your role',    icon: BookOpen, component: InterviewPrep,        accent: '#ffb4ab', pro: true },
+  { key: 'interview-coach', path: '/ai/interview-coach', label: 'Interview Coach', desc: 'Live mock interview + scorecard', icon: Mic,     component: InterviewCoach,       accent: '#ffb4ab', apex: true },
   { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',    desc: 'Know your market worth',      icon: DollarSign, component: SalaryIntelligence,   accent: '#a3c9ff', pro: true },
   { key: 'market',         path: '/ai/market',         label: 'Market Intel',    desc: 'Industry trends & signals',   icon: BarChart2,  component: MarketAnalysis,       accent: '#4edea3', pro: true },
   { key: 'company',        path: '/ai/company',        label: 'Company Brief',   desc: 'Deep-dive any employer',      icon: Building2,  component: CompanyResearch,      accent: '#ffb689', pro: true },
