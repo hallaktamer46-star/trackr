@@ -15,9 +15,9 @@ const nav = [
 ]
 
 const CV_TOOLS = [
-  { to: '/ai/cv-builder',  label: 'CV Builder',    desc: 'Build a CV from scratch', icon: PenLine  },
-  { to: '/ai/cv',          label: 'CV Reviewer',   desc: 'Score & fix your CV',     icon: FileText },
-  { to: '/ai/cover-letter',label: 'Cover Letter',  desc: 'Tailored letter drafts',  icon: Mail     },
+  { to: '/cv/builder',      label: 'CV Builder',   desc: 'Build a CV from scratch', icon: PenLine  },
+  { to: '/cv/reviewer',     label: 'CV Reviewer',  desc: 'Score & fix your CV',     icon: FileText },
+  { to: '/cv/cover-letter', label: 'Cover Letter', desc: 'Tailored letter drafts',  icon: Mail     },
 ]
 
 export default function Header() {
@@ -36,7 +36,7 @@ export default function Header() {
   // close on route change
   useEffect(() => { setCvOpen(false) }, [location.pathname])
 
-  const isCvActive = CV_TOOLS.some(t => location.pathname.startsWith(t.to))
+  const isCvActive = location.pathname.startsWith('/cv')
 
   return (
     <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sticky top-0 z-30 flex items-center">

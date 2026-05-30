@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Plans from './pages/Plans'
 import AITools from './pages/AITools'
+import CVHub from './pages/CVHub'
 import Stats from './pages/Stats'
 import Jobs from './pages/Jobs'
 import Blog from './pages/Blog'
@@ -50,6 +51,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Stats />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/cv/:tool?" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <CVHub />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
