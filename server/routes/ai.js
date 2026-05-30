@@ -686,6 +686,100 @@ Return a JSON object with EXACTLY this shape — no other text, no markdown, no 
   }
 })
 
+// POST /api/ai/interview — single chat turn (AI interviewer responds)
+router.post('/interview', async (req, res) => {
+  const { messages, context } = req.body
+  // context: { jobTitle, company, interviewType, difficulty, totalQuestions, experienceLevel }
+  const groq = getGroq()
+  try {
+    const system = `You are a senior hiring manager at ${context.company || 'a leading company'} conducting a real job interview for a ${context.jobTitle} position.
+
+INTERVIEW STRUCTURE:
+- This is a ${context.interviewType} interview, ${context.difficulty === 'tough' ? 'challenging and rigorous' : 'professional and fair'}
+- The candidate has ${context.experienceLevel} experience level — calibrate question difficulty accordingly
+- Ask ONE question at a time — never multiple questions in one message
+- Start with a warm professional greeting and one easy opener
+- Follow up naturally based on their answer — dig deeper, ask for specifics, challenge vague answers
+- Mix question types appropriate for a ${context.interviewType} interview
+- After exactly ${context.totalQuestions} questions have been asked, end the interview by saying EXACTLY this phrase and nothing else: "That's all the questions I have for you today. Thank you for your time."
+
+BEHAVIOURAL RULES:
+- Stay in character as the interviewer the entire time — never break character
+- If their answer is too short or vague, push back: "Could you be more specific?" or "Can you walk me through a concrete example?"
+- Never give feedback, scores, hints, or encouragement during the interview
+- Never acknowledge you are an AI
+- Keep your messages short — 1 to 3 sentences max, like a real interviewer would
+- TONE: Professional, neutral, slightly formal`
+
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [
+        { role: 'system', content: system },
+        ...messages,
+      ],
+      temperature: 0.6,
+      max_tokens: 200,
+    })
+    res.json({ message: completion.choices[0].message.content.trim() })
+  } catch (err) {
+    console.error('Interview error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/interview/score — full scorecard after interview ends
+router.post('/interview/score', async (req, res) => {
+  const { messages, context } = req.body
+  const groq = getGroq()
+  try {
+    const transcript = messages
+      .filter(m => m.role !== 'system')
+      .map(m => `${m.role === 'user' ? 'CANDIDATE' : 'INTERVIEWER'}: ${m.content}`)
+      .join('\n\n')
+
+    const prompt = `You were just the interviewer in a mock ${context.interviewType} interview for a ${context.jobTitle} role at ${context.company || 'a company'}.
+
+Here is the full interview transcript:
+${transcript}
+
+Now step out of character and analyse the CANDIDATE'S performance as an expert career coach.
+
+Return a JSON object with exactly this structure:
+{
+  "overallScore": <number 0-100>,
+  "verdict": "<one punchy sentence — e.g. Strong communicator, needs sharper examples>",
+  "breakdown": {
+    "clarity":    { "score": <0-100>, "comment": "<1 sentence>" },
+    "structure":  { "score": <0-100>, "comment": "<1 sentence — did they use STAR method?>" },
+    "confidence": { "score": <0-100>, "comment": "<1 sentence>" },
+    "relevance":  { "score": <0-100>, "comment": "<1 sentence — did answers match the role?>" },
+    "depth":      { "score": <0-100>, "comment": "<1 sentence — specific examples vs vague?>" }
+  },
+  "strengths": ["<specific thing they did well>", "<another strength>"],
+  "improvements": [
+    { "issue": "<what went wrong>", "fix": "<concrete advice>", "example": "<how they should have answered>" }
+  ],
+  "standoutMoment": "<the single best thing they said, quoted or paraphrased>",
+  "redFlag": "<the single biggest weakness, or null if none>"
+}
+
+Return ONLY valid JSON. No explanation, no markdown fences.`
+
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+      max_tokens: 1200,
+    })
+    const raw = completion.choices[0].message.content.trim()
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Interview score error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 // POST /api/ai/build-cv
 router.post('/build-cv', async (req, res) => {
   const { personal, experience, education, skills, extras } = req.body
