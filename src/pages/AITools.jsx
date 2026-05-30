@@ -15,14 +15,14 @@ import { apiFetch } from '../lib/api'
 import { cn } from '../lib/cn'
 
 const TOOLS = [
-  { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',    icon: FileText,    component: CVReviewer          },
-  { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',   icon: Mail,        component: CoverLetterReviewer },
-  { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',      icon: Send,        component: FollowUpGenerator   },
-  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', icon: BookOpen,    component: InterviewPrep,       hot: true },
-  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',   icon: DollarSign,  component: SalaryIntelligence,  hot: true },
-  { key: 'market',         path: '/ai/market',         label: 'Market Intel',   icon: BarChart2,   component: MarketAnalysis,      hot: true },
-  { key: 'company',        path: '/ai/company',        label: 'Company Brief',  icon: Building2,   component: CompanyResearch,     hot: true },
-  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',       icon: Link2,       component: LinkedInReviewer,    hot: true },
+  { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',    desc: 'Score & fix your CV',        icon: FileText,   component: CVReviewer,          accent: '#a3c9ff' },
+  { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',   desc: 'Tailored letter drafts',     icon: Mail,       component: CoverLetterReviewer, accent: '#4edea3' },
+  { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',      desc: 'Chase with confidence',      icon: Send,       component: FollowUpGenerator,   accent: '#ffb689' },
+  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', desc: 'Ace the interview',          icon: BookOpen,   component: InterviewPrep,       accent: '#c084fc', hot: true },
+  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',   desc: 'Know your market worth',     icon: DollarSign, component: SalaryIntelligence,  accent: '#f472b6', hot: true },
+  { key: 'market',         path: '/ai/market',         label: 'Market Intel',   desc: 'Industry trends & signals',  icon: BarChart2,  component: MarketAnalysis,      accent: '#fb923c', hot: true },
+  { key: 'company',        path: '/ai/company',        label: 'Company Brief',  desc: 'Deep-dive any employer',     icon: Building2,  component: CompanyResearch,     accent: '#34d399', hot: true },
+  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',       desc: 'Optimise your profile',      icon: Link2,      component: LinkedInReviewer,    accent: '#60a5fa', hot: true },
 ]
 
 export default function AITools() {
@@ -58,7 +58,7 @@ export default function AITools() {
     <div className="ai-sharp max-w-4xl mx-auto relative">
 
       {/* Header */}
-      <div className="mb-6" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+      <div className="mb-7" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
         <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 4 }}>
           Trackr Assist
         </p>
@@ -70,8 +70,8 @@ export default function AITools() {
         </p>
       </div>
 
-      {/* Icon grid toolbar */}
-      <div className="grid grid-cols-8 mb-6" style={{ background: 'rgba(138,145,159,0.15)', gap: 1 }}>
+      {/* Tool picker grid */}
+      <div className="grid grid-cols-4 gap-px mb-8" style={{ background: 'rgba(138,145,159,0.12)' }}>
         {TOOLS.map(t => {
           const Icon = t.icon
           const isActive = t.key === tool
@@ -79,40 +79,71 @@ export default function AITools() {
             <NavLink
               key={t.key}
               to={t.path}
-              className="relative flex flex-col items-center justify-center gap-2 py-4 transition-all group"
+              className="relative flex items-center gap-3 transition-all"
               style={{
-                background: isActive ? 'rgba(163,201,255,0.08)' : '#111318',
-                borderBottom: isActive ? '2px solid #a3c9ff' : '2px solid transparent',
+                background: isActive
+                  ? `linear-gradient(135deg, ${t.accent}0f 0%, rgba(17,19,24,0.95) 100%)`
+                  : '#111318',
+                padding: '14px 16px',
+                borderLeft: isActive ? `2px solid ${t.accent}` : '2px solid transparent',
               }}
             >
-              <Icon
-                size={18}
-                style={{ color: isActive ? '#a3c9ff' : '#8a919f', transition: 'color 0.15s' }}
-              />
-              <span style={{
-                fontFamily: 'Geist Mono, monospace',
-                fontSize: 9,
-                fontWeight: 600,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: isActive ? '#a3c9ff' : '#8a919f',
-                transition: 'color 0.15s',
+              {/* Icon tile */}
+              <div style={{
+                width: 36,
+                height: 36,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: isActive ? `${t.accent}18` : 'rgba(138,145,159,0.07)',
+                border: `0.5px solid ${isActive ? t.accent + '40' : 'rgba(138,145,159,0.15)'}`,
+                flexShrink: 0,
+                transition: 'all 0.2s',
               }}>
-                {t.label}
-              </span>
+                <Icon size={16} style={{ color: isActive ? t.accent : '#8a919f', transition: 'color 0.2s' }} />
+              </div>
+
+              {/* Label + desc */}
+              <div className="min-w-0">
+                <p style={{
+                  fontFamily: 'Geist, Inter, sans-serif',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: isActive ? '#e2e2e8' : '#c0c7d5',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.2,
+                  marginBottom: 2,
+                }}>
+                  {t.label}
+                </p>
+                <p style={{
+                  fontFamily: 'Geist Mono, monospace',
+                  fontSize: 9,
+                  color: isActive ? t.accent + 'cc' : '#404753',
+                  letterSpacing: '0.02em',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {t.desc}
+                </p>
+              </div>
+
+              {/* NEW badge */}
               {t.hot && (
                 <span style={{
                   position: 'absolute',
-                  top: 6,
-                  right: 6,
+                  top: 8,
+                  right: 8,
                   fontFamily: 'Geist Mono, monospace',
                   fontSize: 7,
                   fontWeight: 700,
-                  letterSpacing: '0.05em',
+                  letterSpacing: '0.06em',
                   background: '#1493ff',
                   color: '#fff',
-                  padding: '1px 4px',
-                  lineHeight: '14px',
+                  padding: '2px 5px',
+                  lineHeight: 1.4,
                 }}>
                   NEW
                 </span>
