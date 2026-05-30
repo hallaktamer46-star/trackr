@@ -103,20 +103,18 @@ export default function Home() {
       </section>
 
       {/* Stats row */}
-      <section className="flex gap-3 overflow-x-auto -mx-3 px-3 pb-1 no-scrollbar">
+      <section className="grid grid-cols-5 gap-px" style={{ background: 'rgba(138,145,159,0.15)' }}>
         {STATS.map(({ key, label, dot, color }) => {
           const val = stats[key]
           return (
-            <div key={key} className="surface-glass flex-1 min-w-[90px]" style={{ padding: '10px 12px' }}>
-              <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
-                <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', color: '#c0c7d5', textTransform: 'uppercase' }}>
-                  {label}
-                </span>
-              </div>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: val === 0 ? 'rgba(194,199,213,0.25)' : color, lineHeight: 1 }}>
+            <div key={key} style={{ background: '#111318', padding: '10px 14px' }}>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', marginBottom: 6 }}>
+                {label}
+              </p>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: val === 0 ? 'rgba(138,145,159,0.2)' : color }}>
                 {val}
               </p>
+              <div style={{ marginTop: 8, height: 2, background: val === 0 ? 'rgba(138,145,159,0.1)' : dot, opacity: val === 0 ? 1 : 0.5 }} />
             </div>
           )
         })}
