@@ -858,4 +858,67 @@ Extra notes / achievements: ${extras?.notes || ''}
   }
 })
 
+// POST /api/ai/compare-offers
+router.post('/compare-offers', async (req, res) => {
+  const { offers, careerGoal, yearsExp, location } = req.body
+  try {
+    const groq = getGroq()
+
+    const prompt = `You are a career strategist and compensation expert helping a candidate objectively compare job offers.
+
+Here are the offers to compare:
+${JSON.stringify(offers, null, 2)}
+
+Candidate context:
+- Location: ${location || 'Not specified'}
+- Career goal: ${careerGoal}
+- Years of experience: ${yearsExp || 'Not specified'}
+
+Analyse every offer across these dimensions and return a JSON object with exactly this structure:
+{
+  "winner": "<company name of the overall best offer>",
+  "winnerReason": "<1-2 sentence explanation of why it wins overall>",
+  "offers": [
+    {
+      "company": "<name>",
+      "totalCompScore": <0-100>,
+      "totalComp": "<calculated total annual compensation as a readable string e.g. $142,000–$155,000>",
+      "scores": {
+        "compensation": { "score": <0-100>, "comment": "<1 sentence>" },
+        "growth":       { "score": <0-100>, "comment": "<1 sentence — career trajectory, company trajectory>" },
+        "workLife":     { "score": <0-100>, "comment": "<1 sentence — remote policy, commute, company size>" },
+        "stability":    { "score": <0-100>, "comment": "<1 sentence — company size, industry, funding>" },
+        "benefits":     { "score": <0-100>, "comment": "<1 sentence>" }
+      },
+      "pros": ["<specific pro>", "<specific pro>", "<specific pro>"],
+      "cons": ["<specific con>", "<specific con>"],
+      "watchOut": "<one hidden risk or overlooked detail, or null>",
+      "negotiationTip": "<one specific thing they could push back on to improve this offer>"
+    }
+  ],
+  "headToHead": [
+    { "category": "<category>", "winner": "<company name>", "reason": "<1 sentence why>" }
+  ],
+  "verdict": "<2-3 sentence honest bottom-line recommendation tailored to their career goal>"
+}
+
+Be brutally honest. Factor in total comp (base + bonus + equity). Account for cost of living if locations differ. Weight your analysis toward the stated career goal.
+Return ONLY valid JSON. No explanation, no markdown fences.`
+
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+      max_tokens: 2000,
+    })
+
+    const raw = completion.choices[0].message.content.trim()
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Compare offers error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router

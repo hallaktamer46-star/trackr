@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, Mic } from 'lucide-react'
+import { Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, Mic, GitCompare } from 'lucide-react'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
 import InterviewPrep from '../components/AI/InterviewPrep'
 import InterviewCoach from '../components/AI/InterviewCoach'
@@ -9,6 +9,7 @@ import MarketAnalysis from '../components/AI/MarketAnalysis'
 import CompanyResearch from '../components/AI/CompanyResearch'
 import LinkedInReviewer from '../components/AI/LinkedInReviewer'
 import NegotiationSimulator from '../components/AI/NegotiationSimulator'
+import OfferComparison from '../components/AI/OfferComparison'
 import { useApplications } from '../contexts/ApplicationContext'
 import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../lib/api'
@@ -21,6 +22,7 @@ const TOOLS = [
   { key: 'market',         path: '/ai/market',         label: 'Market Intel',    desc: 'Industry trends & signals',   icon: BarChart2,  component: MarketAnalysis,       accent: '#4edea3', pro: true },
   { key: 'company',        path: '/ai/company',        label: 'Company Brief',   desc: 'Deep-dive any employer',      icon: Building2,  component: CompanyResearch,      accent: '#ffb689', pro: true },
   { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',        desc: 'Optimise your profile',       icon: Link2,      component: LinkedInReviewer,     accent: '#ffb4ab', pro: true },
+  { key: 'offer-compare',  path: '/ai/offer-compare',  label: 'Offer Comparison', desc: 'Compare & pick the best offer', icon: GitCompare, component: OfferComparison,     accent: '#a3c9ff', pro: true },
   { key: 'negotiate',      path: '/ai/negotiate',      label: 'Offer Simulator', desc: 'Practice salary negotiation', icon: Handshake,  component: NegotiationSimulator, accent: '#4edea3', apex: true },
 ]
 
