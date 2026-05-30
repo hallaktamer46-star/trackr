@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ApplicationProvider } from './contexts/ApplicationContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import Layout from './components/Layout/Layout'
+import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import AITools from './pages/AITools'
 import Stats from './pages/Stats'
@@ -26,6 +27,15 @@ function AppRoutes() {
     <Routes>
       <Route path="/auth" element={user ? <Navigate to="/" replace /> : <Auth />} />
       <Route path="/" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <Home />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/board" element={
         <ProtectedRoute>
           <ApplicationProvider>
             <Layout>
