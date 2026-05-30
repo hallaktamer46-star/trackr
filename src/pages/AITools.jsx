@@ -18,11 +18,11 @@ const TOOLS = [
   { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',    desc: 'Score & fix your CV',        icon: FileText,   component: CVReviewer,          accent: '#a3c9ff' },
   { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',   desc: 'Tailored letter drafts',     icon: Mail,       component: CoverLetterReviewer, accent: '#4edea3' },
   { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',      desc: 'Chase with confidence',      icon: Send,       component: FollowUpGenerator,   accent: '#ffb689' },
-  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', desc: 'Ace the interview',          icon: BookOpen,   component: InterviewPrep,       accent: '#c084fc', hot: true },
-  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',   desc: 'Know your market worth',     icon: DollarSign, component: SalaryIntelligence,  accent: '#f472b6', hot: true },
-  { key: 'market',         path: '/ai/market',         label: 'Market Intel',   desc: 'Industry trends & signals',  icon: BarChart2,  component: MarketAnalysis,      accent: '#fb923c', hot: true },
-  { key: 'company',        path: '/ai/company',        label: 'Company Brief',  desc: 'Deep-dive any employer',     icon: Building2,  component: CompanyResearch,     accent: '#34d399', hot: true },
-  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',       desc: 'Optimise your profile',      icon: Link2,      component: LinkedInReviewer,    accent: '#60a5fa', hot: true },
+  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', desc: 'Ace the interview',          icon: BookOpen,   component: InterviewPrep,       accent: '#ffb4ab', hot: true },
+  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',   desc: 'Know your market worth',     icon: DollarSign, component: SalaryIntelligence,  accent: '#a3c9ff', hot: true },
+  { key: 'market',         path: '/ai/market',         label: 'Market Intel',   desc: 'Industry trends & signals',  icon: BarChart2,  component: MarketAnalysis,      accent: '#4edea3', hot: true },
+  { key: 'company',        path: '/ai/company',        label: 'Company Brief',  desc: 'Deep-dive any employer',     icon: Building2,  component: CompanyResearch,     accent: '#ffb689', hot: true },
+  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',       desc: 'Optimise your profile',      icon: Link2,      component: LinkedInReviewer,    accent: '#ffb4ab', hot: true },
 ]
 
 export default function AITools() {
