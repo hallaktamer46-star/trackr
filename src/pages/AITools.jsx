@@ -79,7 +79,7 @@ export default function AITools() {
             <NavLink
               key={t.key}
               to={t.path}
-              className="relative flex items-center gap-3 transition-all"
+              className="tool-picker-card relative flex items-center gap-3 transition-all"
               style={{
                 background: isActive
                   ? `linear-gradient(135deg, ${t.accent}18 0%, #0d2040 100%)`

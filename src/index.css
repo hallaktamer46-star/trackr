@@ -38,6 +38,11 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 
+.tool-picker-card:hover {
+  background: #152440 !important;
+  border-left-color: rgba(163,201,255,0.4) !important;
+}
+
 /* Strip all border-radius inside AI Tools page, keep circles intact */
 .ai-sharp *:not(.rounded-full) {
   border-radius: 0 !important;
