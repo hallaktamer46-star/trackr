@@ -158,32 +158,28 @@ export default function AITools() {
 
       {/* Paywall overlay */}
       {!isPaidUser && (
-        <div className="absolute inset-0 bg-white/80 dark:bg-slate-950/85 backdrop-blur-md grid place-items-center p-8 rounded-2xl">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 max-w-md text-center shadow-2xl">
-            <div className="w-12 h-12 rounded-full bg-sky-50 dark:bg-sky-900/30 grid place-items-center mx-auto mb-5">
-              <Lock size={20} className="text-sky-500" />
+        <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
+          <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+            <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)' }}>
+              <Lock size={18} style={{ color: '#a3c9ff' }} />
             </div>
-            <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-2">
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
               Pro Feature
             </p>
-            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mb-2">
+            <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
               Unlock AI Tools
             </h2>
-            <p className="text-sm text-slate-400 dark:text-slate-500 mb-6">
+            <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
               Tailored CV reviews, cover letter critiques and follow-up drafts. Triple your interview rate.
             </p>
-            {checkoutError && <p className="text-xs text-rose-600 mb-4">{checkoutError}</p>}
             <button
-              onClick={handleUpgrade}
-              disabled={checkoutLoading}
-              className="w-full h-11 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2"
+              onClick={() => navigate('/plans')}
+              className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
+              style={{ background: '#1493ff', color: '#fff', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
             >
-              {checkoutLoading
-                ? <><Loader2 size={14} className="animate-spin" /> Opening checkout…</>
-                : <><Crown size={14} /> Upgrade to Pro · $15/mo</>
-              }
+              <Crown size={13} /> View Plans
             </button>
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-3 font-mono">Cancel anytime</p>
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
           </div>
         </div>
       )}

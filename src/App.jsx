@@ -5,6 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
+import Plans from './pages/Plans'
 import AITools from './pages/AITools'
 import Stats from './pages/Stats'
 import Jobs from './pages/Jobs'
@@ -76,6 +77,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Blog />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/plans" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <Plans />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, UserCog, Crown, Check, X } from 'lucide-react'
+import { LogOut, UserCog, Crown, Check, X, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApplications } from '../../contexts/ApplicationContext'
 import { supabase, isSupabaseConfigured } from '../../lib/supabase'
@@ -7,6 +8,7 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabase'
 export default function ProfileDropdown() {
   const { user, signOut } = useAuth()
   const { isPaidUser } = useApplications()
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -138,6 +140,16 @@ export default function ProfileDropdown() {
               <UserCog size={15} /> Edit profile
             </button>
           )}
+
+          {/* Plans */}
+          <button
+            onClick={() => { setOpen(false); navigate('/plans') }}
+            className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-slate-800"
+            style={{ color: isPaidUser ? '#4edea3' : '#a3c9ff' }}
+          >
+            {isPaidUser ? <Crown size={15} /> : <Zap size={15} />}
+            {isPaidUser ? 'Manage plan' : 'View plans & upgrade'}
+          </button>
 
           {/* Sign out */}
           <button
