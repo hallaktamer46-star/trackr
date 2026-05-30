@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2 } from 'lucide-react'
+import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake } from 'lucide-react'
 import CVReviewer from '../components/AI/CVReviewer'
 import CoverLetterReviewer from '../components/AI/CoverLetterReviewer'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
@@ -9,6 +9,7 @@ import SalaryIntelligence from '../components/AI/SalaryIntelligence'
 import MarketAnalysis from '../components/AI/MarketAnalysis'
 import CompanyResearch from '../components/AI/CompanyResearch'
 import LinkedInReviewer from '../components/AI/LinkedInReviewer'
+import NegotiationSimulator from '../components/AI/NegotiationSimulator'
 import { useApplications } from '../contexts/ApplicationContext'
 import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../lib/api'
@@ -23,6 +24,7 @@ const TOOLS = [
   { key: 'market',         path: '/ai/market',         label: 'Market Intel',   desc: 'Industry trends & signals',  icon: BarChart2,  component: MarketAnalysis,      accent: '#4edea3', hot: true },
   { key: 'company',        path: '/ai/company',        label: 'Company Brief',  desc: 'Deep-dive any employer',     icon: Building2,  component: CompanyResearch,     accent: '#ffb689', hot: true },
   { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',       desc: 'Optimise your profile',      icon: Link2,      component: LinkedInReviewer,    accent: '#ffb4ab', hot: true },
+  { key: 'negotiate',      path: '/ai/negotiate',      label: 'Offer Simulator', desc: 'Practice salary negotiation', icon: Handshake,  component: NegotiationSimulator, accent: '#4edea3', hot: true, apex: true },
 ]
 
 export default function AITools() {
@@ -130,8 +132,24 @@ export default function AITools() {
                 </p>
               </div>
 
-              {/* NEW badge */}
-              {t.hot && (
+              {/* Badge */}
+              {t.apex ? (
+                <span style={{
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
+                  fontFamily: 'Geist Mono, monospace',
+                  fontSize: 7,
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  background: 'linear-gradient(90deg, #4edea3, #a3c9ff)',
+                  color: '#0d1117',
+                  padding: '2px 5px',
+                  lineHeight: 1.4,
+                }}>
+                  APEX
+                </span>
+              ) : t.hot ? (
                 <span style={{
                   position: 'absolute',
                   top: 8,
@@ -147,7 +165,7 @@ export default function AITools() {
                 }}>
                   NEW
                 </span>
-              )}
+              ) : null}
             </NavLink>
           )
         })}

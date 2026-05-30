@@ -604,4 +604,86 @@ Critical rules:
   }
 })
 
+// Negotiation Simulator — chat turn
+router.post('/negotiate', async (req, res) => {
+  const { messages, context } = req.body
+  if (!context?.company || !context?.jobTitle || !context?.offerAmount || !context?.targetAmount) {
+    return res.status(400).json({ error: 'context with company, jobTitle, offerAmount, targetAmount is required' })
+  }
+  try {
+    const groq = getGroq()
+    const system = `You are a recruiter at ${context.company} hiring for a ${context.jobTitle} position. You have extended an offer of ${context.offerAmount}.
+
+Your role is to simulate a realistic salary negotiation conversation. Follow these rules strictly:
+- Stay in character as a professional recruiter at all times. Never break character.
+- Start by presenting the offer warmly but firmly.
+- Use realistic recruiter tactics: reference budget constraints, mention equity or benefits as alternatives, bring up "what HR has approved", compare to team benchmarks.
+- Do NOT cave immediately. Hold firm for at least 2 rounds before showing any flexibility.
+- You can move up maximum 12-15% from the initial offer across the whole conversation — no more.
+- If the candidate asks for more than 20% above the offer, express surprise and push back firmly.
+- Keep each response to 2-4 sentences max — this is a conversation, not an essay.
+- Be warm, professional, and human. Not robotic.
+- If the candidate is aggressive or rude, stay calm but become slightly cooler in tone.
+- If a deal is agreed, say so clearly and congratulate them.
+- The candidate's experience level is: ${context.experienceLevel || 'Mid-level'}.`
+
+    const response = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [{ role: 'system', content: system }, ...messages],
+      temperature: 0.7,
+      max_tokens: 300,
+    })
+    res.json({ reply: response.choices[0].message.content.trim() })
+  } catch (err) {
+    console.error('Negotiate error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// Negotiation Simulator — score the full conversation
+router.post('/negotiate/score', async (req, res) => {
+  const { messages, context } = req.body
+  if (!messages?.length || !context) return res.status(400).json({ error: 'messages and context required' })
+  try {
+    const transcript = messages.map(m => `${m.role === 'user' ? 'CANDIDATE' : 'RECRUITER'}: ${m.content}`).join('\n')
+    const raw = await ask(`You are an expert salary negotiation coach. Analyse this negotiation conversation and score the candidate's performance.
+
+Context:
+- Company: ${context.company}
+- Role: ${context.jobTitle}
+- Initial offer: ${context.offerAmount}
+- Candidate's target: ${context.targetAmount}
+- Experience level: ${context.experienceLevel}
+
+Transcript:
+${transcript}
+
+Return a JSON object with EXACTLY this shape — no other text, no markdown, no code fences:
+{
+  "score": <integer 0-100>,
+  "verdict": "<one of: Excellent / Strong / Good / Needs Work / Weak>",
+  "final_outcome": "<what was the final outcome — deal reached at X, no deal, still in progress, etc.>",
+  "strengths": [
+    "<specific thing the candidate did well with an example from the conversation>",
+    "<strength 2>",
+    "<strength 3>"
+  ],
+  "improvements": [
+    {
+      "what": "<specific thing they did wrong or missed>",
+      "instead": "<exactly what they should have said or done — be specific and tactical>"
+    },
+    { "what": "...", "instead": "..." },
+    { "what": "...", "instead": "..." }
+  ],
+  "script": "<A ready-to-use negotiation script they can use in a real conversation for this exact role and company. Write it as a flowing message/email they could send or say. 150-200 words. Professional, confident, specific to their situation. Start with acknowledging the offer, then make the ask, then back it up with 2 specific reasons, then close.>"
+}`)
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Negotiate score error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
