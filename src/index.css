@@ -15,6 +15,28 @@
 
 * { box-sizing: border-box; }
 
+.surface-glass {
+  background: rgba(30, 32, 36, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 0.5px solid rgba(138, 145, 159, 0.2);
+  transition: border-color 0.15s;
+}
+.surface-glass:hover {
+  border-color: rgba(163, 201, 255, 0.35);
+}
+.tool-card {
+  background: #1a1c20;
+  border: 0.5px solid rgba(138, 145, 159, 0.15);
+  transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+.tool-card:hover {
+  transform: translateY(-1px);
+  background: #1e2024;
+  border-color: rgba(163, 201, 255, 0.28);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
 /* Hide scrollbars globally */
 ::-webkit-scrollbar { display: none; }
 * { scrollbar-width: none; -ms-overflow-style: none; }
