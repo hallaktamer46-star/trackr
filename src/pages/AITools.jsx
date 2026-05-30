@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket } from 'lucide-react'
+import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, PenLine } from 'lucide-react'
 import CVReviewer from '../components/AI/CVReviewer'
 import CoverLetterReviewer from '../components/AI/CoverLetterReviewer'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
@@ -10,12 +10,14 @@ import MarketAnalysis from '../components/AI/MarketAnalysis'
 import CompanyResearch from '../components/AI/CompanyResearch'
 import LinkedInReviewer from '../components/AI/LinkedInReviewer'
 import NegotiationSimulator from '../components/AI/NegotiationSimulator'
+import CVBuilder from '../components/AI/CVBuilder'
 import { useApplications } from '../contexts/ApplicationContext'
 import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../lib/api'
 
 const TOOLS = [
   { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',     desc: 'Score & fix your CV',         icon: FileText,   component: CVReviewer,           accent: '#a3c9ff' },
+  { key: 'cv-builder',    path: '/ai/cv-builder',    label: 'CV Builder',      desc: 'Build a perfect CV from scratch', icon: PenLine,  component: CVBuilder,            accent: '#4edea3', pro: true },
   { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',    desc: 'Tailored letter drafts',      icon: Mail,       component: CoverLetterReviewer,  accent: '#4edea3' },
   { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',       desc: 'Chase with confidence',       icon: Send,       component: FollowUpGenerator,    accent: '#ffb689' },
   { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep',  desc: 'Ace the interview',           icon: BookOpen,   component: InterviewPrep,        accent: '#ffb4ab', pro: true },

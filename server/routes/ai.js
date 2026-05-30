@@ -686,4 +686,82 @@ Return a JSON object with EXACTLY this shape — no other text, no markdown, no 
   }
 })
 
+// POST /api/ai/build-cv
+router.post('/build-cv', async (req, res) => {
+  const { personal, experience, education, skills, extras } = req.body
+  try {
+    const groq = getGroq()
+
+    const expBlock = (experience || []).map((e, i) => `
+Experience ${i + 1}:
+  Company: ${e.company}
+  Title: ${e.title}
+  Start: ${e.start} | End: ${e.end || 'Present'}
+  Location: ${e.location || ''}
+  Bullets (raw): ${(e.bullets || []).join(' | ')}
+`).join('\n')
+
+    const eduBlock = (education || []).map((e, i) => `
+Education ${i + 1}:
+  Institution: ${e.institution}
+  Degree: ${e.degree}
+  Field: ${e.field || ''}
+  Graduation: ${e.graduation}
+  GPA: ${e.gpa || 'N/A'}
+  Achievements: ${e.achievements || ''}
+`).join('\n')
+
+    const prompt = `You are an expert CV writer who specialises in ATS-optimised, recruiter-approved CVs that consistently land interviews at top companies.
+
+Using the candidate information below, write a complete, polished, professional CV.
+
+RULES:
+- Use a clean reverse-chronological format
+- Start with a punchy 2-3 sentence Professional Summary tailored to their target role
+- For each work experience, write 3-5 strong bullet points starting with powerful action verbs (Led, Built, Drove, Reduced, Increased, Spearheaded, etc.)
+- Quantify achievements wherever possible — infer reasonable numbers if the candidate hasn't provided them (e.g. "Reduced deployment time by ~40%")
+- Skills section: split into Technical Skills and Soft Skills, formatted as a clean comma-separated list
+- Education: include relevant coursework or achievements only if provided
+- Keep language tight, confident, professional — no fluff
+- Output ONLY the CV text — no commentary, no markdown code fences, no "Here is your CV:" preamble
+- Format sections with clear ALL-CAPS headers followed by a line of dashes, like:
+  PROFESSIONAL SUMMARY
+  ─────────────────────
+- Use two-space indent for bullet points under experience
+
+CANDIDATE INFO:
+Name: ${personal.firstName} ${personal.lastName}
+Email: ${personal.email}
+Phone: ${personal.phone || ''}
+Location: ${personal.location || ''}
+LinkedIn: ${personal.linkedin || ''}
+Portfolio/Website: ${personal.website || ''}
+Target Role: ${extras?.targetRole || 'Not specified'}
+Years of Experience: ${extras?.yearsExp || 'Not specified'}
+
+${expBlock}
+
+${eduBlock}
+
+Hard Skills: ${(skills?.hard || []).join(', ')}
+Soft Skills: ${(skills?.soft || []).join(', ')}
+Languages: ${(skills?.languages || []).join(', ')}
+Certifications: ${(skills?.certifications || []).join(', ')}
+Extra notes / achievements: ${extras?.notes || ''}
+`
+
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      max_tokens: 2000,
+    })
+
+    res.json({ cv: completion.choices[0].message.content.trim() })
+  } catch (err) {
+    console.error('CV build error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router

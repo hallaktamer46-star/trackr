@@ -36,7 +36,8 @@ const PLANS = [
     description: 'Everything you need to land your next role faster.',
     features: [
       'Unlimited applications',
-      'All 8 AI tools',
+      'All AI tools',
+      'CV Builder (build from scratch)',
       'CV & Cover Letter AI review',
       'Interview prep & coaching',
       'Salary & market intelligence',
