@@ -44,9 +44,24 @@ export default function Header() {
 
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 bg-sky-500 rounded-lg shadow-[0_0_14px_rgba(14,165,233,0.45)] grid place-items-center">
-            <div className="w-4 h-4 border-2 border-white rounded-sm" />
-          </div>
+          <svg width="32" height="32" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="arrowGradient" x1="250" y1="700" x2="760" y2="270" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#1267FF"/>
+                <stop offset="55%" stopColor="#00A7A7"/>
+                <stop offset="100%" stopColor="#00B86B"/>
+              </linearGradient>
+              <linearGradient id="darkGradient" x1="220" y1="330" x2="600" y2="760" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#10233D"/>
+                <stop offset="100%" stopColor="#06111F"/>
+              </linearGradient>
+            </defs>
+            <g transform="translate(40, 20)">
+              <path d="M205 355 Q215 325 245 325 H690 L650 405 H525 L455 700 Q445 745 395 745 H315 L395 405 H160 L205 355Z" fill="url(#darkGradient)"/>
+              <path d="M455 745 C610 755 735 640 735 500 C735 448 722 405 700 370 L760 370 L650 255 L610 405 L670 405 C690 435 700 470 700 508 C700 628 600 715 455 745Z" fill="url(#arrowGradient)"/>
+              <path d="M505 455 C565 395 630 385 710 390 C630 410 565 465 525 540 C490 610 425 640 350 640 C420 620 460 565 505 455Z" fill="#ffffff"/>
+            </g>
+          </svg>
           <span className="font-extrabold text-lg tracking-tighter font-mono text-slate-900 dark:text-white hidden sm:block">
             TRACKR
           </span>
