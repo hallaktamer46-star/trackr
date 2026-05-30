@@ -93,7 +93,7 @@ export default function Home() {
         {canAddMore && (
           <button
             onClick={() => { setEditingApp(null); setModalOpen(true) }}
-            className="flex items-center gap-1.5 px-4 py-2 rounded font-bold text-xs text-white transition-all active:scale-95 hover:brightness-110"
+            className="flex items-center gap-1.5 px-4 py-2 font-bold text-xs text-white transition-all active:scale-95 hover:brightness-110"
             style={{ background: '#1493ff', boxShadow: '0 4px 12px rgba(20,147,255,0.3)', letterSpacing: '0.02em' }}
           >
             <Plus size={14} />
@@ -107,14 +107,14 @@ export default function Home() {
         {STATS.map(({ key, label, dot, color }) => {
           const val = stats[key]
           return (
-            <div key={key} className="surface-glass rounded-lg flex-1 min-w-[110px]" style={{ padding: '14px 16px' }}>
-              <div className="flex items-center gap-1.5 mb-2">
+            <div key={key} className="surface-glass flex-1 min-w-[90px]" style={{ padding: '10px 12px' }}>
+              <div className="flex items-center gap-1.5 mb-1.5">
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: dot }} />
                 <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', color: '#c0c7d5', textTransform: 'uppercase' }}>
                   {label}
                 </span>
               </div>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 32, fontWeight: 700, letterSpacing: '-0.04em', color: val === 0 ? 'rgba(194,199,213,0.25)' : color, lineHeight: 1 }}>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: val === 0 ? 'rgba(194,199,213,0.25)' : color, lineHeight: 1 }}>
                 {val}
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function Home() {
               <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: '#c0c7d5', textTransform: 'uppercase' }}>
                 Follow-up Reminders
               </span>
-              <span className="rounded-full px-1.5 py-0.5 text-[10px] font-bold" style={{ background: '#e56f03', color: '#fff', fontFamily: 'Geist Mono, monospace' }}>
+              <span className="px-1.5 py-0.5 text-[10px] font-bold" style={{ background: '#e56f03', color: '#fff', fontFamily: 'Geist Mono, monospace' }}>
                 {followUps.length}
               </span>
             </div>
@@ -148,7 +148,7 @@ export default function Home() {
               <button
                 key={app.id}
                 onClick={() => { setEditingApp(app); setModalOpen(true) }}
-                className="surface-glass w-full flex items-center gap-3 rounded-lg text-left transition-all group"
+                className="surface-glass w-full flex items-center gap-3 rounded-none text-left transition-all group"
                 style={{ padding: '10px 14px' }}
               >
                 <AlertTriangle size={13} style={{ color: '#ffb689', flexShrink: 0 }} />
@@ -171,7 +171,7 @@ export default function Home() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
         {/* Weekly chart */}
-        <section className="surface-glass rounded-lg lg:col-span-7" style={{ padding: 16 }}>
+        <section className="surface-glass rounded-none lg:col-span-7" style={{ padding: 16 }}>
           <div className="flex items-center justify-between mb-5">
             <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: '#c0c7d5', textTransform: 'uppercase' }}>
               Applications Activity
@@ -206,7 +206,7 @@ export default function Home() {
         </section>
 
         {/* AI Tools */}
-        <section className="surface-glass rounded-lg lg:col-span-5" style={{ padding: 16 }}>
+        <section className="surface-glass rounded-none lg:col-span-5" style={{ padding: 16 }}>
           <div className="flex items-center gap-2 mb-4">
             <Sparkles size={15} style={{ color: '#a3c9ff' }} />
             <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: '#c0c7d5', textTransform: 'uppercase' }}>
@@ -218,10 +218,10 @@ export default function Home() {
               <button
                 key={to}
                 onClick={() => navigate(to)}
-                className="tool-card flex items-center gap-2.5 rounded-lg text-left group"
+                className="tool-card flex items-center gap-2.5 rounded-none text-left group"
                 style={{ padding: '8px 10px' }}
               >
-                <div className="w-7 h-7 rounded flex items-center justify-center shrink-0" style={{ background: iconBg, border: `0.5px solid ${border}` }}>
+                <div className="w-7 h-7 flex items-center justify-center shrink-0" style={{ background: iconBg, border: `0.5px solid ${border}` }}>
                   <Icon size={13} style={{ color: accent }} />
                 </div>
                 <span className="text-xs font-medium leading-tight" style={{ color: '#e2e2e8', fontFamily: 'Geist, Inter, sans-serif' }}>

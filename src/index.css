@@ -28,6 +28,7 @@
 .tool-card {
   background: #1a1c20;
   border: 0.5px solid rgba(138, 145, 159, 0.15);
+  border-radius: 0 !important;
   transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
 }
 .tool-card:hover {
