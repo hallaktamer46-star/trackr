@@ -71,7 +71,7 @@ export default function AITools() {
       </div>
 
       {/* Tool picker grid */}
-      <div className="grid grid-cols-4 gap-px mb-8" style={{ background: 'rgba(138,145,159,0.12)' }}>
+      <div className="grid grid-cols-4 gap-px mb-8" style={{ background: 'rgba(48,54,61,0.6)' }}>
         {TOOLS.map(t => {
           const Icon = t.icon
           const isActive = t.key === tool
@@ -82,8 +82,8 @@ export default function AITools() {
               className="relative flex items-center gap-3 transition-all"
               style={{
                 background: isActive
-                  ? `linear-gradient(135deg, ${t.accent}0f 0%, rgba(17,19,24,0.95) 100%)`
-                  : '#0d1117',
+                  ? `linear-gradient(135deg, ${t.accent}14 0%, #1c2128 100%)`
+                  : '#161b22',
                 padding: '14px 16px',
                 borderLeft: isActive ? `2px solid ${t.accent}` : '2px solid transparent',
               }}
