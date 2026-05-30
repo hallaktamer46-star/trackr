@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { isSupabaseConfigured } from '../lib/supabase'
+import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 export default function Auth() {
   const { signIn, signUp } = useAuth()
@@ -139,6 +139,20 @@ export default function Auth() {
             <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 font-mono">or</span>
             <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
           </div>
+
+          <button
+            type="button"
+            onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })}
+            className="mt-4 w-full h-11 flex items-center justify-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200"
+          >
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.3z"/>
+              <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.1 1.4-4.8 2.3-8 2.3-6.2 0-11.4-4.2-13.3-9.8H2.6v6.2C6.6 42.7 14.8 48 24 48z"/>
+              <path fill="#FBBC05" d="M10.7 28.7A14.7 14.7 0 0 1 10 24c0-1.6.3-3.2.7-4.7v-6.2H2.6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.9l8.1-6.2z"/>
+              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.9 2.1 30.4 0 24 0 14.8 0 6.6 5.3 2.6 13.1l8.1 6.2C12.6 13.7 17.8 9.5 24 9.5z"/>
+            </svg>
+            Continue with Google
+          </button>
 
           <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 text-center">
             {mode === 'signin' ? 'No account yet?' : 'Already have an account?'}{' '}
