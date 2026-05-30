@@ -142,64 +142,66 @@ export default function AITools() {
         })}
       </div>
 
-      {/* Tool content */}
-      <ActiveComponent />
+      {/* Tool content — paywall scoped to this box only */}
+      <div className="relative">
+        <ActiveComponent />
 
-      {/* Free → Pro paywall */}
-      {showProWall && (
-        <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
-          <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
-            <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)' }}>
-              <Lock size={18} style={{ color: '#a3c9ff' }} />
+        {/* Free → Pro paywall */}
+        {showProWall && (
+          <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
+            <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+              <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)' }}>
+                <Lock size={18} style={{ color: '#a3c9ff' }} />
+              </div>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
+                Pro Feature
+              </p>
+              <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
+                Unlock AI Tools
+              </h2>
+              <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
+                Tailored CV reviews, cover letter critiques and follow-up drafts. Triple your interview rate.
+              </p>
+              <button
+                onClick={() => navigate('/plans')}
+                className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
+                style={{ background: '#1493ff', color: '#fff', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
+              >
+                <Crown size={13} /> View Plans
+              </button>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
             </div>
-            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
-              Pro Feature
-            </p>
-            <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
-              Unlock AI Tools
-            </h2>
-            <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
-              Tailored CV reviews, cover letter critiques and follow-up drafts. Triple your interview rate.
-            </p>
-            <button
-              onClick={() => navigate('/plans')}
-              className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
-              style={{ background: '#1493ff', color: '#fff', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
-            >
-              <Crown size={13} /> View Plans
-            </button>
-            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Pro → Apex paywall (only on apex tools) */}
-      {showApexWall && (
-        <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
-          <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
-            <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(78,222,163,0.08)', border: '0.5px solid rgba(78,222,163,0.25)' }}>
-              <Rocket size={18} style={{ color: '#4edea3' }} />
+        {/* Pro → Apex paywall */}
+        {showApexWall && (
+          <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
+            <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+              <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(78,222,163,0.08)', border: '0.5px solid rgba(78,222,163,0.25)' }}>
+                <Rocket size={18} style={{ color: '#4edea3' }} />
+              </div>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 8 }}>
+                Apex Exclusive
+              </p>
+              <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
+                Upgrade to Apex
+              </h2>
+              <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
+                The Offer Simulator is exclusive to Apex. Practice real salary negotiations with an AI recruiter and get a full performance scorecard.
+              </p>
+              <button
+                onClick={() => navigate('/plans')}
+                className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
+                style={{ background: 'linear-gradient(90deg, #4edea3, #a3c9ff)', color: '#0d1117', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
+              >
+                <Rocket size={13} /> Upgrade to Apex — $29/mo
+              </button>
+              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
             </div>
-            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 8 }}>
-              Apex Exclusive
-            </p>
-            <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
-              Upgrade to Apex
-            </h2>
-            <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
-              The Offer Simulator is exclusive to Apex. Practice real salary negotiations with an AI recruiter and get a full performance scorecard.
-            </p>
-            <button
-              onClick={() => navigate('/plans')}
-              className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
-              style={{ background: 'linear-gradient(90deg, #4edea3, #a3c9ff)', color: '#0d1117', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
-            >
-              <Rocket size={13} /> Upgrade to Apex — $29/mo
-            </button>
-            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
     </div>
   )
