@@ -83,7 +83,7 @@ export default function AITools() {
               style={{
                 background: isActive
                   ? `linear-gradient(135deg, ${t.accent}0f 0%, rgba(17,19,24,0.95) 100%)`
-                  : '#111318',
+                  : '#0d1117',
                 padding: '14px 16px',
                 borderLeft: isActive ? `2px solid ${t.accent}` : '2px solid transparent',
               }}

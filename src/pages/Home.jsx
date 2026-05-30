@@ -33,7 +33,7 @@ const STATS = [
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div style={{ background: '#1e2024', border: '0.5px solid rgba(138,145,159,0.3)', borderRadius: 6, padding: '6px 10px' }}>
+    <div style={{ background: '#161b22', border: '0.5px solid rgba(138,145,159,0.3)', borderRadius: 6, padding: '6px 10px' }}>
       <p style={{ color: '#c0c7d5', fontFamily: 'Geist Mono, monospace', fontSize: 10, marginBottom: 2 }}>{label}</p>
       <p style={{ color: '#a3c9ff', fontFamily: 'Geist Mono, monospace', fontSize: 13, fontWeight: 600 }}>{payload[0].value}</p>
     </div>
@@ -107,7 +107,7 @@ export default function Home() {
         {STATS.map(({ key, label, dot, color }) => {
           const val = stats[key]
           return (
-            <div key={key} style={{ background: '#111318', padding: '10px 14px' }}>
+            <div key={key} style={{ background: '#0d1117', padding: '10px 14px' }}>
               <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', marginBottom: 6 }}>
                 {label}
               </p>

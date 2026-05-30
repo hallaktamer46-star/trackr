@@ -20,7 +20,7 @@ const STATUS_LABELS = {
 
 const TIP = {
   contentStyle: {
-    background: '#1e2024',
+    background: '#161b22',
     border: '0.5px solid rgba(138,145,159,0.3)',
     borderRadius: 0,
     fontSize: 11,
@@ -32,10 +32,10 @@ const TIP = {
 }
 
 const CARD = {
-  background: 'rgba(30,32,36,0.7)',
+  background: 'rgba(22,27,34,0.85)',
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
-  border: '0.5px solid rgba(138,145,159,0.2)',
+  border: '0.5px solid rgba(48,54,61,0.9)',
   padding: 16,
 }
 
@@ -103,7 +103,7 @@ export default function Stats() {
         {kpis.map(({ label, value, color, bar }) => {
           const isEmpty = value === 0 || value === '0%'
           return (
-            <div key={label} style={{ background: '#111318', padding: '10px 14px' }}>
+            <div key={label} style={{ background: '#0d1117', padding: '10px 14px' }}>
               <p style={{ ...LABEL, marginBottom: 6 }}>{label}</p>
               <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: isEmpty ? 'rgba(138,145,159,0.2)' : color }}>
                 {value}

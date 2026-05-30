@@ -16,26 +16,26 @@
 * { box-sizing: border-box; }
 
 .surface-glass {
-  background: rgba(30, 32, 36, 0.7);
+  background: rgba(22, 27, 34, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 0.5px solid rgba(138, 145, 159, 0.2);
+  border: 0.5px solid rgba(48, 54, 61, 0.9);
   transition: border-color 0.15s;
 }
 .surface-glass:hover {
-  border-color: rgba(163, 201, 255, 0.35);
+  border-color: rgba(163, 201, 255, 0.3);
 }
 .tool-card {
-  background: #1a1c20;
-  border: 0.5px solid rgba(138, 145, 159, 0.15);
+  background: #161b22;
+  border: 0.5px solid rgba(48, 54, 61, 0.9);
   border-radius: 0 !important;
   transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
 }
 .tool-card:hover {
   transform: translateY(-1px);
-  background: #1e2024;
-  border-color: rgba(163, 201, 255, 0.28);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  background: #1c2128;
+  border-color: rgba(163, 201, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 
 /* Strip all border-radius inside AI Tools page, keep circles intact */
@@ -55,4 +55,4 @@ body {
   background: #f8fafc;
 }
 
-.dark body { background: #020817; }
+.dark body { background: #0d1117; }
