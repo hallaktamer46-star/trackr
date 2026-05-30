@@ -10,7 +10,7 @@ export default function ProfileDropdown() {
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [form, setForm] = useState({ first_name: '', last_name: '', age: '' })
+  const [form, setForm] = useState({ first_name: '', last_name: '', age: '', profession: '' })
   const ref = useRef(null)
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function ProfileDropdown() {
   useEffect(() => {
     if (open) {
       const m = user?.user_metadata || {}
-      setForm({ first_name: m.first_name || '', last_name: m.last_name || '', age: m.age || '' })
+      setForm({ first_name: m.first_name || '', last_name: m.last_name || '', age: m.age || '', profession: m.profession || '' })
       setEditing(false)
     }
   }, [open, user])
@@ -83,6 +83,7 @@ export default function ProfileDropdown() {
               {displayName || user?.email}
             </p>
             <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">{user?.email}</p>
+            {m.profession && <p className="text-xs text-sky-500 font-mono mt-0.5">{m.profession}</p>}
 
             {/* Age + Plan grid */}
             <div className="grid grid-cols-2 gap-2 mt-3">
@@ -101,8 +102,9 @@ export default function ProfileDropdown() {
           {editing ? (
             <div className="px-4 py-3 space-y-3 border-b border-slate-100 dark:border-slate-800">
               {[
-                { key: 'first_name', label: 'First name', type: 'text' },
-                { key: 'last_name',  label: 'Last name',  type: 'text' },
+                { key: 'first_name', label: 'First name', type: 'text'   },
+                { key: 'last_name',  label: 'Last name',  type: 'text'   },
+                { key: 'profession', label: 'Profession', type: 'text'   },
                 { key: 'age',        label: 'Age',        type: 'number' },
               ].map(({ key, label, type }) => (
                 <div key={key}>
