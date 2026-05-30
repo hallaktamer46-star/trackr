@@ -47,24 +47,28 @@ export default function Header() {
           <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <rect width="100" height="100" rx="22" fill="#4A1E8A"/>
             <circle cx="18" cy="37" r="7.5" fill="#C084FC"/>
-            <line x1="18" y1="45" x2="18" y2="57" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="18" y1="48" x2="18" y2="54" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="18" cy="65" r="7.5" fill="#C084FC"/>
             <circle cx="33" cy="20" r="7.5" fill="#C084FC"/>
-            <line x1="33" y1="28" x2="33" y2="74" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="33" y1="31" x2="33" y2="43" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="33" cy="51" r="7.5" fill="#C084FC"/>
+            <line x1="33" y1="61" x2="33" y2="71" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="33" cy="82" r="7.5" fill="#C084FC"/>
             <circle cx="50" cy="13" r="7" fill="#C084FC"/>
-            <line x1="50" y1="20" x2="50" y2="38" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="50" y1="23" x2="50" y2="27" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="50" y1="31" x2="50" y2="35" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="50" cy="45" r="7" fill="#C084FC"/>
             <circle cx="50" cy="59" r="7" fill="#C084FC"/>
-            <line x1="50" y1="66" x2="50" y2="84" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="50" y1="69" x2="50" y2="73" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="50" y1="77" x2="50" y2="81" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="50" cy="91" r="7" fill="#C084FC"/>
             <circle cx="67" cy="20" r="7.5" fill="#C084FC"/>
-            <line x1="67" y1="28" x2="67" y2="74" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="67" y1="31" x2="67" y2="43" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="67" cy="51" r="7.5" fill="#C084FC"/>
+            <line x1="67" y1="61" x2="67" y2="71" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="67" cy="82" r="7.5" fill="#C084FC"/>
             <circle cx="82" cy="37" r="7.5" fill="#C084FC"/>
-            <line x1="82" y1="45" x2="82" y2="57" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
+            <line x1="82" y1="48" x2="82" y2="54" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
             <circle cx="82" cy="65" r="7.5" fill="#C084FC"/>
           </svg>
           <span className="font-extrabold text-lg tracking-tighter font-mono text-slate-900 dark:text-white hidden sm:block">
