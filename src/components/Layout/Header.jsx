@@ -44,28 +44,28 @@ export default function Header() {
 
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
-          <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <rect width="100" height="100" rx="22" fill="#4A1E8A"/>
-            <circle cx="13" cy="38" r="5" fill="#C084FC"/>
-            <line x1="13" y1="43" x2="13" y2="59" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="13" cy="64" r="5" fill="#C084FC"/>
-            <circle cx="28" cy="19" r="5" fill="#C084FC"/>
-            <line x1="28" y1="24" x2="28" y2="76" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="28" cy="50" r="5" fill="#C084FC"/>
-            <circle cx="28" cy="81" r="5" fill="#C084FC"/>
-            <circle cx="50" cy="18" r="4.5" fill="#C084FC"/>
-            <line x1="50" y1="23" x2="50" y2="34" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="50" cy="39" r="4.5" fill="#C084FC"/>
-            <circle cx="50" cy="55" r="4.5" fill="#C084FC"/>
-            <line x1="50" y1="60" x2="50" y2="71" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="50" cy="76" r="4.5" fill="#C084FC"/>
-            <circle cx="72" cy="19" r="5" fill="#C084FC"/>
-            <line x1="72" y1="24" x2="72" y2="76" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="72" cy="50" r="5" fill="#C084FC"/>
-            <circle cx="72" cy="81" r="5" fill="#C084FC"/>
-            <circle cx="87" cy="38" r="5" fill="#C084FC"/>
-            <line x1="87" y1="43" x2="87" y2="59" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="87" cy="64" r="5" fill="#C084FC"/>
+            <circle cx="18" cy="38" r="6" fill="#C084FC"/>
+            <line x1="18" y1="44" x2="18" y2="58" stroke="#C084FC" strokeWidth="6" strokeLinecap="round"/>
+            <circle cx="18" cy="64" r="6" fill="#C084FC"/>
+            <circle cx="33" cy="18" r="6" fill="#C084FC"/>
+            <line x1="33" y1="24" x2="33" y2="78" stroke="#C084FC" strokeWidth="6" strokeLinecap="round"/>
+            <circle cx="33" cy="50" r="6" fill="#C084FC"/>
+            <circle cx="33" cy="84" r="6" fill="#C084FC"/>
+            <circle cx="50" cy="22" r="5" fill="#C084FC"/>
+            <line x1="50" y1="27" x2="50" y2="38" stroke="#C084FC" strokeWidth="5.5" strokeLinecap="round"/>
+            <circle cx="50" cy="43" r="5" fill="#C084FC"/>
+            <circle cx="50" cy="57" r="5" fill="#C084FC"/>
+            <line x1="50" y1="62" x2="50" y2="73" stroke="#C084FC" strokeWidth="5.5" strokeLinecap="round"/>
+            <circle cx="50" cy="78" r="5" fill="#C084FC"/>
+            <circle cx="67" cy="18" r="6" fill="#C084FC"/>
+            <line x1="67" y1="24" x2="67" y2="78" stroke="#C084FC" strokeWidth="6" strokeLinecap="round"/>
+            <circle cx="67" cy="50" r="6" fill="#C084FC"/>
+            <circle cx="67" cy="84" r="6" fill="#C084FC"/>
+            <circle cx="82" cy="38" r="6" fill="#C084FC"/>
+            <line x1="82" y1="44" x2="82" y2="58" stroke="#C084FC" strokeWidth="6" strokeLinecap="round"/>
+            <circle cx="82" cy="64" r="6" fill="#C084FC"/>
           </svg>
           <span className="font-extrabold text-lg tracking-tighter font-mono text-slate-900 dark:text-white hidden sm:block">
             TRACKR
