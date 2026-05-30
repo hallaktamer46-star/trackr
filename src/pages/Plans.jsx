@@ -49,13 +49,14 @@ const PLANS = [
   {
     key: 'apex',
     name: 'Apex',
-    price: '$39',
+    price: '$29',
     period: 'per month',
     icon: Rocket,
     accent: '#4edea3',
     description: 'For serious candidates who want an unfair advantage.',
     features: [
       'Everything in Pro',
+      'Offer Negotiation Simulator',
       'AI job matching from board',
       'Email reminders to your inbox',
       'Exportable pipeline (PDF / CSV)',
@@ -71,7 +72,7 @@ const PLANS = [
 
 export default function Plans() {
   const { user } = useAuth()
-  const { isPaidUser } = useApplications()
+  const { isPaidUser, isApexUser } = useApplications()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(null)
   const [error, setError] = useState(null)
@@ -119,7 +120,10 @@ export default function Plans() {
         {PLANS.map(plan => {
           const Icon = plan.icon
           const isCurrentFree = plan.key === 'free' && !isPaidUser
-          const isCurrentPro  = plan.key === 'pro'  && isPaidUser
+          const isCurrentPro  = plan.key === 'pro'  && isPaidUser && !isApexUser
+          const isCurrentApex = plan.key === 'apex' && isApexUser
+
+          const isCurrent = isCurrentFree || isCurrentPro || isCurrentApex
 
           return (
             <div
@@ -185,27 +189,29 @@ export default function Plans() {
 
               {/* CTA */}
               <button
-                onClick={() => plan.key !== 'free' && !isCurrentPro && handleUpgrade(plan.key)}
-                disabled={plan.disabled || isCurrentFree || isCurrentPro || loading === plan.key}
+                onClick={() => !isCurrent && !plan.disabled && handleUpgrade(plan.key)}
+                disabled={plan.disabled || isCurrent || loading === plan.key}
                 className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110 disabled:opacity-40"
                 style={{
                   padding: '11px 0',
-                  background: plan.disabled || isCurrentFree || isCurrentPro
+                  background: isCurrent || plan.disabled
                     ? 'rgba(138,145,159,0.1)'
-                    : plan.accent === '#a3c9ff' ? '#1493ff' : `${plan.accent}22`,
-                  border: `0.5px solid ${plan.disabled || isCurrentFree || isCurrentPro ? 'rgba(138,145,159,0.2)' : plan.accent}`,
-                  color: plan.disabled || isCurrentFree || isCurrentPro ? '#8a919f' : plan.key === 'pro' ? '#fff' : plan.accent,
+                    : plan.key === 'apex'
+                      ? 'linear-gradient(90deg, #4edea3, #a3c9ff)'
+                      : plan.accent === '#a3c9ff' ? '#1493ff' : `${plan.accent}22`,
+                  border: `0.5px solid ${isCurrent || plan.disabled ? 'rgba(138,145,159,0.2)' : plan.accent}`,
+                  color: isCurrent || plan.disabled ? '#8a919f' : plan.key === 'apex' ? '#0d1117' : plan.key === 'pro' ? '#fff' : plan.accent,
                   fontFamily: 'Geist Mono, monospace',
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
-                  cursor: plan.disabled || isCurrentFree || isCurrentPro ? 'default' : 'pointer',
+                  cursor: isCurrent || plan.disabled ? 'default' : 'pointer',
                 }}
               >
                 {loading === plan.key
                   ? <><Loader2 size={13} className="animate-spin" /> Opening…</>
-                  : isCurrentFree || isCurrentPro ? 'Current plan' : plan.cta
+                  : isCurrent ? 'Current plan' : plan.cta
                 }
               </button>
             </div>

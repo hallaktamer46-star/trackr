@@ -128,6 +128,7 @@ export function ApplicationProvider({ children }) {
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL
   const isAdmin = adminEmail && user?.email === adminEmail
   const isPaidUser = isAdmin || user?.user_metadata?.is_paid || !isSupabaseConfigured
+  const isApexUser = isAdmin || user?.user_metadata?.is_apex || !isSupabaseConfigured
   const canAddMore = !isSupabaseConfigured || isPaidUser || applications.length < 10
 
   return (
@@ -138,6 +139,7 @@ export function ApplicationProvider({ children }) {
       deleteApplication,
       moveApplication,
       isPaidUser,
+      isApexUser,
       canAddMore,
     }}>
       {children}

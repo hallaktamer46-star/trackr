@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake } from 'lucide-react'
+import { FileText, Mail, Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket } from 'lucide-react'
 import CVReviewer from '../components/AI/CVReviewer'
 import CoverLetterReviewer from '../components/AI/CoverLetterReviewer'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
@@ -13,48 +13,31 @@ import NegotiationSimulator from '../components/AI/NegotiationSimulator'
 import { useApplications } from '../contexts/ApplicationContext'
 import { useAuth } from '../contexts/AuthContext'
 import { apiFetch } from '../lib/api'
-import { cn } from '../lib/cn'
 
 const TOOLS = [
-  { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',    desc: 'Score & fix your CV',        icon: FileText,   component: CVReviewer,          accent: '#a3c9ff' },
-  { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',   desc: 'Tailored letter drafts',     icon: Mail,       component: CoverLetterReviewer, accent: '#4edea3' },
-  { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',      desc: 'Chase with confidence',      icon: Send,       component: FollowUpGenerator,   accent: '#ffb689' },
-  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep', desc: 'Ace the interview',          icon: BookOpen,   component: InterviewPrep,       accent: '#ffb4ab', hot: true },
-  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',   desc: 'Know your market worth',     icon: DollarSign, component: SalaryIntelligence,  accent: '#a3c9ff', hot: true },
-  { key: 'market',         path: '/ai/market',         label: 'Market Intel',   desc: 'Industry trends & signals',  icon: BarChart2,  component: MarketAnalysis,      accent: '#4edea3', hot: true },
-  { key: 'company',        path: '/ai/company',        label: 'Company Brief',  desc: 'Deep-dive any employer',     icon: Building2,  component: CompanyResearch,     accent: '#ffb689', hot: true },
-  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',       desc: 'Optimise your profile',      icon: Link2,      component: LinkedInReviewer,    accent: '#ffb4ab', hot: true },
-  { key: 'negotiate',      path: '/ai/negotiate',      label: 'Offer Simulator', desc: 'Practice salary negotiation', icon: Handshake,  component: NegotiationSimulator, accent: '#4edea3', hot: true, apex: true },
+  { key: 'cv',             path: '/ai/cv',             label: 'CV Reviewer',     desc: 'Score & fix your CV',         icon: FileText,   component: CVReviewer,           accent: '#a3c9ff' },
+  { key: 'cover-letter',   path: '/ai/cover-letter',   label: 'Cover Letter',    desc: 'Tailored letter drafts',      icon: Mail,       component: CoverLetterReviewer,  accent: '#4edea3' },
+  { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',       desc: 'Chase with confidence',       icon: Send,       component: FollowUpGenerator,    accent: '#ffb689' },
+  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep',  desc: 'Ace the interview',           icon: BookOpen,   component: InterviewPrep,        accent: '#ffb4ab', pro: true },
+  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',    desc: 'Know your market worth',      icon: DollarSign, component: SalaryIntelligence,   accent: '#a3c9ff', pro: true },
+  { key: 'market',         path: '/ai/market',         label: 'Market Intel',    desc: 'Industry trends & signals',   icon: BarChart2,  component: MarketAnalysis,       accent: '#4edea3', pro: true },
+  { key: 'company',        path: '/ai/company',        label: 'Company Brief',   desc: 'Deep-dive any employer',      icon: Building2,  component: CompanyResearch,      accent: '#ffb689', pro: true },
+  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',        desc: 'Optimise your profile',       icon: Link2,      component: LinkedInReviewer,     accent: '#ffb4ab', pro: true },
+  { key: 'negotiate',      path: '/ai/negotiate',      label: 'Offer Simulator', desc: 'Practice salary negotiation', icon: Handshake,  component: NegotiationSimulator, accent: '#4edea3', apex: true },
 ]
 
 export default function AITools() {
   const { tool = 'cv' } = useParams()
-  const { isPaidUser } = useApplications()
+  const { isPaidUser, isApexUser } = useApplications()
   const { user } = useAuth()
   const navigate = useNavigate()
-  const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const [checkoutError, setCheckoutError] = useState(null)
-
-  const handleUpgrade = async () => {
-    if (!user) return
-    setCheckoutLoading(true); setCheckoutError(null)
-    try {
-      const res = await apiFetch('/api/stripe/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, email: user.email }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-      window.location.href = data.url
-    } catch (err) {
-      setCheckoutError(err.message || 'Could not open checkout. Is the server running?')
-      setCheckoutLoading(false)
-    }
-  }
 
   const active = TOOLS.find(t => t.key === tool) || TOOLS[0]
   const ActiveComponent = active.component
+
+  // Which paywall to show?
+  const showProWall  = !isPaidUser
+  const showApexWall = isPaidUser && !isApexUser && active.apex
 
   return (
     <div className="ai-sharp max-w-4xl mx-auto relative">
@@ -135,35 +118,23 @@ export default function AITools() {
               {/* Badge */}
               {t.apex ? (
                 <span style={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  fontFamily: 'Geist Mono, monospace',
-                  fontSize: 7,
-                  fontWeight: 700,
+                  position: 'absolute', top: 8, right: 8,
+                  fontFamily: 'Geist Mono, monospace', fontSize: 7, fontWeight: 700,
                   letterSpacing: '0.06em',
                   background: 'linear-gradient(90deg, #4edea3, #a3c9ff)',
-                  color: '#0d1117',
-                  padding: '2px 5px',
-                  lineHeight: 1.4,
+                  color: '#0d1117', padding: '2px 5px', lineHeight: 1.4,
                 }}>
                   APEX
                 </span>
-              ) : t.hot ? (
+              ) : t.pro ? (
                 <span style={{
-                  position: 'absolute',
-                  top: 8,
-                  right: 8,
-                  fontFamily: 'Geist Mono, monospace',
-                  fontSize: 7,
-                  fontWeight: 700,
+                  position: 'absolute', top: 8, right: 8,
+                  fontFamily: 'Geist Mono, monospace', fontSize: 7, fontWeight: 700,
                   letterSpacing: '0.06em',
                   background: '#1493ff',
-                  color: '#fff',
-                  padding: '2px 5px',
-                  lineHeight: 1.4,
+                  color: '#fff', padding: '2px 5px', lineHeight: 1.4,
                 }}>
-                  NEW
+                  PRO
                 </span>
               ) : null}
             </NavLink>
@@ -174,8 +145,8 @@ export default function AITools() {
       {/* Tool content */}
       <ActiveComponent />
 
-      {/* Paywall overlay */}
-      {!isPaidUser && (
+      {/* Free → Pro paywall */}
+      {showProWall && (
         <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
           <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
             <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)' }}>
@@ -201,6 +172,35 @@ export default function AITools() {
           </div>
         </div>
       )}
+
+      {/* Pro → Apex paywall (only on apex tools) */}
+      {showApexWall && (
+        <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
+          <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+            <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(78,222,163,0.08)', border: '0.5px solid rgba(78,222,163,0.25)' }}>
+              <Rocket size={18} style={{ color: '#4edea3' }} />
+            </div>
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 8 }}>
+              Apex Exclusive
+            </p>
+            <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
+              Upgrade to Apex
+            </h2>
+            <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
+              The Offer Simulator is exclusive to Apex. Practice real salary negotiations with an AI recruiter and get a full performance scorecard.
+            </p>
+            <button
+              onClick={() => navigate('/plans')}
+              className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
+              style={{ background: 'linear-gradient(90deg, #4edea3, #a3c9ff)', color: '#0d1117', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
+            >
+              <Rocket size={13} /> Upgrade to Apex — $29/mo
+            </button>
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
