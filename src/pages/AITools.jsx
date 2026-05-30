@@ -58,18 +58,20 @@ export default function AITools() {
     <div className="ai-sharp max-w-4xl mx-auto relative">
 
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-2">
+      <div className="mb-6" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+        <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 4 }}>
           Trackr Assist
         </p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">AI Toolkit</h1>
-        <p className="text-sm text-slate-400 dark:text-slate-500 mt-2 max-w-xl">
+        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15 }}>
+          AI Toolkit
+        </h1>
+        <p style={{ fontSize: 13, color: '#8a919f', marginTop: 4 }}>
           Precision feedback on your materials. Each tool is tuned to the role, not generic AI fluff.
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-1 mb-6 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1 rounded-xl w-fit">
+      {/* Icon grid toolbar */}
+      <div className="grid grid-cols-8 mb-6" style={{ background: 'rgba(138,145,159,0.15)', gap: 1 }}>
         {TOOLS.map(t => {
           const Icon = t.icon
           const isActive = t.key === tool
@@ -77,16 +79,41 @@ export default function AITools() {
             <NavLink
               key={t.key}
               to={t.path}
-              className={cn(
-                'relative flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-mono uppercase tracking-wider font-semibold transition-all',
-                isActive
-                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-              )}
+              className="relative flex flex-col items-center justify-center gap-2 py-4 transition-all group"
+              style={{
+                background: isActive ? 'rgba(163,201,255,0.08)' : '#111318',
+                borderBottom: isActive ? '2px solid #a3c9ff' : '2px solid transparent',
+              }}
             >
-              <Icon size={13} /> {t.label}
+              <Icon
+                size={18}
+                style={{ color: isActive ? '#a3c9ff' : '#8a919f', transition: 'color 0.15s' }}
+              />
+              <span style={{
+                fontFamily: 'Geist Mono, monospace',
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: isActive ? '#a3c9ff' : '#8a919f',
+                transition: 'color 0.15s',
+              }}>
+                {t.label}
+              </span>
               {t.hot && (
-                <span className="absolute -top-1.5 -right-1.5 text-[8px] font-extrabold bg-sky-500 text-white px-1 py-0.5 leading-none tracking-wide uppercase">
+                <span style={{
+                  position: 'absolute',
+                  top: 6,
+                  right: 6,
+                  fontFamily: 'Geist Mono, monospace',
+                  fontSize: 7,
+                  fontWeight: 700,
+                  letterSpacing: '0.05em',
+                  background: '#1493ff',
+                  color: '#fff',
+                  padding: '1px 4px',
+                  lineHeight: '14px',
+                }}>
                   NEW
                 </span>
               )}
