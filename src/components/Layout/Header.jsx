@@ -44,21 +44,17 @@ export default function Header() {
 
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
-          <svg width="34" height="34" viewBox="155 248 615 510" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="hArrowGrad" x1="250" y1="700" x2="760" y2="270" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#1267FF"/>
-                <stop offset="55%" stopColor="#00A7A7"/>
-                <stop offset="100%" stopColor="#00B86B"/>
-              </linearGradient>
-              <linearGradient id="hDarkGrad" x1="220" y1="330" x2="600" y2="760" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#10233D"/>
-                <stop offset="100%" stopColor="#06111F"/>
-              </linearGradient>
-            </defs>
-            <path d="M205 355 Q215 325 245 325 H690 L650 405 H525 L455 700 Q445 745 395 745 H315 L395 405 H160 L205 355Z" fill="url(#hDarkGrad)"/>
-            <path d="M455 745 C610 755 735 640 735 500 C735 448 722 405 700 370 L760 370 L650 255 L610 405 L670 405 C690 435 700 470 700 508 C700 628 600 715 455 745Z" fill="url(#hArrowGrad)"/>
-            <path d="M505 455 C565 395 630 385 710 390 C630 410 565 465 525 540 C490 610 425 640 350 640 C420 620 460 565 505 455Z" fill="#ffffff"/>
+          <svg width="34" height="34" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="22" fill="#4A1E8A"/>
+            <line x1="30" y1="30" x2="30" y2="58" stroke="#C084FC" strokeWidth="5.5" strokeLinecap="round"/>
+            <circle cx="30" cy="24" r="7.5" fill="#C084FC"/>
+            <circle cx="30" cy="64" r="7.5" fill="#C084FC"/>
+            <line x1="50" y1="22" x2="50" y2="66" stroke="#C084FC" strokeWidth="5.5" strokeLinecap="round"/>
+            <circle cx="50" cy="16" r="7.5" fill="#C084FC"/>
+            <circle cx="50" cy="72" r="7.5" fill="#C084FC"/>
+            <line x1="70" y1="30" x2="70" y2="58" stroke="#C084FC" strokeWidth="5.5" strokeLinecap="round"/>
+            <circle cx="70" cy="24" r="7.5" fill="#C084FC"/>
+            <circle cx="70" cy="64" r="7.5" fill="#C084FC"/>
           </svg>
           <span className="font-extrabold text-lg tracking-tighter font-mono text-slate-900 dark:text-white hidden sm:block">
             TRACKR
