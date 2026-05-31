@@ -4,6 +4,7 @@ import {
   Plus, Bell, FileText, Mail, MessageSquare, Mic, DollarSign,
   TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles
 } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
@@ -42,9 +43,19 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function Home() {
   const { applications, addApplication, updateApplication, deleteApplication, canAddMore } = useApplications()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingApp, setEditingApp] = useState(null)
+
+  const firstName = user?.user_metadata?.first_name || null
+
+  const greeting = useMemo(() => {
+    const h = new Date().getHours()
+    if (h < 12) return 'Good morning'
+    if (h < 17) return 'Good afternoon'
+    return 'Good evening'
+  }, [])
 
   const stats = useMemo(() => ({
     total:     applications.length,
@@ -59,6 +70,18 @@ export default function Home() {
       .filter(a => a.reminder_date && (isToday(parseISO(a.reminder_date)) || isPast(parseISO(a.reminder_date))))
       .sort((a, b) => new Date(a.reminder_date) - new Date(b.reminder_date))
   , [applications])
+
+  const smartSummary = useMemo(() => {
+    const parts = []
+    if (followUps.length > 0) parts.push(`${followUps.length} follow-up${followUps.length > 1 ? 's' : ''} due`)
+    const interviews = applications.filter(a => a.status === 'interview').length
+    if (interviews > 0) parts.push(`${interviews} interview${interviews > 1 ? 's' : ''} in progress`)
+    const offers = applications.filter(a => a.status === 'offer').length
+    if (offers > 0) parts.push(`${offers} offer${offers > 1 ? 's' : ''}`)
+    if (parts.length === 0 && applications.length === 0) return 'Add your first application to get started.'
+    if (parts.length === 0) return `${applications.length} application${applications.length > 1 ? 's' : ''} tracked — keep pushing.`
+    return parts.join(' · ')
+  }, [applications, followUps])
 
   const weeklyData = useMemo(() =>
     Array.from({ length: 7 }, (_, i) => {
@@ -81,22 +104,28 @@ export default function Home() {
     <div className="space-y-5 max-w-5xl mx-auto" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
 
       {/* Header row */}
-      <section className="flex items-end justify-between pt-1">
+      <section className="flex items-center justify-between pt-2">
         <div>
-          <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, letterSpacing: '0.08em', fontWeight: 600, color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 2 }}>
-            Overview
+          <p style={{
+            fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600,
+            letterSpacing: '0.08em', color: '#404753', textTransform: 'uppercase', marginBottom: 6,
+          }}>
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
-          <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15 }}>
-            Home
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15, marginBottom: 6 }}>
+            {greeting}{firstName ? `, ${firstName}` : ''}.
           </h1>
+          <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 11, color: '#8a919f', letterSpacing: '0.01em' }}>
+            {smartSummary}
+          </p>
         </div>
         {canAddMore && (
           <button
             onClick={() => { setEditingApp(null); setModalOpen(true) }}
-            className="flex items-center gap-1.5 px-4 py-2 font-bold text-xs text-white transition-all active:scale-95 hover:brightness-110"
-            style={{ background: '#1493ff', boxShadow: '0 4px 12px rgba(20,147,255,0.3)', letterSpacing: '0.02em' }}
+            className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-xs text-white transition-all active:scale-95 hover:brightness-110"
+            style={{ background: '#1493ff', boxShadow: '0 4px 16px rgba(20,147,255,0.25)', letterSpacing: '0.04em', fontFamily: 'Geist Mono, monospace' }}
           >
-            <Plus size={14} />
+            <Plus size={13} />
             Add Application
           </button>
         )}
