@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
-import { parseISO, isToday, isPast, format, subDays, startOfDay, isSameDay } from 'date-fns'
+import { parseISO, isToday, isPast, format, subDays, startOfDay, isSameDay, addDays } from 'date-fns'
 import { useApplications } from '../contexts/ApplicationContext'
 import ApplicationModal from '../components/Modals/ApplicationModal'
 
@@ -24,12 +24,28 @@ const AI_TOOLS = [
 ]
 
 const STATS = [
-  { key: 'total',     label: 'Total',      dot: '#8a919f', color: '#e2e2e8' },
-  { key: 'applied',   label: 'Applied',    dot: '#a3c9ff', color: '#a3c9ff' },
-  { key: 'interview', label: 'Interviews', dot: '#ffb689', color: '#ffb689' },
-  { key: 'offer',     label: 'Offers',     dot: '#4edea3', color: '#4edea3' },
-  { key: 'rejected',  label: 'Rejected',   dot: '#ffb4ab', color: '#ffb4ab' },
+  { key: 'total',     label: 'Total',       color: '#e2e2e8', accent: 'rgba(226,226,232,0.12)' },
+  { key: 'applied',   label: 'Applied',     color: '#a3c9ff', accent: 'rgba(163,201,255,0.12)' },
+  { key: 'interview', label: 'Interviews',  color: '#ffb689', accent: 'rgba(255,182,137,0.12)' },
+  { key: 'offer',     label: 'Offers',      color: '#4edea3', accent: 'rgba(78,222,163,0.12)'  },
+  { key: 'rejected',  label: 'Rejected',    color: '#ffb4ab', accent: 'rgba(255,180,171,0.12)' },
 ]
+
+function Spark({ data, color }) {
+  const max = Math.max(...data, 1)
+  const W = 36, H = 18, bw = 6, gap = 2
+  return (
+    <svg width={W} height={H} style={{ display: 'block' }}>
+      {data.map((v, i) => {
+        const h = Math.max((v / max) * H, v > 0 ? 3 : 1)
+        return (
+          <rect key={i} x={i * (bw + gap)} y={H - h} width={bw} height={h}
+            fill={i === data.length - 1 ? color : `${color}55`} rx={1} />
+        )
+      })}
+    </svg>
+  )
+}
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
@@ -64,6 +80,48 @@ export default function Home() {
     offer:     applications.filter(a => a.status === 'offer').length,
     rejected:  applications.filter(a => a.status === 'rejected').length,
   }), [applications])
+
+  // 4-week sparkline data per stat key
+  const sparkData = useMemo(() => {
+    const weeks = Array.from({ length: 4 }, (_, i) => {
+      const start = startOfDay(subDays(new Date(), (3 - i) * 7 + 6))
+      const end   = addDays(start, 7)
+      const week  = applications.filter(a =>
+        a.created_at && parseISO(a.created_at) >= start && parseISO(a.created_at) < end
+      )
+      return {
+        total:     week.length,
+        applied:   week.filter(a => a.status === 'applied').length,
+        interview: week.filter(a => a.status === 'interview').length,
+        offer:     week.filter(a => a.status === 'offer').length,
+        rejected:  week.filter(a => a.status === 'rejected').length,
+      }
+    })
+    return {
+      total:     weeks.map(w => w.total),
+      applied:   weeks.map(w => w.applied),
+      interview: weeks.map(w => w.interview),
+      offer:     weeks.map(w => w.offer),
+      rejected:  weeks.map(w => w.rejected),
+    }
+  }, [applications])
+
+  // This week vs last week delta (new apps added)
+  const thisWeekCount = useMemo(() =>
+    applications.filter(a =>
+      a.created_at && parseISO(a.created_at) >= startOfDay(subDays(new Date(), 6))
+    ).length
+  , [applications])
+
+  const lastWeekCount = useMemo(() =>
+    applications.filter(a => {
+      if (!a.created_at) return false
+      const d = parseISO(a.created_at)
+      return d >= startOfDay(subDays(new Date(), 13)) && d < startOfDay(subDays(new Date(), 6))
+    }).length
+  , [applications])
+
+  const weekDelta = thisWeekCount - lastWeekCount
 
   const followUps = useMemo(() =>
     applications
@@ -132,18 +190,109 @@ export default function Home() {
       </section>
 
       {/* Stats row */}
-      <section className="grid grid-cols-5 gap-px" style={{ background: 'rgba(138,145,159,0.15)' }}>
-        {STATS.map(({ key, label, dot, color }) => {
+      <section className="grid grid-cols-5 gap-px" style={{ background: 'rgba(138,145,159,0.12)' }}>
+        {STATS.map(({ key, label, color, accent }) => {
           const val = stats[key]
+          const empty = val === 0
+          const pct = key !== 'total' && stats.total > 0
+            ? Math.round((val / stats.total) * 100) : null
+          const responseRate = key === 'interview' && stats.applied > 0
+            ? Math.round((stats.interview / stats.applied) * 100) : null
+          const closeRate = key === 'offer' && stats.interview > 0
+            ? Math.round((stats.offer / stats.interview) * 100) : null
+
+          // context line per stat
+          let context = null
+          if (key === 'total') {
+            if (weekDelta > 0) context = { text: `+${weekDelta} this week`, up: true }
+            else if (weekDelta < 0) context = { text: `${weekDelta} vs last week`, up: false }
+            else if (thisWeekCount > 0) context = { text: `${thisWeekCount} this week`, up: null }
+            else context = { text: 'no new this week', up: null }
+          } else if (key === 'applied') {
+            context = pct !== null ? { text: `${pct}% of pipeline`, up: null } : null
+          } else if (key === 'interview') {
+            context = responseRate !== null
+              ? { text: `${responseRate}% response rate`, up: responseRate >= 15 }
+              : pct !== null ? { text: `${pct}% of pipeline`, up: null } : null
+          } else if (key === 'offer') {
+            context = closeRate !== null
+              ? { text: `${closeRate}% close rate`, up: closeRate >= 30 }
+              : pct !== null ? { text: `${pct}% of pipeline`, up: null } : null
+          } else if (key === 'rejected') {
+            context = pct !== null ? { text: `${pct}% of pipeline`, up: pct < 40 } : null
+          }
+
+          // proportion bar width
+          const barWidth = key === 'total'
+            ? (thisWeekCount > 0 ? Math.min((thisWeekCount / Math.max(lastWeekCount, thisWeekCount, 1)) * 100, 100) : 0)
+            : stats.total > 0 ? (val / stats.total) * 100 : 0
+
           return (
-            <div key={key} style={{ background: '#0d1117', padding: '10px 14px' }}>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', marginBottom: 6 }}>
+            <div key={key} style={{
+              background: '#0d1117',
+              padding: '14px 16px 12px',
+              position: 'relative',
+              overflow: 'hidden',
+            }}>
+              {/* subtle bg glow when active */}
+              {!empty && (
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: `radial-gradient(ellipse at 10% 0%, ${accent} 0%, transparent 70%)`,
+                  pointerEvents: 'none',
+                }} />
+              )}
+
+              <p style={{
+                fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600,
+                letterSpacing: '0.1em', color: '#404753',
+                textTransform: 'uppercase', marginBottom: 8, position: 'relative',
+              }}>
                 {label}
               </p>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 26, fontWeight: 700, letterSpacing: '-0.04em', lineHeight: 1, color: val === 0 ? 'rgba(138,145,159,0.2)' : color }}>
-                {val}
+
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8, position: 'relative' }}>
+                <p style={{
+                  fontFamily: 'Geist Mono, monospace', fontSize: 30, fontWeight: 700,
+                  letterSpacing: '-0.05em', lineHeight: 1,
+                  color: empty ? 'rgba(138,145,159,0.18)' : color,
+                }}>
+                  {val}
+                </p>
+                {!empty && (
+                  <Spark data={sparkData[key]} color={color} />
+                )}
+              </div>
+
+              {/* context line */}
+              <p style={{
+                fontFamily: 'Geist Mono, monospace', fontSize: 9,
+                letterSpacing: '0.02em', lineHeight: 1,
+                color: context?.up === true ? '#4edea3'
+                  : context?.up === false ? '#ffb4ab'
+                  : '#404753',
+                marginBottom: 10, position: 'relative',
+                minHeight: 12,
+              }}>
+                {context ? (
+                  <>
+                    {context.up === true && '↑ '}
+                    {context.up === false && '↓ '}
+                    {context.text}
+                  </>
+                ) : null}
               </p>
-              <div style={{ marginTop: 8, height: 2, background: val === 0 ? 'rgba(138,145,159,0.1)' : dot, opacity: val === 0 ? 1 : 0.5 }} />
+
+              {/* proportion bar */}
+              <div style={{ height: 2, background: 'rgba(138,145,159,0.1)', position: 'relative' }}>
+                <div style={{
+                  position: 'absolute', left: 0, top: 0, height: '100%',
+                  width: `${barWidth}%`,
+                  background: empty ? 'transparent' : color,
+                  opacity: 0.5,
+                  transition: 'width 0.6s ease',
+                }} />
+              </div>
             </div>
           )
         })}
