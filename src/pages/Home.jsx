@@ -190,8 +190,13 @@ export default function Home() {
       </section>
 
       {/* Stats row */}
-      <section className="grid grid-cols-5 gap-px" style={{ background: 'rgba(138,145,159,0.12)' }}>
-        {STATS.map(({ key, label, color, accent }) => {
+      <section style={{
+        display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
+        background: '#0c1d35',
+        border: '0.5px solid rgba(20,60,110,0.7)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+      }}>
+        {STATS.map(({ key, label, color, accent }, idx) => {
           const val = stats[key]
           const empty = val === 0
           const pct = key !== 'total' && stats.total > 0
@@ -201,98 +206,86 @@ export default function Home() {
           const closeRate = key === 'offer' && stats.interview > 0
             ? Math.round((stats.offer / stats.interview) * 100) : null
 
-          // context line per stat
           let context = null
           if (key === 'total') {
             if (weekDelta > 0) context = { text: `+${weekDelta} this week`, up: true }
             else if (weekDelta < 0) context = { text: `${weekDelta} vs last week`, up: false }
             else if (thisWeekCount > 0) context = { text: `${thisWeekCount} this week`, up: null }
-            else context = { text: 'no new this week', up: null }
+            else context = { text: 'no activity', up: null }
           } else if (key === 'applied') {
-            context = pct !== null ? { text: `${pct}% of pipeline`, up: null } : null
+            context = pct !== null ? { text: `${pct}% of total`, up: null } : null
           } else if (key === 'interview') {
             context = responseRate !== null
-              ? { text: `${responseRate}% response rate`, up: responseRate >= 15 }
-              : pct !== null ? { text: `${pct}% of pipeline`, up: null } : null
+              ? { text: `${responseRate}% rate`, up: responseRate >= 15 }
+              : pct !== null ? { text: `${pct}% of total`, up: null } : null
           } else if (key === 'offer') {
             context = closeRate !== null
-              ? { text: `${closeRate}% close rate`, up: closeRate >= 30 }
-              : pct !== null ? { text: `${pct}% of pipeline`, up: null } : null
+              ? { text: `${closeRate}% close`, up: closeRate >= 30 }
+              : pct !== null ? { text: `${pct}% of total`, up: null } : null
           } else if (key === 'rejected') {
-            context = pct !== null ? { text: `${pct}% of pipeline`, up: pct < 40 } : null
+            context = pct !== null ? { text: `${pct}% of total`, up: pct < 40 } : null
           }
-
-          // proportion bar width
-          const barWidth = key === 'total'
-            ? (thisWeekCount > 0 ? Math.min((thisWeekCount / Math.max(lastWeekCount, thisWeekCount, 1)) * 100, 100) : 0)
-            : stats.total > 0 ? (val / stats.total) * 100 : 0
 
           return (
             <div key={key} style={{
-              background: '#0d1117',
-              padding: '14px 16px 12px',
               position: 'relative',
+              padding: '18px 20px 16px',
+              borderRight: idx < 4 ? '0.5px solid rgba(20,60,110,0.6)' : 'none',
+              borderTop: `2px solid ${empty ? 'rgba(138,145,159,0.08)' : color}`,
               overflow: 'hidden',
-            }}>
-              {/* subtle bg glow when active */}
+              transition: 'background 0.2s',
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              {/* bg glow */}
               {!empty && (
                 <div style={{
-                  position: 'absolute', inset: 0,
-                  background: `radial-gradient(ellipse at 10% 0%, ${accent} 0%, transparent 70%)`,
-                  pointerEvents: 'none',
+                  position: 'absolute', inset: 0, pointerEvents: 'none',
+                  background: `radial-gradient(ellipse at 0% 0%, ${accent} 0%, transparent 65%)`,
                 }} />
               )}
 
+              {/* label */}
               <p style={{
-                fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600,
-                letterSpacing: '0.1em', color: '#404753',
-                textTransform: 'uppercase', marginBottom: 8, position: 'relative',
+                fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: empty ? '#2a3040' : `${color}99`,
+                marginBottom: 10, position: 'relative',
               }}>
                 {label}
               </p>
 
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 8, position: 'relative' }}>
+              {/* number + spark */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 10, position: 'relative' }}>
                 <p style={{
-                  fontFamily: 'Geist Mono, monospace', fontSize: 30, fontWeight: 700,
-                  letterSpacing: '-0.05em', lineHeight: 1,
-                  color: empty ? 'rgba(138,145,159,0.18)' : color,
+                  fontFamily: 'Geist Mono, monospace', fontSize: 36, fontWeight: 700,
+                  letterSpacing: '-0.06em', lineHeight: 1,
+                  color: empty ? 'rgba(138,145,159,0.12)' : color,
+                  textShadow: empty ? 'none' : `0 0 24px ${color}40`,
                 }}>
                   {val}
                 </p>
-                {!empty && (
-                  <Spark data={sparkData[key]} color={color} />
-                )}
+                {!empty && <Spark data={sparkData[key]} color={color} />}
               </div>
 
-              {/* context line */}
+              {/* context */}
               <p style={{
                 fontFamily: 'Geist Mono, monospace', fontSize: 9,
-                letterSpacing: '0.02em', lineHeight: 1,
+                letterSpacing: '0.03em', lineHeight: 1,
+                minHeight: 11, position: 'relative',
                 color: context?.up === true ? '#4edea3'
                   : context?.up === false ? '#ffb4ab'
                   : '#404753',
-                marginBottom: 10, position: 'relative',
-                minHeight: 12,
               }}>
-                {context ? (
+                {context && (
                   <>
                     {context.up === true && '↑ '}
                     {context.up === false && '↓ '}
                     {context.text}
                   </>
-                ) : null}
+                )}
               </p>
-
-              {/* proportion bar */}
-              <div style={{ height: 2, background: 'rgba(138,145,159,0.1)', position: 'relative' }}>
-                <div style={{
-                  position: 'absolute', left: 0, top: 0, height: '100%',
-                  width: `${barWidth}%`,
-                  background: empty ? 'transparent' : color,
-                  opacity: 0.5,
-                  transition: 'width 0.6s ease',
-                }} />
-              </div>
             </div>
           )
         })}
