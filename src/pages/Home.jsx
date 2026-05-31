@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Plus, Bell, FileText, Mail, MessageSquare, Mic, DollarSign,
   TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles,
-  BookOpen, Handshake, PenLine, ArrowRight
+  BookOpen, Handshake, PenLine, ArrowRight, PenSquare, Library, BarChart3, GraduationCap
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -184,8 +184,73 @@ export default function Home() {
     else await addApplication({ ...data, status: data.status || 'wishlist' })
   }
 
+  const SIDEBAR = [
+    { label: 'Start a Blog', icon: PenSquare,    to: '/blog',   soon: false },
+    { label: 'Library',      icon: Library,      to: '/blog',   soon: true  },
+    { label: 'Market',       icon: BarChart3,    to: '/ai/market', soon: false },
+    { label: 'Skills',       icon: GraduationCap, to: '/ai/interview-prep', soon: true },
+  ]
+
   return (
-    <div className="space-y-5 max-w-5xl mx-auto" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div style={{ fontFamily: 'Geist, Inter, sans-serif', display: 'flex', gap: 28, alignItems: 'flex-start', maxWidth: 1100, margin: '0 auto' }}>
+
+      {/* Sidebar */}
+      <aside style={{ width: 168, flexShrink: 0, position: 'sticky', top: 72 }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 8 }}>
+          {SIDEBAR.map(({ label, icon: Icon, to, soon }) => (
+            <button
+              key={label}
+              onClick={() => !soon && navigate(to)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '9px 12px',
+                background: 'transparent',
+                border: '0.5px solid transparent',
+                cursor: soon ? 'default' : 'pointer',
+                textAlign: 'left',
+                transition: 'all 0.15s',
+                opacity: soon ? 0.4 : 1,
+              }}
+              onMouseEnter={e => {
+                if (!soon) {
+                  e.currentTarget.style.background = 'rgba(163,201,255,0.04)'
+                  e.currentTarget.style.borderColor = 'rgba(163,201,255,0.08)'
+                }
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.borderColor = 'transparent'
+              }}
+            >
+              <Icon size={14} style={{ color: '#3a4455', flexShrink: 0 }} />
+              <div style={{ minWidth: 0 }}>
+                <p style={{
+                  fontFamily: 'Geist, Inter, sans-serif', fontSize: 12, fontWeight: 500,
+                  color: '#6b7583', letterSpacing: '-0.01em', lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                }}>
+                  {label}
+                </p>
+                {soon && (
+                  <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8, color: '#2a3040', letterSpacing: '0.06em', marginTop: 2 }}>
+                    SOON
+                  </p>
+                )}
+              </div>
+            </button>
+          ))}
+        </nav>
+
+        {/* divider */}
+        <div style={{ height: '0.5px', background: 'rgba(163,201,255,0.05)', margin: '12px 12px' }} />
+
+        <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8, color: '#1e2a3a', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '0 12px' }}>
+          Trackr © 2026
+        </p>
+      </aside>
+
+      {/* Main content */}
+      <div className="space-y-5 flex-1 min-w-0">
 
       {/* Header row */}
       <section className="flex items-center justify-between pt-2">
@@ -573,6 +638,7 @@ export default function Home() {
         onDelete={deleteApplication}
         initial={editingApp ?? { status: 'wishlist' }}
       />
+      </div>{/* end main content */}
     </div>
   )
 }
