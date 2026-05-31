@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { useParams, NavLink, useNavigate } from 'react-router-dom'
-import { Send, Lock, Crown, Loader2, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, Mic, GitCompare } from 'lucide-react'
+import { Send, Lock, Crown, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, Mic, GitCompare, Zap, Star } from 'lucide-react'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
 import InterviewPrep from '../components/AI/InterviewPrep'
 import InterviewCoach from '../components/AI/InterviewCoach'
@@ -11,198 +10,337 @@ import LinkedInReviewer from '../components/AI/LinkedInReviewer'
 import NegotiationSimulator from '../components/AI/NegotiationSimulator'
 import OfferComparison from '../components/AI/OfferComparison'
 import { useApplications } from '../contexts/ApplicationContext'
-import { useAuth } from '../contexts/AuthContext'
-import { apiFetch } from '../lib/api'
+import { useNavigate as useNav } from 'react-router-dom'
 
 const TOOLS = [
-  { key: 'follow-up',      path: '/ai/follow-up',      label: 'Follow-up',       desc: 'Chase with confidence',       icon: Send,       component: FollowUpGenerator,    accent: '#ffb689' },
-  { key: 'interview-prep', path: '/ai/interview-prep', label: 'Interview Prep',  desc: 'Question bank for your role',    icon: BookOpen, component: InterviewPrep,        accent: '#ffb4ab', pro: true },
-  { key: 'interview-coach', path: '/ai/interview-coach', label: 'Interview Coach', desc: 'Live mock interview + scorecard', icon: Mic,     component: InterviewCoach,       accent: '#ffb4ab', apex: true },
-  { key: 'salary',         path: '/ai/salary',         label: 'Salary Intel',    desc: 'Know your market worth',      icon: DollarSign, component: SalaryIntelligence,   accent: '#a3c9ff', pro: true },
-  { key: 'market',         path: '/ai/market',         label: 'Market Intel',    desc: 'Industry trends & signals',   icon: BarChart2,  component: MarketAnalysis,       accent: '#4edea3', pro: true },
-  { key: 'company',        path: '/ai/company',        label: 'Company Brief',   desc: 'Deep-dive any employer',      icon: Building2,  component: CompanyResearch,      accent: '#ffb689', pro: true },
-  { key: 'linkedin',       path: '/ai/linkedin',       label: 'LinkedIn',        desc: 'Optimise your profile',       icon: Link2,      component: LinkedInReviewer,     accent: '#ffb4ab', pro: true },
-  { key: 'offer-compare',  path: '/ai/offer-compare',  label: 'Offer Comparison', desc: 'Compare & pick the best offer', icon: GitCompare, component: OfferComparison,     accent: '#a3c9ff', pro: true },
-  { key: 'negotiate',      path: '/ai/negotiate',      label: 'Offer Simulator', desc: 'Practice salary negotiation', icon: Handshake,  component: NegotiationSimulator, accent: '#4edea3', apex: true },
+  { key: 'follow-up',       path: '/ai/follow-up',       label: 'Follow-up',       desc: 'Chase with confidence',           icon: Send,       component: FollowUpGenerator,    accent: '#ffb689', tier: 'free'  },
+  { key: 'interview-prep',  path: '/ai/interview-prep',  label: 'Interview Prep',  desc: 'Question bank for your role',     icon: BookOpen,   component: InterviewPrep,        accent: '#ffb4ab', tier: 'pro'   },
+  { key: 'salary',          path: '/ai/salary',          label: 'Salary Intel',    desc: 'Know your market worth',          icon: DollarSign, component: SalaryIntelligence,   accent: '#a3c9ff', tier: 'pro'   },
+  { key: 'market',          path: '/ai/market',          label: 'Market Intel',    desc: 'Industry trends & signals',       icon: BarChart2,  component: MarketAnalysis,       accent: '#4edea3', tier: 'pro'   },
+  { key: 'company',         path: '/ai/company',         label: 'Company Brief',   desc: 'Deep-dive any employer',          icon: Building2,  component: CompanyResearch,      accent: '#ffb689', tier: 'pro'   },
+  { key: 'linkedin',        path: '/ai/linkedin',        label: 'LinkedIn',        desc: 'Optimise your profile',           icon: Link2,      component: LinkedInReviewer,     accent: '#ffb4ab', tier: 'pro'   },
+  { key: 'offer-compare',   path: '/ai/offer-compare',   label: 'Offer Comparison',desc: 'Compare & pick the best offer',   icon: GitCompare, component: OfferComparison,      accent: '#a3c9ff', tier: 'pro'   },
+  { key: 'interview-coach', path: '/ai/interview-coach', label: 'Interview Coach', desc: 'Live mock interview + scorecard', icon: Mic,        component: InterviewCoach,       accent: '#ffb4ab', tier: 'apex'  },
+  { key: 'negotiate',       path: '/ai/negotiate',       label: 'Offer Simulator', desc: 'Practice salary negotiation',     icon: Handshake,  component: NegotiationSimulator, accent: '#4edea3', tier: 'apex'  },
 ]
 
+const FREE_TOOLS  = TOOLS.filter(t => t.tier === 'free')
+const PRO_TOOLS   = TOOLS.filter(t => t.tier === 'pro')
+const APEX_TOOLS  = TOOLS.filter(t => t.tier === 'apex')
+
+const MONO = 'Geist Mono, monospace'
+const SANS = 'Geist, Inter, sans-serif'
+
+function TierDivider({ label, color, gradient }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, marginTop: 4 }}>
+      <span style={{
+        fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
+        textTransform: 'uppercase',
+        background: gradient ? 'linear-gradient(90deg, #4edea3, #a3c9ff)' : 'none',
+        WebkitBackgroundClip: gradient ? 'text' : 'unset',
+        WebkitTextFillColor: gradient ? 'transparent' : color,
+        color: gradient ? 'transparent' : color,
+      }}>
+        {label}
+      </span>
+      <div style={{ flex: 1, height: '0.5px', background: gradient
+        ? 'linear-gradient(90deg, rgba(78,222,163,0.3), rgba(163,201,255,0.1), transparent)'
+        : `linear-gradient(90deg, ${color}40, transparent)` }} />
+    </div>
+  )
+}
+
+function ToolCard({ t, tool, cols = 3 }) {
+  const Icon = t.icon
+  const isActive = t.key === tool
+  return (
+    <NavLink
+      to={t.path}
+      style={{
+        position: 'relative', display: 'flex', alignItems: 'center', gap: 12,
+        padding: '14px 16px',
+        background: isActive
+          ? `linear-gradient(135deg, ${t.accent}14 0%, rgba(12,29,53,0.95) 100%)`
+          : 'rgba(10,16,28,0.8)',
+        borderLeft: `2px solid ${isActive ? t.accent : 'transparent'}`,
+        borderBottom: '0.5px solid rgba(163,201,255,0.04)',
+        transition: 'all 0.15s',
+        textDecoration: 'none',
+        overflow: 'hidden',
+      }}
+      onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = `${t.accent}08`; e.currentTarget.style.borderLeftColor = `${t.accent}40` } }}
+      onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(10,16,28,0.8)'; e.currentTarget.style.borderLeftColor = 'transparent' } }}
+    >
+      {/* corner glow on active */}
+      {isActive && (
+        <div style={{
+          position: 'absolute', top: -10, left: -10, width: 60, height: 60,
+          borderRadius: '50%', pointerEvents: 'none',
+          background: `radial-gradient(circle, ${t.accent}25 0%, transparent 70%)`,
+          filter: 'blur(6px)',
+        }} />
+      )}
+
+      {/* icon */}
+      <div style={{
+        width: 34, height: 34, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: isActive ? `${t.accent}15` : 'rgba(255,255,255,0.03)',
+        border: `0.5px solid ${isActive ? t.accent + '40' : 'rgba(255,255,255,0.05)'}`,
+        transition: 'all 0.15s',
+      }}>
+        <Icon size={15} style={{ color: isActive ? t.accent : '#4a5568', transition: 'color 0.15s' }} />
+      </div>
+
+      {/* text */}
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <p style={{
+          fontFamily: SANS, fontSize: 12, fontWeight: 600, letterSpacing: '-0.01em',
+          color: isActive ? '#e2e2e8' : '#6b7583', lineHeight: 1.2, marginBottom: 2,
+          transition: 'color 0.15s',
+        }}>
+          {t.label}
+        </p>
+        <p style={{
+          fontFamily: MONO, fontSize: 9, letterSpacing: '0.02em',
+          color: isActive ? `${t.accent}99` : '#2a3040', lineHeight: 1,
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {t.desc}
+        </p>
+      </div>
+    </NavLink>
+  )
+}
+
 export default function AITools() {
-  const { tool = 'cv' } = useParams()
+  const { tool = 'follow-up' } = useParams()
   const { isPaidUser, isApexUser } = useApplications()
-  const { user } = useAuth()
   const navigate = useNavigate()
 
   const active = TOOLS.find(t => t.key === tool) || TOOLS[0]
   const ActiveComponent = active.component
 
-  // Which paywall to show?
-  const showProWall  = !isPaidUser
-  const showApexWall = isPaidUser && !isApexUser && active.apex
+  const showProWall  = !isPaidUser && (active.tier === 'pro' || active.tier === 'apex')
+  const showApexWall = isPaidUser && !isApexUser && active.tier === 'apex'
+
+  // Badge logic: apex users see nothing, pro users skip PRO badge, free users see both
+  const getBadge = (t) => {
+    if (isApexUser) return null
+    if (isPaidUser && t.tier === 'pro') return null
+    if (t.tier === 'apex') return 'apex'
+    if (t.tier === 'pro') return 'pro'
+    return null
+  }
 
   return (
-    <div className="ai-sharp max-w-4xl mx-auto relative">
+    <div className="ai-sharp max-w-5xl mx-auto" style={{ fontFamily: SANS }}>
 
       {/* Header */}
-      <div className="mb-7" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
-        <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 4 }}>
+      <div style={{ marginBottom: 28 }}>
+        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(163,201,255,0.5)', textTransform: 'uppercase', marginBottom: 6 }}>
           Trackr Assist
         </p>
-        <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15, marginBottom: 6 }}>
           AI Toolkit
         </h1>
-        <p style={{ fontSize: 13, color: '#8a919f', marginTop: 4 }}>
-          Precision feedback on your materials. Each tool is tuned to the role, not generic AI fluff.
+        <p style={{ fontSize: 13, color: '#4a5568', lineHeight: 1.5 }}>
+          Precision tools tuned to your role. Not generic AI fluff.
         </p>
       </div>
 
-      {/* Tool picker grid */}
-      <div className="grid grid-cols-4 gap-px mb-8" style={{ background: 'rgba(20,60,110,0.3)' }}>
-        {TOOLS.map(t => {
-          const Icon = t.icon
-          const isActive = t.key === tool
-          return (
-            <NavLink
-              key={t.key}
-              to={t.path}
-              className="tool-picker-card relative flex items-center gap-3 transition-all"
-              style={{
-                background: isActive
-                  ? `linear-gradient(135deg, ${t.accent}18 0%, #0d2040 100%)`
-                  : '#0c1d35',
-                padding: '14px 16px',
-                borderLeft: isActive ? `2px solid ${t.accent}` : '2px solid transparent',
-              }}
-            >
-              {/* Icon tile */}
-              <div style={{
-                width: 36,
-                height: 36,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: isActive ? `${t.accent}18` : 'rgba(138,145,159,0.07)',
-                border: `0.5px solid ${isActive ? t.accent + '40' : 'rgba(138,145,159,0.15)'}`,
-                flexShrink: 0,
-                transition: 'all 0.2s',
-              }}>
-                <Icon size={16} style={{ color: isActive ? t.accent : '#8a919f', transition: 'color 0.2s' }} />
+      <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: 2, alignItems: 'start' }}>
+
+        {/* ── LEFT NAV ── */}
+        <div style={{
+          background: 'linear-gradient(180deg, #0a1628 0%, #070d1a 100%)',
+          border: '0.5px solid rgba(163,201,255,0.06)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+          position: 'sticky', top: 72,
+        }}>
+
+          {/* FREE */}
+          <div style={{ padding: '14px 14px 8px' }}>
+            <TierDivider label="Free" color="#8a919f" />
+            {FREE_TOOLS.map(t => (
+              <div key={t.key} style={{ position: 'relative' }}>
+                <ToolCard t={t} tool={tool} />
+                {getBadge(t) && (
+                  <span style={{
+                    position: 'absolute', top: 8, right: 8,
+                    fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: '0.06em',
+                    background: '#1e2a3a', color: '#8a919f', padding: '2px 5px',
+                  }}>FREE</span>
+                )}
               </div>
+            ))}
+          </div>
 
-              {/* Label + desc */}
-              <div className="min-w-0">
-                <p style={{
-                  fontFamily: 'Geist, Inter, sans-serif',
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: isActive ? '#e2e2e8' : '#c0c7d5',
-                  letterSpacing: '-0.01em',
-                  lineHeight: 1.2,
-                  marginBottom: 2,
-                }}>
-                  {t.label}
-                </p>
-                <p style={{
-                  fontFamily: 'Geist Mono, monospace',
-                  fontSize: 9,
-                  color: isActive ? t.accent + 'cc' : '#404753',
-                  letterSpacing: '0.02em',
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                }}>
-                  {t.desc}
-                </p>
-              </div>
+          <div style={{ height: '0.5px', background: 'rgba(163,201,255,0.04)', margin: '0 14px' }} />
 
-              {/* Badge */}
-              {t.apex ? (
-                <span style={{
-                  position: 'absolute', top: 8, right: 8,
-                  fontFamily: 'Geist Mono, monospace', fontSize: 7, fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  background: 'linear-gradient(90deg, #4edea3, #a3c9ff)',
-                  color: '#0d1117', padding: '2px 5px', lineHeight: 1.4,
-                }}>
-                  APEX
-                </span>
-              ) : t.pro ? (
-                <span style={{
-                  position: 'absolute', top: 8, right: 8,
-                  fontFamily: 'Geist Mono, monospace', fontSize: 7, fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  background: '#1493ff',
-                  color: '#fff', padding: '2px 5px', lineHeight: 1.4,
-                }}>
-                  PRO
-                </span>
-              ) : null}
-            </NavLink>
-          )
-        })}
-      </div>
+          {/* PRO */}
+          <div style={{ padding: '12px 14px 8px' }}>
+            <TierDivider label="Pro" color="#1493ff" />
+            {PRO_TOOLS.map(t => {
+              const badge = getBadge(t)
+              return (
+                <div key={t.key} style={{ position: 'relative' }}>
+                  <ToolCard t={t} tool={tool} />
+                  {badge === 'pro' && (
+                    <span style={{
+                      position: 'absolute', top: 8, right: 8,
+                      fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: '0.06em',
+                      background: '#1493ff', color: '#fff', padding: '2px 5px',
+                    }}>PRO</span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
 
-      {/* Tool content — paywall scoped to this box only */}
-      <div className="relative">
-        <ActiveComponent />
+          <div style={{ height: '0.5px', background: 'rgba(163,201,255,0.04)', margin: '0 14px' }} />
 
-        {/* Free → Pro paywall */}
-        {showProWall && (
-          <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
-            <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
-              <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)' }}>
-                <Lock size={18} style={{ color: '#a3c9ff' }} />
-              </div>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
-                Pro Feature
-              </p>
-              <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
-                Unlock AI Tools
-              </h2>
-              <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
-                Tailored CV reviews, cover letter critiques and follow-up drafts. Triple your interview rate.
-              </p>
-              <button
-                onClick={() => navigate('/plans')}
-                className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
-                style={{ background: '#1493ff', color: '#fff', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
-              >
-                <Crown size={13} /> View Plans
-              </button>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
+          {/* APEX */}
+          <div style={{ padding: '12px 14px 14px' }}>
+            <TierDivider label="Apex" color="#4edea3" gradient />
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(78,222,163,0.04) 0%, rgba(163,201,255,0.02) 100%)',
+              border: '0.5px solid rgba(78,222,163,0.1)',
+            }}>
+              {APEX_TOOLS.map(t => {
+                const badge = getBadge(t)
+                return (
+                  <div key={t.key} style={{ position: 'relative' }}>
+                    <ToolCard t={t} tool={tool} />
+                    {badge === 'apex' && (
+                      <span style={{
+                        position: 'absolute', top: 8, right: 8,
+                        fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: '0.06em',
+                        background: 'linear-gradient(90deg, #4edea3, #a3c9ff)',
+                        color: '#0d1117', padding: '2px 5px',
+                      }}>APEX</span>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
-        )}
 
-        {/* Pro → Apex paywall */}
-        {showApexWall && (
-          <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(13,17,23,0.92)', backdropFilter: 'blur(8px)' }}>
-            <div className="max-w-sm w-full text-center" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
-              <div className="w-11 h-11 flex items-center justify-center mx-auto mb-5" style={{ background: 'rgba(78,222,163,0.08)', border: '0.5px solid rgba(78,222,163,0.25)' }}>
-                <Rocket size={18} style={{ color: '#4edea3' }} />
-              </div>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 8 }}>
-                Apex Exclusive
+        </div>
+
+        {/* ── RIGHT CONTENT ── */}
+        <div style={{ position: 'relative', minHeight: 400 }}>
+
+          {/* Active tool header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px',
+            background: 'linear-gradient(135deg, rgba(12,29,53,0.95) 0%, rgba(7,13,26,0.98) 100%)',
+            border: '0.5px solid rgba(163,201,255,0.06)',
+            borderBottom: `1px solid ${active.accent}20`,
+            marginBottom: 2,
+          }}>
+            <div style={{
+              width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: `${active.accent}15`, border: `0.5px solid ${active.accent}40`,
+            }}>
+              {(() => { const I = active.icon; return <I size={14} style={{ color: active.accent }} /> })()}
+            </div>
+            <div>
+              <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: '#e2e2e8', letterSpacing: '-0.01em' }}>
+                {active.label}
               </p>
-              <h2 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 8 }}>
-                Upgrade to Apex
-              </h2>
-              <p style={{ fontSize: 13, color: '#8a919f', marginBottom: 28, lineHeight: 1.6 }}>
-                The Offer Simulator is exclusive to Apex. Practice real salary negotiations with an AI recruiter and get a full performance scorecard.
+              <p style={{ fontFamily: MONO, fontSize: 9, color: `${active.accent}80`, letterSpacing: '0.04em' }}>
+                {active.desc}
               </p>
-              <button
-                onClick={() => navigate('/plans')}
-                className="w-full flex items-center justify-center gap-2 transition-all hover:brightness-110"
-                style={{ background: 'linear-gradient(90deg, #4edea3, #a3c9ff)', color: '#0d1117', padding: '11px 0', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}
-              >
-                <Rocket size={13} /> Upgrade to Apex — $29/mo
-              </button>
-              <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12 }}>Cancel anytime · No hidden fees</p>
             </div>
           </div>
-        )}
-      </div>
 
+          {/* Tool content */}
+          <div style={{
+            background: 'linear-gradient(180deg, rgba(10,16,28,0.9) 0%, rgba(7,13,26,0.95) 100%)',
+            border: '0.5px solid rgba(163,201,255,0.06)',
+            padding: 20,
+            position: 'relative',
+          }}>
+            <ActiveComponent />
+
+            {/* Free → Pro paywall */}
+            {showProWall && (
+              <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(7,13,26,0.95)', backdropFilter: 'blur(12px)' }}>
+                <div style={{ maxWidth: 320, width: '100%', textAlign: 'center', fontFamily: SANS }}>
+                  <div style={{
+                    width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 20px',
+                    background: 'rgba(20,147,255,0.08)', border: '0.5px solid rgba(20,147,255,0.2)',
+                  }}>
+                    <Lock size={18} style={{ color: '#1493ff' }} />
+                  </div>
+                  <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: '#1493ff', textTransform: 'uppercase', marginBottom: 10 }}>
+                    Pro Feature
+                  </p>
+                  <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 10 }}>
+                    Unlock AI Tools
+                  </h2>
+                  <p style={{ fontSize: 12, color: '#4a5568', marginBottom: 24, lineHeight: 1.65 }}>
+                    Tailored CV reviews, cover letter critiques, salary intelligence and more. Built to triple your interview rate.
+                  </p>
+                  <button onClick={() => navigate('/plans')} style={{
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    background: '#1493ff', color: '#fff', border: 'none', padding: '12px 0',
+                    fontFamily: MONO, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                    cursor: 'pointer', transition: 'filter 0.15s',
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+                    onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+                  >
+                    <Crown size={13} /> View Plans
+                  </button>
+                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#1e2a3a', marginTop: 10 }}>Cancel anytime · No hidden fees</p>
+                </div>
+              </div>
+            )}
+
+            {/* Pro → Apex paywall */}
+            {showApexWall && (
+              <div className="absolute inset-0 grid place-items-center p-8" style={{ background: 'rgba(7,13,26,0.95)', backdropFilter: 'blur(12px)' }}>
+                <div style={{ maxWidth: 320, width: '100%', textAlign: 'center', fontFamily: SANS }}>
+                  <div style={{
+                    width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 20px',
+                    background: 'rgba(78,222,163,0.08)', border: '0.5px solid rgba(78,222,163,0.25)',
+                  }}>
+                    <Rocket size={18} style={{ color: '#4edea3' }} />
+                  </div>
+                  <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 10 }}>
+                    Apex Exclusive
+                  </p>
+                  <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 10 }}>
+                    Upgrade to Apex
+                  </h2>
+                  <p style={{ fontSize: 12, color: '#4a5568', marginBottom: 24, lineHeight: 1.65 }}>
+                    {active.key === 'interview-coach'
+                      ? 'Practice live mock interviews with an AI hiring manager. Get a full performance scorecard after every session.'
+                      : 'Practice real salary negotiations with an AI recruiter. Get scored and coached after every session.'}
+                  </p>
+                  <button onClick={() => navigate('/plans')} style={{
+                    width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    background: 'linear-gradient(90deg, #4edea3, #a3c9ff)', color: '#0d1117', border: 'none', padding: '12px 0',
+                    fontFamily: MONO, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+                    cursor: 'pointer', transition: 'filter 0.15s',
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.08)'}
+                    onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+                  >
+                    <Rocket size={13} /> Upgrade to Apex — $29/mo
+                  </button>
+                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#1e2a3a', marginTop: 10 }}>Cancel anytime · No hidden fees</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
