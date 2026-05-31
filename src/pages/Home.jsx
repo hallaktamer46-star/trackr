@@ -12,6 +12,7 @@ import {
 import { parseISO, isToday, isPast, format, subDays, startOfDay, isSameDay, addDays } from 'date-fns'
 import { useApplications } from '../contexts/ApplicationContext'
 import ApplicationModal from '../components/Modals/ApplicationModal'
+import QuickPostModal from '../components/QuickPostModal'
 
 const HERO_TOOLS = [
   {
@@ -89,6 +90,7 @@ export default function Home() {
   const navigate = useNavigate()
   const [modalOpen, setModalOpen] = useState(false)
   const [editingApp, setEditingApp] = useState(null)
+  const [quickPostOpen, setQuickPostOpen] = useState(false)
 
   const firstName = user?.user_metadata?.first_name || null
 
@@ -185,7 +187,7 @@ export default function Home() {
   }
 
   const SIDEBAR = [
-    { label: 'Start a Blog', icon: PenSquare,     to: '/blog',    soon: false },
+    { label: 'Start a Blog', icon: PenSquare,     to: null,       soon: false, action: () => setQuickPostOpen(true) },
     { label: 'Library',      icon: Library,       to: '/library', soon: true  },
     { label: 'Market',       icon: BarChart3,     to: '/market',  soon: true  },
     { label: 'Skills',       icon: GraduationCap, to: '/skills',  soon: true  },
@@ -197,10 +199,10 @@ export default function Home() {
       {/* Sidebar */}
       <aside style={{ width: 168, flexShrink: 0, position: 'sticky', top: 72 }}>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 2, paddingTop: 8 }}>
-          {SIDEBAR.map(({ label, icon: Icon, to, soon }) => (
+          {SIDEBAR.map(({ label, icon: Icon, to, soon, action }) => (
             <button
               key={label}
-              onClick={() => !soon && navigate(to)}
+              onClick={() => { if (soon) return; if (action) action(); else navigate(to) }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '9px 12px',
@@ -639,6 +641,13 @@ export default function Home() {
         initial={editingApp ?? { status: 'wishlist' }}
       />
       </div>{/* end main content */}
+
+      {quickPostOpen && (
+        <QuickPostModal
+          onClose={() => setQuickPostOpen(false)}
+          onPublished={() => {}}
+        />
+      )}
     </div>
   )
 }
