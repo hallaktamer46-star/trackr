@@ -340,23 +340,26 @@ function PostModal({ post, onClose, onLike, liked }) {
 }
 
 /* ── write post modal ── */
+const MONO = 'Geist Mono, monospace'
+const SANS = 'Geist, Inter, sans-serif'
+
 function WriteModal({ onClose, onPublish, user }) {
-  const [title,       setTitle]       = useState('')
-  const [content,     setContent]     = useState('')
-  const [category,    setCategory]    = useState('Career Advice')
-  const [authorName,  setAuthorName]  = useState(() => {
-    const email = user?.email || ''
-    return email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Anonymous'
+  const [title,      setTitle]      = useState('')
+  const [content,    setContent]    = useState('')
+  const [category,   setCategory]   = useState('Career Advice')
+  const [authorName, setAuthorName] = useState(() => {
+    const m = user?.user_metadata || {}
+    if (m.first_name) return `${m.first_name}${m.last_name ? ' ' + m.last_name : ''}`
+    return (user?.email || '').split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Anonymous'
   })
-  const [loading,     setLoading]     = useState(false)
-  const [error,       setError]       = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState(null)
 
   const canPublish = title.trim().length >= 10 && content.trim().length >= 50
 
   const handlePublish = async () => {
     if (!canPublish) return
-    setLoading(true)
-    setError(null)
+    setLoading(true); setError(null)
     try {
       await onPublish({ title: title.trim(), content: content.trim(), category, author_name: authorName.trim() || 'Anonymous' })
       onClose()
@@ -368,91 +371,117 @@ function WriteModal({ onClose, onPublish, user }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-12 bg-black/40 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl shadow-2xl">
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 50,
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+      padding: '48px 16px',
+      background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(10px)',
+      overflowY: 'auto',
+    }} onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+
+      <div style={{
+        width: '100%', maxWidth: 560,
+        background: 'linear-gradient(180deg, #0d1f3c 0%, #070d1a 100%)',
+        border: '0.5px solid rgba(163,201,255,0.1)',
+        boxShadow: '0 24px 80px rgba(0,0,0,0.7)',
+        fontFamily: SANS,
+      }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <PenLine size={16} className="text-sky-500" />
-            <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Write a Post</span>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '16px 20px', borderBottom: '0.5px solid rgba(163,201,255,0.07)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)',
+            }}>
+              <PenLine size={13} style={{ color: '#a3c9ff' }} />
+            </div>
+            <div>
+              <p style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: '#e2e2e8', letterSpacing: '-0.01em' }}>Write a Post</p>
+              <p style={{ fontFamily: MONO, fontSize: 9, color: '#3a4455', letterSpacing: '0.04em' }}>Posting as {authorName}</p>
+            </div>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-            <X size={18} />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3a4455', padding: 4 }}
+            onMouseEnter={e => e.currentTarget.style.color = '#8a919f'}
+            onMouseLeave={e => e.currentTarget.style.color = '#3a4455'}
+          >
+            <X size={16} />
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+        {/* Body */}
+        <div style={{ padding: '20px 20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-          {/* Display name */}
+          {/* Name */}
           <div>
-            <label className="block text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold mb-1.5">
-              Your Name
-            </label>
+            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#3a4455', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Your Name</label>
             <input
               value={authorName}
               onChange={e => setAuthorName(e.target.value)}
               placeholder="How you'll appear on this post"
-              className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-sky-400 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+              style={{ width: '100%', padding: '10px 14px', boxSizing: 'border-box', background: '#060c18', border: '0.5px solid rgba(163,201,255,0.08)', color: '#e2e2e8', fontSize: 13, fontFamily: SANS, outline: 'none' }}
+              onFocus={e => e.target.style.borderColor = 'rgba(163,201,255,0.25)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(163,201,255,0.08)'}
             />
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold mb-1.5">
-              Category
-            </label>
-            <select
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              className="w-full px-3 py-2.5 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-sky-400 transition-colors appearance-none cursor-pointer"
-            >
+            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#3a4455', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>Category</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {CATEGORIES.filter(c => c.id !== 'all').map(c => (
-                <option key={c.id} value={c.id}>{c.label}</option>
+                <button key={c.id} onClick={() => setCategory(c.id)} style={{
+                  fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.05em',
+                  padding: '5px 10px', cursor: 'pointer',
+                  background: category === c.id ? 'rgba(163,201,255,0.1)' : 'transparent',
+                  border: `0.5px solid ${category === c.id ? 'rgba(163,201,255,0.35)' : 'rgba(163,201,255,0.07)'}`,
+                  color: category === c.id ? '#a3c9ff' : '#3a4455',
+                  transition: 'all 0.15s',
+                }}>{c.label}</button>
               ))}
-            </select>
+            </div>
           </div>
 
           {/* Title */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold">
-                Title *
-              </label>
-              <span className={cn('text-[10px] font-mono', title.length > 120 ? 'text-rose-500' : 'text-slate-400')}>
-                {title.length}/140
-              </span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#3a4455', textTransform: 'uppercase' }}>Title *</label>
+              <span style={{ fontFamily: MONO, fontSize: 9, color: title.length > 120 ? '#ffb4ab' : '#2a3040' }}>{title.length}/140</span>
             </div>
             <input
               value={title}
               onChange={e => setTitle(e.target.value.slice(0, 140))}
               placeholder="Write a headline that makes people want to read more…"
-              className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-sky-400 focus:bg-white dark:focus:bg-slate-800 transition-colors"
+              style={{ width: '100%', padding: '10px 14px', boxSizing: 'border-box', background: '#060c18', border: '0.5px solid rgba(163,201,255,0.08)', color: '#e2e2e8', fontSize: 13, fontFamily: SANS, fontWeight: 600, outline: 'none' }}
+              onFocus={e => e.target.style.borderColor = 'rgba(163,201,255,0.25)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(163,201,255,0.08)'}
             />
           </div>
 
           {/* Content */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-slate-500 font-semibold">
-                Content *
-              </label>
-              <span className="text-[10px] font-mono text-slate-400">Use **bold** for emphasis</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#3a4455', textTransform: 'uppercase' }}>Content *</label>
+              <span style={{ fontFamily: MONO, fontSize: 9, color: '#2a3040' }}>
+                {content.length < 50 && content.length > 0 ? `${50 - content.length} more to unlock` : `${content.length} chars`}
+              </span>
             </div>
             <textarea
               value={content}
               onChange={e => setContent(e.target.value)}
-              placeholder="Share your experience, insight, or question. Be specific — the best posts tell a real story or share actionable knowledge…"
+              placeholder="Share your experience, insight, or question. Use **bold** for emphasis. Real stories get the most reads."
               rows={10}
-              className="w-full p-4 border border-slate-200 dark:border-slate-700 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 bg-slate-50 dark:bg-slate-800 focus:outline-none focus:border-sky-400 focus:bg-white dark:focus:bg-slate-800 transition-colors resize-none leading-relaxed"
+              style={{ width: '100%', padding: '12px 14px', boxSizing: 'border-box', background: '#060c18', border: '0.5px solid rgba(163,201,255,0.08)', color: '#c0c7d5', fontSize: 13, fontFamily: SANS, lineHeight: 1.65, outline: 'none', resize: 'vertical' }}
+              onFocus={e => e.target.style.borderColor = 'rgba(163,201,255,0.25)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(163,201,255,0.08)'}
             />
-            <p className="text-[10px] font-mono text-slate-400 dark:text-slate-500 mt-1">
-              {content.length} chars {content.length < 50 && content.length > 0 && '· minimum 50 to publish'}
-            </p>
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 text-xs text-rose-600 dark:text-rose-400">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: MONO, fontSize: 11, color: '#ffb4ab' }}>
               <AlertCircle size={12} /> {error}
             </div>
           )}
@@ -460,9 +489,20 @@ function WriteModal({ onClose, onPublish, user }) {
           <button
             onClick={handlePublish}
             disabled={!canPublish || loading}
-            className="w-full py-3 bg-sky-500 hover:bg-sky-600 disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-400 dark:disabled:text-slate-500 text-white font-extrabold text-sm tracking-wide transition-colors flex items-center justify-center gap-2"
+            style={{
+              width: '100%', padding: '13px 0',
+              background: canPublish ? 'linear-gradient(90deg, #1493ff, #0ea5e9)' : 'rgba(138,145,159,0.08)',
+              border: 'none', cursor: canPublish ? 'pointer' : 'default',
+              color: canPublish ? '#fff' : '#2a3040',
+              fontFamily: MONO, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              boxShadow: canPublish ? '0 4px 16px rgba(20,147,255,0.25)' : 'none',
+              transition: 'filter 0.15s',
+            }}
+            onMouseEnter={e => { if (canPublish) e.currentTarget.style.filter = 'brightness(1.1)' }}
+            onMouseLeave={e => e.currentTarget.style.filter = 'none'}
           >
-            {loading ? <><Loader2 size={14} className="animate-spin" /> Publishing…</> : <><PenLine size={14} /> Publish Post</>}
+            {loading ? <><Loader2 size={13} className="animate-spin" /> Publishing…</> : <><PenLine size={13} /> Publish Post</>}
           </button>
         </div>
       </div>
