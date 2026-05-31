@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Plus, Bell, FileText, Mail, MessageSquare, Mic, DollarSign,
-  TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles
+  TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles,
+  BookOpen, Handshake, PenLine, ArrowRight
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -12,15 +13,40 @@ import { parseISO, isToday, isPast, format, subDays, startOfDay, isSameDay, addD
 import { useApplications } from '../contexts/ApplicationContext'
 import ApplicationModal from '../components/Modals/ApplicationModal'
 
-const AI_TOOLS = [
-  { to: '/ai/cv',             label: 'CV Review',       icon: FileText,      accent: '#a3c9ff', iconBg: 'rgba(163,201,255,0.08)', border: 'rgba(163,201,255,0.18)' },
-  { to: '/ai/cover-letter',   label: 'Cover Letter',    icon: Mail,          accent: '#4edea3', iconBg: 'rgba(78,222,163,0.08)',  border: 'rgba(78,222,163,0.18)'  },
-  { to: '/ai/follow-up',      label: 'Follow-up',       icon: MessageSquare, accent: '#ffb689', iconBg: 'rgba(255,182,137,0.08)', border: 'rgba(255,182,137,0.18)' },
-  { to: '/ai/interview-prep', label: 'Interview Prep',  icon: Mic,           accent: '#e56f03', iconBg: 'rgba(229,111,3,0.08)',   border: 'rgba(229,111,3,0.18)'   },
-  { to: '/ai/salary',         label: 'Salary Intel',    icon: DollarSign,    accent: '#ffb4ab', iconBg: 'rgba(255,180,171,0.08)', border: 'rgba(255,180,171,0.18)' },
-  { to: '/ai/market',         label: 'Market Analysis', icon: TrendingUp,    accent: '#a3c9ff', iconBg: 'rgba(163,201,255,0.08)', border: 'rgba(163,201,255,0.18)' },
-  { to: '/ai/company',        label: 'Company Research',icon: Building2,     accent: '#ffb689', iconBg: 'rgba(255,182,137,0.08)', border: 'rgba(255,182,137,0.18)' },
-  { to: '/ai/linkedin',       label: 'LinkedIn Review', icon: Link2,         accent: '#4edea3', iconBg: 'rgba(78,222,163,0.08)',  border: 'rgba(78,222,163,0.18)'  },
+const HERO_TOOLS = [
+  {
+    to: '/ai/interview-coach',
+    label: 'Interview Coach',
+    desc: 'Live mock interview with a real AI hiring manager. Get a full scorecard.',
+    icon: Mic,
+    accent: '#ffb4ab',
+    tag: 'APEX',
+  },
+  {
+    to: '/ai/negotiate',
+    label: 'Offer Simulator',
+    desc: 'Practice salary negotiation. AI plays the recruiter — you practice the counter.',
+    icon: Handshake,
+    accent: '#4edea3',
+    tag: 'APEX',
+  },
+  {
+    to: '/cv/builder',
+    label: 'CV Builder',
+    desc: 'Build a polished, ATS-optimised CV from scratch in minutes.',
+    icon: PenLine,
+    accent: '#a3c9ff',
+    tag: 'PRO',
+  },
+]
+
+const MORE_TOOLS = [
+  { to: '/ai/follow-up',      label: 'Follow-up',       icon: MessageSquare, accent: '#ffb689' },
+  { to: '/ai/salary',         label: 'Salary Intel',    icon: DollarSign,    accent: '#a3c9ff' },
+  { to: '/ai/market',         label: 'Market Intel',    icon: TrendingUp,    accent: '#4edea3' },
+  { to: '/ai/company',        label: 'Company Brief',   icon: Building2,     accent: '#ffb689' },
+  { to: '/ai/interview-prep', label: 'Interview Prep',  icon: BookOpen,      accent: '#ffb4ab' },
+  { to: '/ai/linkedin',       label: 'LinkedIn',        icon: Link2,         accent: '#4edea3' },
 ]
 
 const STATS = [
@@ -373,72 +399,172 @@ export default function Home() {
         </section>
       )}
 
-      {/* Chart + AI Tools grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-
-        {/* Weekly chart */}
-        <section className="surface-glass rounded-none lg:col-span-7" style={{ padding: 16 }}>
-          <div className="flex items-center justify-between mb-5">
-            <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: '#c0c7d5', textTransform: 'uppercase' }}>
-              Applications Activity
-            </span>
+      {/* Weekly Activity Chart — full width */}
+      <section style={{
+        background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
+        border: '0.5px solid rgba(163,201,255,0.07)',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+        padding: '20px 24px 16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div>
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(163,201,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>
+              Activity
+            </p>
+            <p style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 15, fontWeight: 600, color: '#e2e2e8', letterSpacing: '-0.01em' }}>
+              Applications this week
+            </p>
           </div>
-          <ResponsiveContainer width="100%" height={148}>
-            <BarChart data={weeklyData} barSize={20} margin={{ top: 4, right: 0, left: -32, bottom: 0 }}>
-              <XAxis
-                dataKey="day"
-                tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#8a919f', fontWeight: 600 }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis allowDecimals={false} tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#8a919f' }} axisLine={false} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(138,145,159,0.06)' }} />
-              <Bar dataKey="count" radius={[3, 3, 0, 0]}>
-                {weeklyData.map((entry, i) => (
-                  <Cell
-                    key={i}
-                    fill={entry.count > 0 && entry.count === maxCount
-                      ? 'rgba(163,201,255,0.55)'
-                      : entry.count > 0
-                        ? 'rgba(163,201,255,0.2)'
-                        : 'rgba(64,71,83,0.35)'}
-                    stroke={entry.count > 0 && entry.count === maxCount ? 'rgba(163,201,255,0.5)' : 'none'}
-                    strokeWidth={1}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </section>
-
-        {/* AI Tools */}
-        <section className="surface-glass rounded-none lg:col-span-5" style={{ padding: 16 }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles size={15} style={{ color: '#a3c9ff' }} />
-            <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', color: '#c0c7d5', textTransform: 'uppercase' }}>
-              Intelligent Tools
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {weekDelta !== 0 && (
+              <span style={{
+                fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 700,
+                color: weekDelta > 0 ? '#4edea3' : '#ffb4ab',
+                background: weekDelta > 0 ? 'rgba(78,222,163,0.08)' : 'rgba(255,180,171,0.08)',
+                border: `0.5px solid ${weekDelta > 0 ? 'rgba(78,222,163,0.2)' : 'rgba(255,180,171,0.2)'}`,
+                padding: '4px 10px',
+              }}>
+                {weekDelta > 0 ? '↑' : '↓'} {Math.abs(weekDelta)} vs last week
+              </span>
+            )}
+            <div style={{
+              fontFamily: 'Geist Mono, monospace', fontSize: 22, fontWeight: 800,
+              letterSpacing: '-0.05em', lineHeight: 1,
+              background: 'linear-gradient(135deg, #ffffff 0%, #a3c9ff 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(0 0 10px rgba(163,201,255,0.3))',
+            }}>
+              {thisWeekCount}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-1.5">
-            {AI_TOOLS.map(({ to, label, icon: Icon, accent, iconBg, border }) => (
-              <button
-                key={to}
-                onClick={() => navigate(to)}
-                className="tool-card flex items-center gap-2.5 rounded-none text-left group"
-                style={{ padding: '8px 10px' }}
-              >
-                <div className="w-7 h-7 flex items-center justify-center shrink-0" style={{ background: iconBg, border: `0.5px solid ${border}` }}>
-                  <Icon size={13} style={{ color: accent }} />
+        </div>
+        <ResponsiveContainer width="100%" height={200}>
+          <BarChart data={weeklyData} barSize={28} margin={{ top: 4, right: 0, left: -28, bottom: 0 }}>
+            <XAxis dataKey="day" tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#3a4455', fontWeight: 600 }} axisLine={false} tickLine={false} />
+            <YAxis allowDecimals={false} tick={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fill: '#3a4455' }} axisLine={false} tickLine={false} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(163,201,255,0.04)' }} />
+            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+              {weeklyData.map((entry, i) => (
+                <Cell key={i}
+                  fill={entry.count > 0 && entry.count === maxCount
+                    ? 'url(#barGradientPeak)'
+                    : entry.count > 0
+                      ? 'rgba(163,201,255,0.18)'
+                      : 'rgba(255,255,255,0.03)'}
+                  stroke={entry.count > 0 && entry.count === maxCount ? 'rgba(163,201,255,0.4)' : 'none'}
+                  strokeWidth={1}
+                />
+              ))}
+            </Bar>
+            <defs>
+              <linearGradient id="barGradientPeak" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#a3c9ff" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#a3c9ff" stopOpacity={0.3} />
+              </linearGradient>
+            </defs>
+          </BarChart>
+        </ResponsiveContainer>
+      </section>
+
+      {/* AI Tools — full width, hero cards + more row */}
+      <section>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Sparkles size={13} style={{ color: '#a3c9ff' }} />
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(163,201,255,0.6)', textTransform: 'uppercase' }}>
+              AI Toolkit
+            </p>
+          </div>
+          <button onClick={() => navigate('/ai')} style={{
+            display: 'flex', alignItems: 'center', gap: 4,
+            fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700,
+            letterSpacing: '0.08em', color: '#3a4455', textTransform: 'uppercase',
+            background: 'none', border: 'none', cursor: 'pointer',
+          }}
+            onMouseEnter={e => e.currentTarget.style.color = '#a3c9ff'}
+            onMouseLeave={e => e.currentTarget.style.color = '#3a4455'}
+          >
+            All tools <ArrowRight size={10} />
+          </button>
+        </div>
+
+        {/* 3 hero cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, marginBottom: 2 }}>
+          {HERO_TOOLS.map(({ to, label, desc, icon: Icon, accent, tag }) => (
+            <button key={to} onClick={() => navigate(to)} style={{
+              position: 'relative', textAlign: 'left', padding: '20px 20px 16px',
+              background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
+              border: '0.5px solid rgba(163,201,255,0.07)',
+              cursor: 'pointer', overflow: 'hidden',
+              transition: 'border-color 0.2s, background 0.2s',
+            }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = `${accent}30`
+                e.currentTarget.style.background = `linear-gradient(160deg, ${accent}08 0%, #080f1e 100%)`
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(163,201,255,0.07)'
+                e.currentTarget.style.background = 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)'
+              }}
+            >
+              {/* top accent line */}
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, ${accent} 0%, ${accent}00 100%)` }} />
+              {/* corner glow */}
+              <div style={{ position: 'absolute', top: -16, left: -16, width: 80, height: 80, borderRadius: '50%', background: `radial-gradient(circle, ${accent}18 0%, transparent 70%)`, filter: 'blur(8px)', pointerEvents: 'none' }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, position: 'relative' }}>
+                <div style={{
+                  width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: `${accent}12`, border: `0.5px solid ${accent}30`,
+                }}>
+                  <Icon size={16} style={{ color: accent }} />
                 </div>
-                <span className="text-xs font-medium leading-tight" style={{ color: '#e2e2e8', fontFamily: 'Geist, Inter, sans-serif' }}>
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+                <span style={{
+                  fontFamily: 'Geist Mono, monospace', fontSize: 7, fontWeight: 700, letterSpacing: '0.08em',
+                  background: tag === 'APEX' ? 'linear-gradient(90deg, #4edea3, #a3c9ff)' : '#1493ff',
+                  color: tag === 'APEX' ? '#0d1117' : '#fff',
+                  padding: '2px 6px',
+                }}>{tag}</span>
+              </div>
 
-      </div>
+              <p style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 700, color: '#e2e2e8', letterSpacing: '-0.01em', marginBottom: 6, position: 'relative' }}>
+                {label}
+              </p>
+              <p style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 11, color: '#4a5568', lineHeight: 1.55, marginBottom: 14, position: 'relative' }}>
+                {desc}
+              </p>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, position: 'relative' }}>
+                <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', color: accent, textTransform: 'uppercase' }}>
+                  Start
+                </span>
+                <ArrowRight size={10} style={{ color: accent }} />
+              </div>
+            </button>
+          ))}
+        </div>
+
+        {/* More tools row */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 2,
+        }}>
+          {MORE_TOOLS.map(({ to, label, icon: Icon, accent }) => (
+            <button key={to} onClick={() => navigate(to)} style={{
+              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
+              background: '#0a1628', border: '0.5px solid rgba(163,201,255,0.05)',
+              cursor: 'pointer', transition: 'background 0.15s, border-color 0.15s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = `${accent}08`; e.currentTarget.style.borderColor = `${accent}20` }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#0a1628'; e.currentTarget.style.borderColor = 'rgba(163,201,255,0.05)' }}
+            >
+              <Icon size={12} style={{ color: accent, flexShrink: 0 }} />
+              <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, color: '#3a4455', letterSpacing: '0.04em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <ApplicationModal
         open={modalOpen}
