@@ -185,10 +185,10 @@ export default function Home() {
   }
 
   const SIDEBAR = [
-    { label: 'Start a Blog', icon: PenSquare,    to: '/blog',   soon: false },
-    { label: 'Library',      icon: Library,      to: '/blog',   soon: true  },
-    { label: 'Market',       icon: BarChart3,    to: '/ai/market', soon: false },
-    { label: 'Skills',       icon: GraduationCap, to: '/ai/interview-prep', soon: true },
+    { label: 'Start a Blog', icon: PenSquare,     to: '/blog',    soon: false },
+    { label: 'Library',      icon: Library,       to: '/library', soon: true  },
+    { label: 'Market',       icon: BarChart3,     to: '/market',  soon: true  },
+    { label: 'Skills',       icon: GraduationCap, to: '/skills',  soon: true  },
   ]
 
   return (
@@ -222,11 +222,11 @@ export default function Home() {
                 e.currentTarget.style.borderColor = 'transparent'
               }}
             >
-              <Icon size={14} style={{ color: '#3a4455', flexShrink: 0 }} />
+              <Icon size={14} style={{ color: '#8a919f', flexShrink: 0 }} />
               <div style={{ minWidth: 0 }}>
                 <p style={{
                   fontFamily: 'Geist, Inter, sans-serif', fontSize: 12, fontWeight: 500,
-                  color: '#6b7583', letterSpacing: '-0.01em', lineHeight: 1.2,
+                  color: '#8a919f', letterSpacing: '-0.01em', lineHeight: 1.2,
                   whiteSpace: 'nowrap',
                 }}>
                   {label}
