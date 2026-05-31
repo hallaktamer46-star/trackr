@@ -62,7 +62,7 @@ export default function Header() {
               letterSpacing="-2"
             >T</text>
           </svg>
-          <span className="hidden sm:block text-slate-900 dark:text-white" style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 20, fontWeight: 700, letterSpacing: '-0.03em' }}>
+          <span className="hidden sm:block text-slate-900 dark:text-white" style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em' }}>
             TRACKR
           </span>
         </div>
