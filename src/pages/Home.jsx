@@ -192,10 +192,18 @@ export default function Home() {
       {/* Stats row */}
       <section style={{
         display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
-        background: '#0c1d35',
-        border: '0.5px solid rgba(20,60,110,0.7)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+        background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
+        border: '0.5px solid rgba(163,201,255,0.07)',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.03) inset',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
+        {/* ambient background shimmer */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse at 50% -20%, rgba(163,201,255,0.04) 0%, transparent 60%)',
+        }} />
+
         {STATS.map(({ key, label, color, accent }, idx) => {
           const val = stats[key]
           const empty = val === 0
@@ -226,66 +234,95 @@ export default function Home() {
             context = pct !== null ? { text: `${pct}% of total`, up: pct < 40 } : null
           }
 
+          const contextColor = context?.up === true ? '#4edea3'
+            : context?.up === false ? '#ffb4ab' : '#3a4455'
+
           return (
             <div key={key} style={{
               position: 'relative',
-              padding: '18px 20px 16px',
-              borderRight: idx < 4 ? '0.5px solid rgba(20,60,110,0.6)' : 'none',
-              borderTop: `2px solid ${empty ? 'rgba(138,145,159,0.08)' : color}`,
+              padding: '22px 22px 18px',
+              borderRight: idx < 4 ? '0.5px solid rgba(163,201,255,0.05)' : 'none',
               overflow: 'hidden',
-              transition: 'background 0.2s',
+              cursor: 'default',
+              transition: 'background 0.25s ease',
             }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              onMouseEnter={e => { e.currentTarget.style.background = `${color}06` }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
             >
-              {/* bg glow */}
+              {/* gradient top accent — fades out to right */}
+              <div style={{
+                position: 'absolute', top: 0, left: 0, right: 0, height: 3, pointerEvents: 'none',
+                background: empty
+                  ? 'rgba(138,145,159,0.06)'
+                  : `linear-gradient(90deg, ${color} 0%, ${color}00 100%)`,
+              }} />
+
+              {/* deep corner glow */}
               {!empty && (
                 <div style={{
-                  position: 'absolute', inset: 0, pointerEvents: 'none',
-                  background: `radial-gradient(ellipse at 0% 0%, ${accent} 0%, transparent 65%)`,
+                  position: 'absolute', top: -20, left: -20,
+                  width: 120, height: 120, pointerEvents: 'none', borderRadius: '50%',
+                  background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`,
+                  filter: 'blur(12px)',
                 }} />
               )}
 
               {/* label */}
               <p style={{
                 fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700,
-                letterSpacing: '0.12em', textTransform: 'uppercase',
-                color: empty ? '#2a3040' : `${color}99`,
-                marginBottom: 10, position: 'relative',
+                letterSpacing: '0.14em', textTransform: 'uppercase',
+                color: empty ? '#1e2a3a' : `${color}70`,
+                marginBottom: 12, position: 'relative',
               }}>
                 {label}
               </p>
 
-              {/* number + spark */}
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 10, position: 'relative' }}>
+              {/* number */}
+              <p style={{
+                fontFamily: 'Geist Mono, monospace',
+                fontSize: 44, fontWeight: 800,
+                letterSpacing: '-0.07em', lineHeight: 1,
+                marginBottom: 8, position: 'relative',
+                background: empty
+                  ? 'none'
+                  : `linear-gradient(135deg, #ffffff 0%, ${color} 100%)`,
+                WebkitBackgroundClip: empty ? 'unset' : 'text',
+                WebkitTextFillColor: empty ? 'rgba(138,145,159,0.1)' : 'transparent',
+                backgroundClip: empty ? 'unset' : 'text',
+                filter: empty ? 'none' : `drop-shadow(0 0 12px ${color}50)`,
+              }}>
+                {val}
+              </p>
+
+              {/* spark + context row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' }}>
                 <p style={{
-                  fontFamily: 'Geist Mono, monospace', fontSize: 36, fontWeight: 700,
-                  letterSpacing: '-0.06em', lineHeight: 1,
-                  color: empty ? 'rgba(138,145,159,0.12)' : color,
-                  textShadow: empty ? 'none' : `0 0 24px ${color}40`,
+                  fontFamily: 'Geist Mono, monospace', fontSize: 9,
+                  letterSpacing: '0.04em', lineHeight: 1,
+                  color: contextColor, minHeight: 11,
                 }}>
-                  {val}
+                  {context && (
+                    <>
+                      {context.up === true && '↑ '}
+                      {context.up === false && '↓ '}
+                      {context.text}
+                    </>
+                  )}
                 </p>
                 {!empty && <Spark data={sparkData[key]} color={color} />}
               </div>
 
-              {/* context */}
-              <p style={{
-                fontFamily: 'Geist Mono, monospace', fontSize: 9,
-                letterSpacing: '0.03em', lineHeight: 1,
-                minHeight: 11, position: 'relative',
-                color: context?.up === true ? '#4edea3'
-                  : context?.up === false ? '#ffb4ab'
-                  : '#404753',
-              }}>
-                {context && (
-                  <>
-                    {context.up === true && '↑ '}
-                    {context.up === false && '↓ '}
-                    {context.text}
-                  </>
-                )}
-              </p>
+              {/* bottom fill line */}
+              {!empty && (
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1 }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${key === 'total' ? 100 : pct || 0}%`,
+                    background: `linear-gradient(90deg, ${color}60, ${color}00)`,
+                    transition: 'width 0.8s ease',
+                  }} />
+                </div>
+              )}
             </div>
           )
         })}
