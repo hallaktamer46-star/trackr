@@ -45,31 +45,22 @@ export default function Header() {
         {/* Logo */}
         <div className="flex items-center gap-2 shrink-0">
           <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="22" fill="#4A1E8A"/>
-            <circle cx="18" cy="37" r="7.5" fill="#C084FC"/>
-            <line x1="18" y1="48" x2="18" y2="54" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="18" cy="65" r="7.5" fill="#C084FC"/>
-            <circle cx="33" cy="20" r="7.5" fill="#C084FC"/>
-            <line x1="33" y1="31" x2="33" y2="43" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="33" cy="51" r="7.5" fill="#C084FC"/>
-            <line x1="33" y1="61" x2="33" y2="71" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="33" cy="82" r="7.5" fill="#C084FC"/>
-            <circle cx="50" cy="13" r="7" fill="#C084FC"/>
-            <line x1="50" y1="23" x2="50" y2="27" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <line x1="50" y1="31" x2="50" y2="35" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="50" cy="45" r="7" fill="#C084FC"/>
-            <circle cx="50" cy="59" r="7" fill="#C084FC"/>
-            <line x1="50" y1="69" x2="50" y2="73" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <line x1="50" y1="77" x2="50" y2="81" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="50" cy="91" r="7" fill="#C084FC"/>
-            <circle cx="67" cy="20" r="7.5" fill="#C084FC"/>
-            <line x1="67" y1="31" x2="67" y2="43" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="67" cy="51" r="7.5" fill="#C084FC"/>
-            <line x1="67" y1="61" x2="67" y2="71" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="67" cy="82" r="7.5" fill="#C084FC"/>
-            <circle cx="82" cy="37" r="7.5" fill="#C084FC"/>
-            <line x1="82" y1="48" x2="82" y2="54" stroke="#C084FC" strokeWidth="4" strokeLinecap="round"/>
-            <circle cx="82" cy="65" r="7.5" fill="#C084FC"/>
+            <defs>
+              <linearGradient id="tBg" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#1a0533"/>
+                <stop offset="100%" stopColor="#0d0020"/>
+              </linearGradient>
+            </defs>
+            <rect width="100" height="100" rx="18" fill="url(#tBg)"/>
+            <text
+              x="50" y="79"
+              textAnchor="middle"
+              fontFamily="Georgia, 'Times New Roman', serif"
+              fontSize="80"
+              fontWeight="bold"
+              fill="white"
+              letterSpacing="-2"
+            >T</text>
           </svg>
           <span className="font-extrabold text-lg tracking-tighter font-mono text-slate-900 dark:text-white hidden sm:block">
             TRACKR
