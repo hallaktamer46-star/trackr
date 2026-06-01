@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   Plus, Bell, FileText, Mail, MessageSquare, Mic, DollarSign,
   TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles,
-  BookOpen, Handshake, PenLine, ArrowRight, PenSquare, Library, BarChart3, GraduationCap
+  BookOpen, Handshake, PenLine, ArrowRight, PenSquare, Library, BarChart3, GraduationCap,
+  Target, Zap, Trophy, LayoutGrid
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -466,7 +467,130 @@ export default function Home() {
         </section>
       )}
 
-      {/* Weekly Activity Chart — full width */}
+      {/* Empty state — replaces chart + tools when no apps */}
+      {applications.length === 0 && (
+        <section style={{
+          position: 'relative', overflow: 'hidden',
+          background: 'linear-gradient(160deg, #0d1f3c 0%, #070d1a 100%)',
+          border: '0.5px solid rgba(163,201,255,0.08)',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+          padding: '52px 48px',
+        }}>
+          {/* dot grid background */}
+          <div style={{
+            position: 'absolute', inset: 0, pointerEvents: 'none',
+            backgroundImage: 'radial-gradient(circle, rgba(163,201,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }} />
+          {/* top shimmer */}
+          <div style={{
+            position: 'absolute', top: 0, left: '20%', right: '20%', height: 1, pointerEvents: 'none',
+            background: 'linear-gradient(90deg, transparent, rgba(163,201,255,0.3), transparent)',
+          }} />
+          {/* ambient glows */}
+          <div style={{ position: 'absolute', top: -60, left: -60, width: 260, height: 260, borderRadius: '50%', background: 'radial-gradient(circle, rgba(20,147,255,0.08) 0%, transparent 70%)', filter: 'blur(24px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(78,222,163,0.06) 0%, transparent 70%)', filter: 'blur(20px)', pointerEvents: 'none' }} />
+
+          <div style={{ position: 'relative', maxWidth: 520, margin: '0 auto', textAlign: 'center' }}>
+
+            {/* icon */}
+            <div style={{
+              width: 56, height: 56, margin: '0 auto 24px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'linear-gradient(135deg, rgba(20,147,255,0.15) 0%, rgba(78,222,163,0.08) 100%)',
+              border: '0.5px solid rgba(163,201,255,0.2)',
+              boxShadow: '0 0 32px rgba(20,147,255,0.15)',
+            }}>
+              <Target size={24} style={{ color: '#a3c9ff' }} />
+            </div>
+
+            {/* eyebrow */}
+            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', color: 'rgba(163,201,255,0.5)', textTransform: 'uppercase', marginBottom: 12 }}>
+              Pipeline Empty
+            </p>
+
+            {/* headline */}
+            <h2 style={{
+              fontFamily: 'Geist, Inter, sans-serif', fontSize: 28, fontWeight: 800,
+              letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: 14,
+              background: 'linear-gradient(135deg, #ffffff 20%, #a3c9ff 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(0 0 20px rgba(163,201,255,0.2))',
+            }}>
+              Your job search starts here.
+            </h2>
+
+            <p style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, color: '#3a4455', lineHeight: 1.7, marginBottom: 32 }}>
+              Add your first application and Trackr does the rest — reminders, analytics, AI coaching, salary data. Everything in one place.
+            </p>
+
+            {/* CTA */}
+            <button
+              onClick={() => { setEditingApp(null); setModalOpen(true) }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '13px 28px',
+                background: 'linear-gradient(90deg, #1493ff, #0ea5e9)',
+                border: 'none', cursor: 'pointer', color: '#fff',
+                fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700,
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+                boxShadow: '0 4px 24px rgba(20,147,255,0.35)',
+                transition: 'filter 0.15s, transform 0.15s',
+                marginBottom: 40,
+              }}
+              onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.12)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+              onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none' }}
+            >
+              <Plus size={13} /> Add First Application
+            </button>
+
+            {/* feature pills */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+              {[
+                { icon: LayoutGrid, label: 'Kanban Pipeline' },
+                { icon: Zap,        label: 'AI Tools'        },
+                { icon: Trophy,     label: 'Offer Coaching'  },
+                { icon: BarChart3,  label: 'Market Intel'    },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '6px 12px',
+                  background: 'rgba(163,201,255,0.04)',
+                  border: '0.5px solid rgba(163,201,255,0.08)',
+                }}>
+                  <Icon size={10} style={{ color: '#3a4455' }} />
+                  <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, color: '#3a4455', letterSpacing: '0.06em' }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ghost application cards — decorative bottom strip */}
+          <div style={{ display: 'flex', gap: 10, marginTop: 44, opacity: 0.18, pointerEvents: 'none', position: 'relative' }}>
+            {[
+              { co: 'Google', role: 'Senior PM', status: 'Interview', color: '#ffb689' },
+              { co: 'Stripe', role: 'Engineer', status: 'Applied', color: '#a3c9ff' },
+              { co: 'Linear', role: 'Designer', status: 'Offer', color: '#4edea3' },
+              { co: 'Vercel', role: 'DX Lead', status: 'Applied', color: '#a3c9ff' },
+            ].map(({ co, role, status, color }) => (
+              <div key={co} style={{
+                flex: 1, padding: '12px 14px',
+                background: '#0c1d35', border: `0.5px solid ${color}30`,
+                borderTop: `2px solid ${color}`,
+              }}>
+                <p style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 11, fontWeight: 700, color: '#e2e2e8', marginBottom: 2 }}>{role}</p>
+                <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, color: '#8a919f', marginBottom: 8 }}>{co}</p>
+                <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8, fontWeight: 700, color, background: `${color}15`, border: `0.5px solid ${color}30`, padding: '2px 6px' }}>{status}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Weekly Activity Chart + AI Tools — only when data exists */}
+      {applications.length > 0 && <>
       <section style={{
         background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
         border: '0.5px solid rgba(163,201,255,0.07)',
@@ -632,6 +756,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+      </>}
 
       <ApplicationModal
         open={modalOpen}
