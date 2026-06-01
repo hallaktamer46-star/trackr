@@ -1,69 +1,105 @@
 import { useMemo } from 'react'
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts'
-import { format, parseISO, subWeeks, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns'
+import { format, parseISO, subWeeks, startOfWeek, endOfWeek,
+  isWithinInterval, differenceInDays, subDays, startOfDay } from 'date-fns'
 import { useApplications } from '../contexts/ApplicationContext'
-import { TrendingUp, Target, Award, Zap } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Lock, TrendingUp, Zap, Target, Clock, AlertTriangle, Flame, Plus } from 'lucide-react'
 
 const MONO = 'Geist Mono, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
-const STATUS_COLORS = {
+const SC = {
   wishlist:  '#8a919f',
   applied:   '#a3c9ff',
   interview: '#ffb689',
   offer:     '#4edea3',
   rejected:  '#ffb4ab',
 }
-const STATUS_LABELS = {
-  wishlist: 'Wishlist', applied: 'Applied',
-  interview: 'Interview', offer: 'Offer', rejected: 'Rejected',
-}
 
-const CustomTooltip = ({ active, payload, label }) => {
+const Tip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
-    <div style={{
-      background: '#060c18', border: '0.5px solid rgba(163,201,255,0.15)',
-      padding: '8px 12px', fontFamily: MONO,
-      boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
-    }}>
-      <p style={{ fontSize: 9, color: 'rgba(163,201,255,0.5)', letterSpacing: '0.08em', marginBottom: 4 }}>{label}</p>
-      <p style={{ fontSize: 16, fontWeight: 700, color: payload[0].color || '#a3c9ff', letterSpacing: '-0.03em' }}>{payload[0].value}</p>
+    <div style={{ background:'#060c18', border:'0.5px solid rgba(163,201,255,0.15)', padding:'8px 12px', fontFamily:MONO, boxShadow:'0 8px 24px rgba(0,0,0,0.5)' }}>
+      <p style={{ fontSize:9, color:'rgba(163,201,255,0.4)', letterSpacing:'0.08em', marginBottom:4 }}>{label}</p>
+      <p style={{ fontSize:18, fontWeight:800, letterSpacing:'-0.04em', background:`linear-gradient(135deg,#fff,${payload[0].color||'#a3c9ff'})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{payload[0].value}</p>
     </div>
   )
 }
 
-// mini 4-week spark
-function Spark({ data, color }) {
-  const max = Math.max(...data, 1)
+function GradNum({ value, color, size = 36 }) {
+  const empty = !value || value === 0 || value === '0' || value === '0%'
   return (
-    <svg width={36} height={18} style={{ display: 'block' }}>
-      {data.map((v, i) => {
-        const h = Math.max((v / max) * 18, v > 0 ? 3 : 1)
-        return <rect key={i} x={i * 8} y={18 - h} width={6} height={h}
-          fill={i === data.length - 1 ? color : `${color}55`} rx={1} />
-      })}
-    </svg>
+    <span style={{
+      fontFamily: MONO, fontSize: size, fontWeight: 800, letterSpacing: '-0.06em', lineHeight: 1,
+      background: empty ? 'none' : `linear-gradient(135deg,#fff 0%,${color} 100%)`,
+      WebkitBackgroundClip: empty ? 'unset' : 'text',
+      WebkitTextFillColor: empty ? 'rgba(138,145,159,0.15)' : 'transparent',
+      backgroundClip: empty ? 'unset' : 'text',
+      filter: empty ? 'none' : `drop-shadow(0 0 8px ${color}40)`,
+    }}>{empty ? (typeof value === 'string' && value.includes('%') ? '—' : '0') : value}</span>
+  )
+}
+
+function LockedCard({ icon: Icon, label, desc, hint }) {
+  const navigate = useNavigate()
+  return (
+    <div style={{
+      background:'rgba(163,201,255,0.02)', border:'0.5px dashed rgba(163,201,255,0.08)',
+      padding:'14px 16px', display:'flex', flexDirection:'column', gap:6, position:'relative',
+    }}>
+      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+        <Icon size={11} style={{ color:'#3a4455' }} />
+        <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#2a3040', textTransform:'uppercase' }}>{label}</span>
+        <span style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:4, fontFamily:MONO, fontSize:8, color:'#1e2a3a' }}>
+          <Lock size={8} /> NEEDS DATA
+        </span>
+      </div>
+      <p style={{ fontFamily:SANS, fontSize:11, color:'#1e2a3a', lineHeight:1.4 }}>{desc}</p>
+      <button onClick={() => navigate('/board')} style={{
+        display:'inline-flex', alignItems:'center', gap:4,
+        fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase',
+        color:'#3a4455', background:'none', border:'none', cursor:'pointer', padding:0, marginTop:2,
+      }}>
+        <Plus size={8} /> {hint}
+      </button>
+    </div>
   )
 }
 
 export default function Stats() {
   const { applications } = useApplications()
 
-  const total        = applications.length
-  const active       = applications.filter(a => ['applied', 'interview'].includes(a.status)).length
-  const offers       = applications.filter(a => a.status === 'offer').length
-  const interviews   = applications.filter(a => a.status === 'interview').length
-  const rejected     = applications.filter(a => a.status === 'rejected').length
-  const applied      = applications.filter(a => a.status !== 'wishlist').length
-  const responded    = applications.filter(a => ['interview', 'offer', 'rejected'].includes(a.status)).length
-  const responseRate = applied > 0 ? Math.round((responded / applied) * 100) : 0
+  // ── core counts ──────────────────────────────────────────
+  const total      = applications.length
+  const applied    = applications.filter(a => a.status !== 'wishlist').length
+  const active     = applications.filter(a => ['applied','interview'].includes(a.status)).length
+  const interviews = applications.filter(a => a.status === 'interview').length
+  const offers     = applications.filter(a => a.status === 'offer').length
+  const rejected   = applications.filter(a => a.status === 'rejected').length
+  const wishlist   = applications.filter(a => a.status === 'wishlist').length
+  const responded  = interviews + offers + rejected
+
+  const responseRate = applied  > 0 ? Math.round((responded  / applied)  * 100) : 0
+  const interviewRate = applied > 0 ? Math.round((interviews / applied)  * 100) : 0
   const offerRate    = interviews > 0 ? Math.round((offers / interviews) * 100) : 0
 
-  // 8-week activity
+  // ── ghosting rate (applied > 14 days, no movement) ───────
+  const ghosted = useMemo(() =>
+    applications.filter(a => {
+      if (a.status !== 'applied') return false
+      if (!a.date_applied && !a.created_at) return false
+      const d = parseISO(a.date_applied || a.created_at)
+      return differenceInDays(new Date(), d) > 14
+    }).length
+  , [applications])
+
+  const ghostRate = applied > 0 ? Math.round((ghosted / applied) * 100) : 0
+
+  // ── weekly activity (8 weeks) ─────────────────────────────
   const activity = useMemo(() =>
     Array.from({ length: 8 }, (_, i) => {
       const anchor = subWeeks(new Date(), 7 - i)
@@ -71,299 +107,233 @@ export default function Stats() {
       const end    = endOfWeek(anchor,   { weekStartsOn: 1 })
       return {
         week: format(start, 'MMM d'),
-        count: applications.filter(a => a.date_applied &&
-          isWithinInterval(parseISO(a.date_applied), { start, end })
-        ).length,
+        count: applications.filter(a => {
+          const d = a.date_applied || a.created_at
+          return d && isWithinInterval(parseISO(d), { start, end })
+        }).length,
       }
-    }), [applications])
+    })
+  , [applications])
 
-  const byStatus = useMemo(() =>
-    Object.keys(STATUS_COLORS).map(s => ({
-      name: STATUS_LABELS[s], value: applications.filter(a => a.status === s).length, color: STATUS_COLORS[s],
-    })), [applications])
+  // ── velocity (avg apps/week last 4 weeks) ─────────────────
+  const velocity = useMemo(() => {
+    const last4 = activity.slice(-4)
+    const sum = last4.reduce((acc, w) => acc + w.count, 0)
+    return sum > 0 ? (sum / 4).toFixed(1) : '0'
+  }, [activity])
 
-  // 4-week sparklines per KPI
-  const sparkWeeks = useMemo(() =>
-    Array.from({ length: 4 }, (_, i) => {
-      const anchor = subWeeks(new Date(), 3 - i)
+  // ── peak day of week ──────────────────────────────────────
+  const peakDay = useMemo(() => {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+    const counts = Array(7).fill(0)
+    applications.forEach(a => {
+      const d = a.date_applied || a.created_at
+      if (d) counts[parseISO(d).getDay()]++
+    })
+    const max = Math.max(...counts)
+    if (max === 0) return null
+    return days[counts.indexOf(max)]
+  }, [applications])
+
+  // ── streak (consecutive weeks with ≥1 app) ───────────────
+  const streak = useMemo(() => {
+    let s = 0
+    for (let i = 0; i < 8; i++) {
+      const anchor = subWeeks(new Date(), i)
       const start  = startOfWeek(anchor, { weekStartsOn: 1 })
       const end    = endOfWeek(anchor,   { weekStartsOn: 1 })
-      const week   = applications.filter(a => a.date_applied &&
-        isWithinInterval(parseISO(a.date_applied), { start, end }))
-      return {
-        total:     week.length,
-        active:    week.filter(a => ['applied','interview'].includes(a.status)).length,
-        offers:    week.filter(a => a.status === 'offer').length,
-        response:  week.length > 0 ? Math.round((week.filter(a => ['interview','offer','rejected'].includes(a.status)).length / week.length) * 100) : 0,
-      }
-    }), [applications])
+      const has    = applications.some(a => {
+        const d = a.date_applied || a.created_at
+        return d && isWithinInterval(parseISO(d), { start, end })
+      })
+      if (has) s++; else break
+    }
+    return s
+  }, [applications])
 
-  const kpis = [
-    { label: 'Total',         value: total,              display: String(total),          color: '#e2e2e8', accent: 'rgba(226,226,232,0.12)', spark: sparkWeeks.map(w => w.total),    icon: Target },
-    { label: 'Active',        value: active,             display: String(active),         color: '#a3c9ff', accent: 'rgba(163,201,255,0.12)', spark: sparkWeeks.map(w => w.active),   icon: Zap },
-    { label: 'Offers',        value: offers,             display: String(offers),         color: '#4edea3', accent: 'rgba(78,222,163,0.12)',  spark: sparkWeeks.map(w => w.offers),   icon: Award },
-    { label: 'Response Rate', value: responseRate,       display: `${responseRate}%`,     color: '#ffb689', accent: 'rgba(255,182,137,0.12)', spark: sparkWeeks.map(w => w.response), icon: TrendingUp },
+  // ── funnel data ───────────────────────────────────────────
+  const funnel = [
+    { label: 'Wishlist',  value: wishlist,   color: '#8a919f', pct: total  > 0 ? Math.round((wishlist   / total)  * 100) : 0 },
+    { label: 'Applied',   value: applied,    color: '#a3c9ff', pct: total  > 0 ? Math.round((applied    / total)  * 100) : 0 },
+    { label: 'Interview', value: interviews, color: '#ffb689', pct: applied > 0 ? Math.round((interviews / applied) * 100) : 0 },
+    { label: 'Offer',     value: offers,     color: '#4edea3', pct: applied > 0 ? Math.round((offers     / applied) * 100) : 0 },
   ]
 
-  const maxActivity = Math.max(...activity.map(d => d.count), 1)
+  // ── status pie ────────────────────────────────────────────
+  const pieData = Object.keys(SC).map(s => ({
+    name: s, value: applications.filter(a => a.status === s).length, color: SC[s],
+  }))
+
+  const hasData = total > 0
 
   return (
-    <div style={{ fontFamily: SANS, maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ fontFamily: SANS, display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 1000 }}>
 
-      {/* Page header */}
-      <div style={{ paddingTop: 4 }}>
-        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', color: 'rgba(163,201,255,0.5)', textTransform: 'uppercase', marginBottom: 6 }}>
-          Analytics
-        </p>
-        <h1 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.04em', color: '#e2e2e8', lineHeight: 1.1, marginBottom: 4 }}>
-          Activity Overview
-        </h1>
-        <p style={{ fontFamily: MONO, fontSize: 10, color: '#3a4455', letterSpacing: '0.02em' }}>
-          {total === 0 ? 'No applications yet — add one to start tracking.' : `Tracking ${total} application${total > 1 ? 's' : ''} across your pipeline.`}
+      {/* ── Header ── */}
+      <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', paddingTop: 4 }}>
+        <div>
+          <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.14em', color:'rgba(163,201,255,0.4)', textTransform:'uppercase', marginBottom:4 }}>Analytics</p>
+          <h1 style={{ fontSize:22, fontWeight:800, letterSpacing:'-0.04em', color:'#e2e2e8', lineHeight:1 }}>Job Search Dashboard</h1>
+        </div>
+        <p style={{ fontFamily:MONO, fontSize:9, color:'#2a3040', letterSpacing:'0.06em' }}>
+          {format(new Date(), 'MMM yyyy')}
         </p>
       </div>
 
-      {/* KPI strip */}
-      <section style={{
-        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-        background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
-        border: '0.5px solid rgba(163,201,255,0.07)',
-        boxShadow: '0 8px 40px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.03) inset',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at 50% -20%, rgba(163,201,255,0.04) 0%, transparent 60%)' }} />
-        {kpis.map(({ label, value, display, color, accent, spark, icon: Icon }, idx) => {
-          const empty = value === 0
-          return (
-            <div key={label} style={{
-              position: 'relative', padding: '20px 20px 16px',
-              borderRight: idx < 3 ? '0.5px solid rgba(163,201,255,0.05)' : 'none',
-              overflow: 'hidden', transition: 'background 0.25s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = `${color}06` }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
-            >
-              {/* gradient top accent */}
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, pointerEvents: 'none', background: empty ? 'rgba(138,145,159,0.06)' : `linear-gradient(90deg, ${color} 0%, ${color}00 100%)` }} />
-              {/* corner glow */}
-              {!empty && <div style={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`, filter: 'blur(12px)', pointerEvents: 'none' }} />}
-
-              {/* label row */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, position: 'relative' }}>
-                <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: empty ? '#1e2a3a' : `${color}70` }}>
-                  {label}
-                </p>
-                <Icon size={11} style={{ color: empty ? '#1e2a3a' : `${color}60` }} />
-              </div>
-
-              {/* number */}
-              <p style={{
-                fontFamily: MONO, fontSize: 40, fontWeight: 800,
-                letterSpacing: '-0.07em', lineHeight: 1, marginBottom: 8, position: 'relative',
-                background: empty ? 'none' : `linear-gradient(135deg, #ffffff 0%, ${color} 100%)`,
-                WebkitBackgroundClip: empty ? 'unset' : 'text',
-                WebkitTextFillColor: empty ? 'rgba(138,145,159,0.1)' : 'transparent',
-                backgroundClip: empty ? 'unset' : 'text',
-                filter: empty ? 'none' : `drop-shadow(0 0 10px ${color}40)`,
-              }}>
-                {display}
-              </p>
-
-              {/* spark */}
-              <div style={{ position: 'relative' }}>
-                {!empty ? <Spark data={spark} color={color} /> : (
-                  <div style={{ height: 18, display: 'flex', alignItems: 'flex-end', gap: 2 }}>
-                    {[3,5,2,4].map((h,i) => <div key={i} style={{ width: 6, height: h, background: 'rgba(163,201,255,0.05)', borderRadius: 1 }} />)}
-                  </div>
-                )}
-              </div>
-
-              {/* bottom fill */}
-              {!empty && (
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 1 }}>
-                  <div style={{ height: '100%', width: label === 'Total' ? '100%' : label === 'Response Rate' ? `${responseRate}%` : `${Math.min((value / Math.max(total, 1)) * 100, 100)}%`, background: `linear-gradient(90deg, ${color}60, ${color}00)`, transition: 'width 0.8s ease' }} />
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </section>
-
-      {/* Activity chart — full width */}
-      <section style={{
-        background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
-        border: '0.5px solid rgba(163,201,255,0.07)',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
-        padding: '20px 24px 16px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div>
-            <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(163,201,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>
-              Activity Over Time
-            </p>
-            <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 600, color: '#e2e2e8', letterSpacing: '-0.01em' }}>
-              Weekly application volume
-            </p>
+      {/* ── KPI strip ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:2 }}>
+        {[
+          { label:'Total',       val: total,              raw: total,        color:'#e2e2e8' },
+          { label:'Applied',     val: applied,            raw: applied,      color:'#a3c9ff' },
+          { label:'Interviews',  val: interviews,         raw: interviews,   color:'#ffb689' },
+          { label:'Offers',      val: offers,             raw: offers,       color:'#4edea3' },
+          { label:'Response',    val:`${responseRate}%`,  raw: responseRate, color:'#ffb689' },
+          { label:'Interview %', val:`${interviewRate}%`, raw: interviewRate,color:'#ffb4ab' },
+        ].map(({ label, val, raw, color }, i) => (
+          <div key={label} style={{
+            background:'linear-gradient(160deg,#0d1f3c,#080f1e)',
+            border:'0.5px solid rgba(163,201,255,0.06)',
+            padding:'12px 14px', position:'relative', overflow:'hidden',
+            transition:'background 0.2s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = `${color}08`}
+            onMouseLeave={e => e.currentTarget.style.background = 'linear-gradient(160deg,#0d1f3c,#080f1e)'}
+          >
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background: raw > 0 ? `linear-gradient(90deg,${color},${color}00)` : 'rgba(138,145,159,0.06)' }} />
+            {raw > 0 && <div style={{ position:'absolute', top:-16, left:-16, width:60, height:60, borderRadius:'50%', background:`radial-gradient(circle,${color}20,transparent 70%)`, filter:'blur(10px)', pointerEvents:'none' }} />}
+            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', color: raw > 0 ? `${color}80` : '#1e2a3a', marginBottom:6 }}>{label}</p>
+            <GradNum value={val} color={color} size={28} />
           </div>
-          <span style={{
-            fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.06em',
-            color: 'rgba(163,201,255,0.5)', background: 'rgba(163,201,255,0.06)',
-            border: '0.5px solid rgba(163,201,255,0.12)', padding: '4px 10px',
-          }}>
-            8 WEEKS
-          </span>
-        </div>
-        <ResponsiveContainer width="100%" height={200}>
-          <AreaChart data={activity} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="aGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#a3c9ff" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#a3c9ff" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke="rgba(163,201,255,0.04)" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="week" tick={{ fontFamily: MONO, fontSize: 9, fill: '#3a4455', fontWeight: 600 }} axisLine={false} tickLine={false} />
-            <YAxis allowDecimals={false} tick={{ fontFamily: MONO, fontSize: 9, fill: '#3a4455' }} axisLine={false} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(163,201,255,0.1)', strokeWidth: 1 }} />
-            <Area type="monotone" dataKey="count" stroke="#a3c9ff" strokeWidth={2} fill="url(#aGrad)" dot={{ fill: '#a3c9ff', r: 3, strokeWidth: 0 }} activeDot={{ fill: '#a3c9ff', r: 5, strokeWidth: 0, filter: 'drop-shadow(0 0 6px #a3c9ff)' }} />
-          </AreaChart>
-        </ResponsiveContainer>
-      </section>
-
-      {/* Pie + Funnel row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-
-        {/* Status breakdown */}
-        <div style={{
-          background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
-          border: '0.5px solid rgba(163,201,255,0.07)',
-          padding: '20px 24px',
-        }}>
-          <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(163,201,255,0.4)', textTransform: 'uppercase', marginBottom: 16 }}>
-            Status Breakdown
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-            <ResponsiveContainer width={130} height={130}>
-              <PieChart>
-                <Pie data={byStatus} dataKey="value" nameKey="name" innerRadius={38} outerRadius={58}
-                  paddingAngle={byStatus.filter(d => d.value > 0).length > 1 ? 3 : 0} stroke="none">
-                  {byStatus.map(d => <Cell key={d.name} fill={d.color} opacity={d.value === 0 ? 0.08 : 0.9} />)}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {byStatus.map(d => {
-                const pct = total > 0 ? Math.round((d.value / total) * 100) : 0
-                return (
-                  <div key={d.name}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                        <div style={{ width: 6, height: 6, background: d.color, opacity: d.value === 0 ? 0.15 : 1 }} />
-                        <span style={{ fontFamily: SANS, fontSize: 11, color: d.value === 0 ? '#2a3040' : '#8a919f' }}>{d.name}</span>
-                      </div>
-                      <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: d.value === 0 ? '#1e2a3a' : d.color }}>{d.value}</span>
-                    </div>
-                    <div style={{ height: 2, background: 'rgba(163,201,255,0.05)' }}>
-                      <div style={{ height: '100%', width: `${pct}%`, background: d.color, opacity: d.value === 0 ? 0.1 : 0.6, transition: 'width 0.8s ease' }} />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Conversion funnel */}
-        <div style={{
-          background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
-          border: '0.5px solid rgba(163,201,255,0.07)',
-          padding: '20px 24px',
-        }}>
-          <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(163,201,255,0.4)', textTransform: 'uppercase', marginBottom: 20 }}>
-            Conversion Funnel
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {[
-              { label: 'Applied',    value: applied,    color: '#a3c9ff', pct: 100 },
-              { label: 'Responded',  value: responded,  color: '#ffb689', pct: applied > 0 ? Math.round((responded / applied) * 100) : 0 },
-              { label: 'Interview',  value: interviews, color: '#ffb689', pct: applied > 0 ? Math.round((interviews / applied) * 100) : 0 },
-              { label: 'Offer',      value: offers,     color: '#4edea3', pct: applied > 0 ? Math.round((offers / applied) * 100) : 0 },
-            ].map(({ label, value, color, pct }) => (
-              <div key={label}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                  <span style={{ fontFamily: SANS, fontSize: 12, color: value === 0 ? '#2a3040' : '#8a919f' }}>{label}</span>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <span style={{ fontFamily: MONO, fontSize: 10, color: value === 0 ? '#1e2a3a' : '#3a4455' }}>{pct}%</span>
-                    <span style={{
-                      fontFamily: MONO, fontSize: 13, fontWeight: 800, letterSpacing: '-0.04em',
-                      background: value === 0 ? 'none' : `linear-gradient(135deg, #fff 0%, ${color} 100%)`,
-                      WebkitBackgroundClip: value === 0 ? 'unset' : 'text',
-                      WebkitTextFillColor: value === 0 ? 'rgba(138,145,159,0.15)' : 'transparent',
-                      backgroundClip: value === 0 ? 'unset' : 'text',
-                    }}>{value}</span>
-                  </div>
-                </div>
-                <div style={{ height: 6, background: 'rgba(163,201,255,0.05)', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{
-                    position: 'absolute', inset: 0, right: `${100 - pct}%`,
-                    background: value === 0 ? 'transparent' : `linear-gradient(90deg, ${color}80, ${color}30)`,
-                    transition: 'right 0.9s ease',
-                  }} />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* conversion rates */}
-          <div style={{ display: 'flex', gap: 2, marginTop: 20 }}>
-            {[
-              { label: 'Response rate', value: `${responseRate}%`, color: '#ffb689' },
-              { label: 'Offer rate',    value: `${offerRate}%`,    color: '#4edea3' },
-            ].map(({ label, value, color }) => (
-              <div key={label} style={{ flex: 1, padding: '10px 12px', background: 'rgba(163,201,255,0.03)', border: `0.5px solid ${color}15` }}>
-                <p style={{ fontFamily: MONO, fontSize: 8, color: '#2a3040', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>{label}</p>
-                <p style={{ fontFamily: MONO, fontSize: 18, fontWeight: 800, letterSpacing: '-0.04em', background: `linear-gradient(135deg, #fff 0%, ${color} 100%)`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-                  {value}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Bar chart — full width */}
-      <section style={{
-        background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
-        border: '0.5px solid rgba(163,201,255,0.07)',
-        padding: '20px 24px 16px',
-      }}>
-        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: 'rgba(163,201,255,0.4)', textTransform: 'uppercase', marginBottom: 4 }}>
-          Pipeline Distribution
-        </p>
-        <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 600, color: '#e2e2e8', letterSpacing: '-0.01em', marginBottom: 20 }}>
-          Applications by status
-        </p>
-        <ResponsiveContainer width="100%" height={160}>
-          <BarChart data={byStatus} barSize={32} margin={{ top: 4, right: 0, left: -20, bottom: 0 }}>
-            <defs>
-              {byStatus.map(d => (
-                <linearGradient key={d.name} id={`bGrad-${d.name}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor={d.color} stopOpacity={d.value === 0 ? 0.08 : 0.85} />
-                  <stop offset="100%" stopColor={d.color} stopOpacity={d.value === 0 ? 0.03 : 0.30} />
+      {/* ── Main bento ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gridTemplateRows:'auto auto', gap:2 }}>
+
+        {/* Activity chart — spans 2 cols, 2 rows */}
+        <div style={{ gridColumn:'1/3', gridRow:'1/3', background:'linear-gradient(160deg,#0d1f3c,#080f1e)', border:'0.5px solid rgba(163,201,255,0.07)', padding:'16px 18px' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
+            <div>
+              <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'rgba(163,201,255,0.4)', textTransform:'uppercase', marginBottom:3 }}>Activity</p>
+              <p style={{ fontFamily:SANS, fontSize:13, fontWeight:700, color:'#e2e2e8', letterSpacing:'-0.01em' }}>Weekly applications</p>
+            </div>
+            <div style={{ display:'flex', gap:6 }}>
+              <div style={{ textAlign:'right' }}>
+                <p style={{ fontFamily:MONO, fontSize:8, color:'#2a3040', letterSpacing:'0.06em', marginBottom:2 }}>AVG/WEEK</p>
+                <GradNum value={velocity} color='#a3c9ff' size={18} />
+              </div>
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={activity} margin={{ top:4, right:0, left:-28, bottom:0 }}>
+              <defs>
+                <linearGradient id="aG" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#a3c9ff" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#a3c9ff" stopOpacity={0} />
                 </linearGradient>
-              ))}
-            </defs>
-            <CartesianGrid stroke="rgba(163,201,255,0.04)" strokeDasharray="4 4" vertical={false} />
-            <XAxis dataKey="name" tick={{ fontFamily: MONO, fontSize: 9, fill: '#3a4455', fontWeight: 600 }} axisLine={false} tickLine={false} />
-            <YAxis allowDecimals={false} tick={{ fontFamily: MONO, fontSize: 9, fill: '#3a4455' }} axisLine={false} tickLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(163,201,255,0.03)' }} />
-            <Bar dataKey="value" radius={[3, 3, 0, 0]}>
-              {byStatus.map(d => <Cell key={d.name} fill={`url(#bGrad-${d.name})`} />)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </section>
+              </defs>
+              <XAxis dataKey="week" tick={{ fontFamily:MONO, fontSize:8, fill:'#3a4455', fontWeight:600 }} axisLine={false} tickLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontFamily:MONO, fontSize:8, fill:'#3a4455' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<Tip />} cursor={{ stroke:'rgba(163,201,255,0.08)', strokeWidth:1 }} />
+              <Area type="monotone" dataKey="count" stroke="#a3c9ff" strokeWidth={2} fill="url(#aG)"
+                dot={{ fill:'#a3c9ff', r:3, strokeWidth:0 }}
+                activeDot={{ fill:'#a3c9ff', r:5, strokeWidth:0, filter:'drop-shadow(0 0 6px #a3c9ff)' }} />
+            </AreaChart>
+          </ResponsiveContainer>
+
+          {/* Mini stat row inside chart */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:2, marginTop:10 }}>
+            {[
+              { icon:Flame,         label:'Streak',     value: streak ? `${streak}w` : '—',   color:'#ffb689' },
+              { icon:Target,        label:'Peak day',   value: peakDay || '—',                 color:'#a3c9ff' },
+              { icon:AlertTriangle, label:'Ghosted',    value: ghosted ? `${ghosted}` : '0',   color:'#ffb4ab' },
+              { icon:Zap,           label:'Ghost rate', value: ghostRate ? `${ghostRate}%`:'—',color:'#ffb4ab' },
+            ].map(({ icon:Icon, label, value, color }) => (
+              <div key={label} style={{ background:'rgba(163,201,255,0.03)', border:'0.5px solid rgba(163,201,255,0.06)', padding:'8px 10px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:4 }}>
+                  <Icon size={9} style={{ color }} />
+                  <span style={{ fontFamily:MONO, fontSize:8, color:'#2a3040', letterSpacing:'0.08em', textTransform:'uppercase' }}>{label}</span>
+                </div>
+                <GradNum value={value} color={color} size={16} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Status pie — top right */}
+        <div style={{ background:'linear-gradient(160deg,#0d1f3c,#080f1e)', border:'0.5px solid rgba(163,201,255,0.07)', padding:'16px 18px' }}>
+          <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'rgba(163,201,255,0.4)', textTransform:'uppercase', marginBottom:12 }}>Pipeline</p>
+          <ResponsiveContainer width="100%" height={110}>
+            <PieChart>
+              <Pie data={pieData} dataKey="value" innerRadius={32} outerRadius={50}
+                paddingAngle={pieData.filter(d => d.value > 0).length > 1 ? 3 : 0} stroke="none">
+                {pieData.map(d => <Cell key={d.name} fill={d.color} opacity={d.value === 0 ? 0.07 : 0.9} />)}
+              </Pie>
+              <Tooltip content={<Tip />} />
+            </PieChart>
+          </ResponsiveContainer>
+          <div style={{ display:'flex', flexDirection:'column', gap:5, marginTop:8 }}>
+            {pieData.map(d => {
+              const pct = total > 0 ? Math.round((d.value / total) * 100) : 0
+              return (
+                <div key={d.name}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:2 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                      <div style={{ width:5, height:5, background:d.color, opacity: d.value===0?0.15:1 }} />
+                      <span style={{ fontFamily:SANS, fontSize:10, color: d.value===0?'#2a3040':'#6b7583' }}>{d.name.charAt(0).toUpperCase()+d.name.slice(1)}</span>
+                    </div>
+                    <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color: d.value===0?'#1e2a3a':d.color }}>{d.value}</span>
+                  </div>
+                  <div style={{ height:2, background:'rgba(163,201,255,0.04)' }}>
+                    <div style={{ height:'100%', width:`${pct}%`, background:d.color, opacity: d.value===0?0.06:0.5, transition:'width 0.8s ease' }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Conversion funnel — bottom right */}
+        <div style={{ background:'linear-gradient(160deg,#0d1f3c,#080f1e)', border:'0.5px solid rgba(163,201,255,0.07)', padding:'16px 18px' }}>
+          <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'rgba(163,201,255,0.4)', textTransform:'uppercase', marginBottom:12 }}>Funnel</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {funnel.map(({ label, value, color, pct }) => (
+              <div key={label}>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
+                  <span style={{ fontFamily:SANS, fontSize:11, color: value===0?'#2a3040':'#8a919f' }}>{label}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ fontFamily:MONO, fontSize:9, color:'#2a3040' }}>{pct}%</span>
+                    <GradNum value={value} color={color} size={14} />
+                  </div>
+                </div>
+                <div style={{ height:5, background:'rgba(163,201,255,0.05)', overflow:'hidden' }}>
+                  <div style={{ height:'100%', width:`${pct}%`, background:`linear-gradient(90deg,${color}90,${color}30)`, transition:'width 0.9s ease' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* rates */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginTop:12 }}>
+            {[
+              { label:'Response', val:`${responseRate}%`, color:'#ffb689' },
+              { label:'Offer',    val:`${offerRate}%`,    color:'#4edea3' },
+            ].map(({ label, val, color }) => (
+              <div key={label} style={{ background:`${color}06`, border:`0.5px solid ${color}15`, padding:'8px 10px' }}>
+                <p style={{ fontFamily:MONO, fontSize:7, color:`${color}60`, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:4 }}>{label} rate</p>
+                <GradNum value={val} color={color} size={20} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Locked insights ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:2 }}>
+        <LockedCard icon={TrendingUp} label="Source ROI"       desc='"LinkedIn gets you 3× more interviews than Indeed"'     hint="Add source to applications" />
+        <LockedCard icon={Clock}      label="Avg Response Time" desc='"You typically hear back in 8 days"'                    hint="Add interview dates"        />
+        <LockedCard icon={Target}     label="Salary Range"      desc='"Your target: $90k–$120k. Avg offer: $105k"'            hint="Add salary to applications" />
+        <LockedCard icon={Zap}        label="Level Performance" desc='"Senior roles give you 2× your interview rate"'         hint="Add job level field"        />
+      </div>
 
     </div>
   )
