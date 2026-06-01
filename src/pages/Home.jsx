@@ -300,7 +300,7 @@ export default function Home() {
       <div className="space-y-5 flex-1 min-w-0">
 
       {/* Header row */}
-      <section className="flex items-center justify-between pt-2">
+      <section style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', paddingTop: 8 }}>
         <div>
           <p style={{
             fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600,
@@ -315,17 +315,69 @@ export default function Home() {
             {smartSummary}
           </p>
         </div>
+
         {canAddMore && (
           <button
             onClick={() => { setEditingApp(null); setModalOpen(true) }}
-            className="flex items-center gap-1.5 px-4 py-2.5 font-bold text-xs text-white transition-all active:scale-95 hover:brightness-110"
-            style={{ background: '#1493ff', boxShadow: '0 4px 16px rgba(20,147,255,0.25)', letterSpacing: '0.04em', fontFamily: 'Geist Mono, monospace' }}
+            style={{
+              position: 'relative',
+              display: 'flex', alignItems: 'center', gap: 10,
+              padding: '11px 22px 11px 14px',
+              borderRadius: 999,
+              background: 'linear-gradient(135deg, #1493ff 0%, #6366f1 100%)',
+              border: 'none', cursor: 'pointer',
+              boxShadow: '0 0 0 1px rgba(99,102,241,0.4), 0 4px 24px rgba(20,147,255,0.35), 0 0 40px rgba(99,102,241,0.15)',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+              overflow: 'hidden',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 0 0 1px rgba(99,102,241,0.6), 0 8px 32px rgba(20,147,255,0.5), 0 0 60px rgba(99,102,241,0.25)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 0 0 1px rgba(99,102,241,0.4), 0 4px 24px rgba(20,147,255,0.35), 0 0 40px rgba(99,102,241,0.15)'
+            }}
+            onMouseDown={e => e.currentTarget.style.transform = 'translateY(0) scale(0.97)'}
+            onMouseUp={e => e.currentTarget.style.transform = 'translateY(-2px)'}
           >
-            <Plus size={13} />
-            Add Application
+            {/* shimmer sweep */}
+            <span style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 50%, transparent 60%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 3s infinite',
+              borderRadius: 999,
+              pointerEvents: 'none',
+            }} />
+
+            {/* plus circle */}
+            <span style={{
+              width: 24, height: 24, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <Plus size={13} color="#fff" strokeWidth={2.5} />
+            </span>
+
+            <span style={{
+              fontFamily: 'Geist, Inter, sans-serif',
+              fontSize: 13, fontWeight: 700, color: '#fff',
+              letterSpacing: '-0.01em', whiteSpace: 'nowrap',
+            }}>
+              Track a role
+            </span>
           </button>
         )}
       </section>
+
+      <style>{`
+        @keyframes shimmer {
+          0%   { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `}</style>
 
       {/* Stats row */}
       <section style={{
