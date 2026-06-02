@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, UserCog, Crown, Check, X, Zap } from 'lucide-react'
+import { LogOut, UserCog, Crown, Check, X, Zap, Rocket } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApplications } from '../../contexts/ApplicationContext'
@@ -7,7 +7,7 @@ import { supabase, isSupabaseConfigured } from '../../lib/supabase'
 
 export default function ProfileDropdown() {
   const { user, signOut } = useAuth()
-  const { isPaidUser } = useApplications()
+  const { isPaidUser, isApexUser } = useApplications()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -72,14 +72,19 @@ export default function ProfileDropdown() {
               <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold font-mono">
                 Signed in as
               </p>
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded flex items-center gap-1 ${
-                isPaidUser
-                  ? 'bg-sky-50 text-sky-600'
-                  : 'bg-slate-100 text-slate-500'
-              }`}>
-                {isPaidUser && <Crown size={10} />}
-                {isPaidUser ? 'PRO' : 'FREE'}
-              </span>
+              {isApexUser ? (
+                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'linear-gradient(135deg, rgba(78,222,163,0.15), rgba(163,201,255,0.15))', border:'0.5px solid rgba(78,222,163,0.4)', color:'#4edea3', letterSpacing:'0.06em' }}>
+                  <Rocket size={9} /> APEX
+                </span>
+              ) : isPaidUser ? (
+                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'rgba(163,201,255,0.12)', border:'0.5px solid rgba(163,201,255,0.35)', color:'#a3c9ff', letterSpacing:'0.06em' }}>
+                  <Crown size={9} /> PRO
+                </span>
+              ) : (
+                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'rgba(138,145,159,0.1)', border:'0.5px solid rgba(138,145,159,0.25)', color:'#8a919f', letterSpacing:'0.06em' }}>
+                  FREE
+                </span>
+              )}
             </div>
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
               {displayName || user?.email}
@@ -95,7 +100,7 @@ export default function ProfileDropdown() {
               </div>
               <div className="bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg px-3 py-2">
                 <p className="text-[10px] text-slate-400 uppercase tracking-wider font-mono">Plan</p>
-                <p className="text-xs font-mono text-slate-700 dark:text-slate-200 font-semibold">{isPaidUser ? 'Pro' : 'Free'}</p>
+                <p className="text-xs font-mono text-slate-700 dark:text-slate-200 font-semibold">{isApexUser ? 'Apex' : isPaidUser ? 'Pro' : 'Free'}</p>
               </div>
             </div>
           </div>
@@ -145,10 +150,10 @@ export default function ProfileDropdown() {
           <button
             onClick={() => { setOpen(false); navigate('/plans') }}
             className="w-full flex items-center gap-2 px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-slate-800"
-            style={{ color: isPaidUser ? '#4edea3' : '#a3c9ff' }}
+            style={{ color: isApexUser ? '#4edea3' : isPaidUser ? '#a3c9ff' : '#ffb689' }}
           >
-            {isPaidUser ? <Crown size={15} /> : <Zap size={15} />}
-            {isPaidUser ? 'Manage plan' : 'View plans & upgrade'}
+            {isApexUser ? <Rocket size={15} /> : isPaidUser ? <Crown size={15} /> : <Zap size={15} />}
+            {isApexUser ? 'Manage Apex plan' : isPaidUser ? 'Upgrade to Apex' : 'View plans & upgrade'}
           </button>
 
           {/* Sign out */}

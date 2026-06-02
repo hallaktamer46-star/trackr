@@ -17,8 +17,13 @@ function getSupabaseAdmin() {
 
 // Create a Stripe Checkout session for the Pro subscription
 router.post('/create-checkout', async (req, res) => {
-  const { userId, email } = req.body
+  const { userId, email, plan = 'pro' } = req.body
   if (!userId || !email) return res.status(400).json({ error: 'userId and email are required' })
+
+  const isApex = plan === 'apex'
+  const planConfig = isApex
+    ? { amount: 2900, name: 'Trackr Apex', description: 'Everything in Pro + Negotiation Simulator, AI job matching & more' }
+    : { amount: 1500, name: 'Trackr Pro',  description: 'Unlimited applications + all AI coaching tools' }
 
   try {
     const stripe = getStripe()
@@ -28,17 +33,14 @@ router.post('/create-checkout', async (req, res) => {
       line_items: [{
         price_data: {
           currency: 'usd',
-          unit_amount: 1500,
+          unit_amount: planConfig.amount,
           recurring: { interval: 'month' },
-          product_data: {
-            name: 'Trackr Pro',
-            description: 'Unlimited applications + AI coaching tools',
-          },
+          product_data: { name: planConfig.name, description: planConfig.description },
         },
         quantity: 1,
       }],
-      metadata: { userId },
-      success_url: `${process.env.APP_URL || 'http://localhost:5173'}/?checkout=success`,
+      metadata: { userId, plan },
+      success_url: `${process.env.APP_URL || 'http://localhost:5173'}/?checkout=success&plan=${plan}`,
       cancel_url:  `${process.env.APP_URL || 'http://localhost:5173'}/?checkout=cancelled`,
     })
 
@@ -63,10 +65,12 @@ router.post('/webhook', async (req, res) => {
       const userId = session.metadata?.userId
       if (userId) {
         const supabase = getSupabaseAdmin()
+        const plan = session.metadata?.plan || 'pro'
+        const isApex = plan === 'apex'
         await supabase.auth.admin.updateUserById(userId, {
-          user_metadata: { is_paid: true },
+          user_metadata: { is_paid: true, ...(isApex && { is_apex: true }) },
         })
-        console.log(`User ${userId} upgraded to Pro`)
+        console.log(`User ${userId} upgraded to ${isApex ? 'Apex' : 'Pro'}`)
       }
     }
 
