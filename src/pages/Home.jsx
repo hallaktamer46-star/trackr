@@ -5,7 +5,8 @@ import {
   Mic, Handshake, PenLine, ArrowRight, Target,
   TrendingUp, TrendingDown, Briefcase, CheckCircle2,
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
-  BookOpen, Building2, MessageSquare, Link2, Activity
+  BookOpen, Building2, MessageSquare, Link2, Activity,
+  PenSquare, Library, GraduationCap
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -38,33 +39,30 @@ function useLocalStorage(key, initial) {
   return [val]
 }
 
-/* ─── KPI Card ─── */
-function KPICard({ label, value, sub, icon: Icon, gradient, iconBg, trend, trendUp }) {
+/* ─── KPI Card — compact horizontal pill ─── */
+function KPICard({ label, value, sub, icon: Icon, gradient, trend, trendUp }) {
   return (
     <div style={{
-      background: gradient, padding: '18px 20px',
+      background: gradient, padding: '11px 14px',
       position: 'relative', overflow: 'hidden',
-      boxShadow: '0 4px 24px rgba(0,0,0,0.35)',
+      boxShadow: '0 2px 16px rgba(0,0,0,0.3)',
+      display: 'flex', alignItems: 'center', gap: 12,
     }}>
-      {/* background glow orb */}
-      <div style={{ position:'absolute', right:-20, top:-20, width:100, height:100, borderRadius:'50%', background:'rgba(255,255,255,0.07)', pointerEvents:'none' }}/>
-      <div style={{ position:'absolute', right:10, bottom:-30, width:70, height:70, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }}/>
-
-      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between' }}>
-        <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <Icon size={18} color="#fff"/>
-        </div>
-        {trend != null && (
-          <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.85)', background:'rgba(255,255,255,0.15)', padding:'3px 7px', borderRadius:999 }}>
-            {trendUp ? <TrendingUp size={9}/> : <TrendingDown size={9}/>} {Math.abs(trend)}%
-          </span>
-        )}
+      <div style={{ position:'absolute', right:-12, top:-12, width:60, height:60, borderRadius:'50%', background:'rgba(255,255,255,0.07)', pointerEvents:'none' }}/>
+      <div style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        <Icon size={14} color="#fff"/>
       </div>
-
-      <div style={{ marginTop:14 }}>
-        <p style={{ fontFamily:MONO, fontSize:9, fontWeight:600, letterSpacing:'0.1em', color:'rgba(255,255,255,0.6)', textTransform:'uppercase', marginBottom:4 }}>{label}</p>
-        <p style={{ fontFamily:MONO, fontSize:32, fontWeight:900, letterSpacing:'-0.05em', color:'#fff', lineHeight:1, marginBottom:4 }}>{value}</p>
-        <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(255,255,255,0.5)' }}>{sub}</p>
+      <div style={{ flex:1, minWidth:0 }}>
+        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:600, letterSpacing:'0.08em', color:'rgba(255,255,255,0.55)', textTransform:'uppercase', marginBottom:2 }}>{label}</p>
+        <div style={{ display:'flex', alignItems:'baseline', gap:6 }}>
+          <p style={{ fontFamily:MONO, fontSize:22, fontWeight:900, letterSpacing:'-0.04em', color:'#fff', lineHeight:1 }}>{value}</p>
+          {trend != null && (
+            <span style={{ display:'flex', alignItems:'center', gap:2, fontFamily:MONO, fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.8)', background:'rgba(255,255,255,0.15)', padding:'2px 5px', borderRadius:999 }}>
+              {trendUp ? <TrendingUp size={8}/> : <TrendingDown size={8}/>} {Math.abs(trend)}%
+            </span>
+          )}
+        </div>
+        <p style={{ fontFamily:MONO, fontSize:8, color:'rgba(255,255,255,0.4)', marginTop:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{sub}</p>
       </div>
     </div>
   )
@@ -218,8 +216,61 @@ export default function Home() {
   const offerRate    = stats.interview > 0 ? Math.round((stats.offer/stats.interview)*100) : 0
   const maxCount     = Math.max(...weeklyData.map(d=>d.count),1)
 
+  const SIDEBAR_LINKS = [
+    { label:'Start a Blog', icon:PenSquare,    action:()=>setQuickPostOpen(true) },
+    { label:'Library',      icon:Library,       soon:true },
+    { label:'Market',       icon:BarChart3,      soon:true },
+    { label:'Skills',       icon:GraduationCap,  soon:true },
+    { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
+  ]
+
   return (
-    <div style={{ fontFamily:SANS, maxWidth:1200, margin:'0 auto', display:'flex', flexDirection:'column', gap:14, paddingTop:4 }}>
+    <div style={{ fontFamily:SANS, maxWidth:1280, margin:'0 auto', display:'flex', gap:20, alignItems:'flex-start', paddingTop:4 }}>
+
+      {/* ── Left sidebar ── */}
+      <aside style={{ width:148, flexShrink:0, position:'sticky', top:72 }}>
+        <nav style={{ display:'flex', flexDirection:'column', gap:1, paddingTop:8 }}>
+          {SIDEBAR_LINKS.map(({ label, icon:Icon, soon, action }) => (
+            <button key={label} onClick={()=>{ if(soon)return; action?.() }}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'transparent', border:'0.5px solid transparent', cursor:soon?'default':'pointer', textAlign:'left', transition:'all 0.15s', opacity:soon?0.35:1 }}
+              onMouseEnter={e=>{ if(!soon){ e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.08)' }}}
+              onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent' }}>
+              <Icon size={13} style={{ color:'#8a919f', flexShrink:0 }}/>
+              <div>
+                <p style={{ fontSize:12, fontWeight:500, color:'#8a919f', letterSpacing:'-0.01em', whiteSpace:'nowrap' }}>{label}</p>
+                {soon && <p style={{ fontFamily:MONO, fontSize:7, color:'#2a3040', letterSpacing:'0.06em', marginTop:1 }}>SOON</p>}
+              </div>
+            </button>
+          ))}
+        </nav>
+
+        <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'10px 10px' }}/>
+
+        <div style={{ padding:'0 10px' }}>
+          <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#2a3040', textTransform:'uppercase', marginBottom:6 }}>Job Boards</p>
+          {[
+            { label:'LinkedIn',   url:'https://linkedin.com/jobs',           color:'#0a66c2' },
+            { label:'Indeed',     url:'https://indeed.com',                  color:'#2164f3' },
+            { label:'Glassdoor',  url:'https://glassdoor.com/Job/index.htm', color:'#0caa41' },
+            { label:'Wellfound',  url:'https://wellfound.com/jobs',          color:'#fb4f4f' },
+            { label:'Levels.fyi', url:'https://levels.fyi/jobs',             color:'#7c3aed' },
+          ].map(({label,url,color})=>(
+            <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+              style={{ display:'flex', alignItems:'center', gap:7, padding:'5px 8px', textDecoration:'none', border:'0.5px solid transparent', transition:'all 0.15s' }}
+              onMouseEnter={e=>{ e.currentTarget.style.background=`${color}10`; e.currentTarget.style.borderColor=`${color}25` }}
+              onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent' }}>
+              <div style={{ width:4, height:4, borderRadius:'50%', background:color, flexShrink:0, opacity:0.7 }}/>
+              <span style={{ fontSize:11, fontWeight:500, color:'#6b7583', whiteSpace:'nowrap' }}>{label}</span>
+            </a>
+          ))}
+        </div>
+
+        <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'10px 10px' }}/>
+        <p style={{ fontFamily:MONO, fontSize:7, color:'#1e2a3a', letterSpacing:'0.08em', textTransform:'uppercase', padding:'0 10px' }}>Trackr © 2026</p>
+      </aside>
+
+      {/* ── Main dashboard ── */}
+      <div style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', gap:12 }}>
 
       {/* ══ Header row ══ */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -464,6 +515,7 @@ export default function Home() {
       {quickPostOpen && <QuickPostModal onClose={()=>setQuickPostOpen(false)} onPublished={()=>{}}/>}
 
       <style>{`@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
+      </div>
     </div>
   )
 }
