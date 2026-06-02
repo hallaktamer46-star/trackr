@@ -65,46 +65,125 @@ function Card({ children, accent, style }) {
 /* ─── Mini calendar ─── */
 function MiniCal({ selected, onSelect, marked = [] }) {
   const [month, setMonth] = useState(new Date())
+  const [hovDay, setHovDay] = useState(null)
   const days = eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) })
   const startOffset = startOfMonth(month).getDay()
+  const DAY_LABELS = ['Su','Mo','Tu','We','Th','Fr','Sa']
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <button onClick={() => setMonth(m => subMonths(m, 1))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5a6478', display: 'flex', padding: 2 }}><ChevronLeft size={14}/></button>
-        <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: '#c0c7d5', letterSpacing: '0.06em' }}>{format(month, 'MMM yyyy').toUpperCase()}</span>
-        <button onClick={() => setMonth(m => addMonths(m, 1))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5a6478', display: 'flex', padding: 2 }}><ChevronRight size={14}/></button>
+    <div style={{ padding: '4px 2px' }}>
+
+      {/* Month nav */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <button onClick={() => setMonth(m => subMonths(m, 1))}
+          style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(163,201,255,0.05)', border: '0.5px solid rgba(163,201,255,0.1)', cursor: 'pointer', color: '#5a6478', transition: 'all 0.15s', borderRadius: 0 }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.12)'; e.currentTarget.style.color='#a3c9ff' }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(163,201,255,0.05)'; e.currentTarget.style.color='#5a6478' }}>
+          <ChevronLeft size={12}/>
+        </button>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontFamily: MONO, fontSize: 13, fontWeight: 800, color: '#e2e2e8', letterSpacing: '-0.02em', lineHeight: 1 }}>
+            {format(month, 'MMMM')}
+          </p>
+          <p style={{ fontFamily: MONO, fontSize: 9, color: '#5a6478', letterSpacing: '0.08em', marginTop: 2 }}>
+            {format(month, 'yyyy')}
+          </p>
+        </div>
+        <button onClick={() => setMonth(m => addMonths(m, 1))}
+          style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(163,201,255,0.05)', border: '0.5px solid rgba(163,201,255,0.1)', cursor: 'pointer', color: '#5a6478', transition: 'all 0.15s', borderRadius: 0 }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.12)'; e.currentTarget.style.color='#a3c9ff' }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(163,201,255,0.05)'; e.currentTarget.style.color='#5a6478' }}>
+          <ChevronRight size={12}/>
+        </button>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 2 }}>
-        {['S','M','T','W','T','F','S'].map((d,i) => (
-          <div key={i} style={{ fontFamily: MONO, fontSize: 8, color: '#3a4455', textAlign: 'center', paddingBottom: 4 }}>{d}</div>
+
+      {/* Day label row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: 6 }}>
+        {DAY_LABELS.map((d, i) => (
+          <div key={i} style={{
+            fontFamily: MONO, fontSize: 8, fontWeight: 700,
+            color: i === 0 || i === 6 ? '#3a4455' : '#404753',
+            textAlign: 'center', paddingBottom: 6,
+            letterSpacing: '0.04em',
+          }}>{d}</div>
         ))}
-        {Array(startOffset).fill(null).map((_, i) => <div key={`e${i}`}/>)}
+      </div>
+
+      {/* Days grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 3 }}>
+        {Array(startOffset).fill(null).map((_,i) => <div key={`e${i}`}/>)}
         {days.map(day => {
-          const iso = format(day, 'yyyy-MM-dd')
+          const iso  = format(day, 'yyyy-MM-dd')
           const isSel = selected && isSameDay(day, parseISO(selected))
-          const isT = isToday(day)
+          const isT  = isToday(day)
+          const isHov = hovDay === iso
           const hasMark = marked.some(m => isSameDay(day, typeof m === 'string' ? parseISO(m) : m))
+          const isWeekend = day.getDay() === 0 || day.getDay() === 6
+
           return (
-            <button key={iso} onClick={() => onSelect(iso)}
+            <button key={iso}
+              onClick={() => onSelect(iso)}
+              onMouseEnter={() => setHovDay(iso)}
+              onMouseLeave={() => setHovDay(null)}
               style={{
-                fontFamily: MONO, fontSize: 9, textAlign: 'center', padding: '4px 2px',
-                background: isSel ? '#a3c9ff' : isT ? 'rgba(163,201,255,0.1)' : 'transparent',
-                border: isT && !isSel ? '0.5px solid rgba(163,201,255,0.3)' : '0.5px solid transparent',
-                color: isSel ? '#0d1117' : isT ? '#a3c9ff' : '#8a919f',
-                cursor: 'pointer', position: 'relative', fontWeight: isSel || isT ? 700 : 400,
-                transition: 'all 0.1s',
+                position: 'relative',
+                fontFamily: MONO,
+                fontSize: 11,
+                fontWeight: isSel || isT ? 700 : isWeekend ? 400 : 500,
+                textAlign: 'center',
+                lineHeight: 1,
+                aspectRatio: '1',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                border: 'none',
+                borderRadius: '50%',
+                background: isSel
+                  ? 'linear-gradient(135deg, #a3c9ff, #7ab4ff)'
+                  : isT && !isSel
+                    ? 'rgba(163,201,255,0.12)'
+                    : isHov && !isSel
+                      ? 'rgba(163,201,255,0.08)'
+                      : 'transparent',
+                color: isSel
+                  ? '#0a1628'
+                  : isT
+                    ? '#a3c9ff'
+                    : isHov
+                      ? '#c0c7d5'
+                      : isWeekend
+                        ? '#3a4455'
+                        : '#8a919f',
+                boxShadow: isSel
+                  ? '0 2px 12px rgba(163,201,255,0.4)'
+                  : isT && !isSel
+                    ? '0 0 0 1px rgba(163,201,255,0.25)'
+                    : 'none',
+                transform: isHov && !isSel ? 'scale(1.15)' : 'scale(1)',
+                transition: 'all 0.15s cubic-bezier(0.34,1.4,0.64,1)',
               }}
-              onMouseEnter={e => { if (!isSel) e.currentTarget.style.background = 'rgba(163,201,255,0.08)' }}
-              onMouseLeave={e => { if (!isSel) e.currentTarget.style.background = isT ? 'rgba(163,201,255,0.1)' : 'transparent' }}
             >
               {format(day, 'd')}
               {hasMark && !isSel && (
-                <div style={{ position: 'absolute', bottom: 1, left: '50%', transform: 'translateX(-50%)', width: 3, height: 3, borderRadius: '50%', background: '#4edea3' }}/>
+                <div style={{
+                  position: 'absolute', bottom: 2, left: '50%', transform: 'translateX(-50%)',
+                  width: 3, height: 3, borderRadius: '50%',
+                  background: isT ? '#a3c9ff' : '#4edea3',
+                  boxShadow: `0 0 4px ${isT ? '#a3c9ff' : '#4edea3'}`,
+                }}/>
               )}
             </button>
           )
         })}
+      </div>
+
+      {/* Today shortcut */}
+      <div style={{ marginTop: 14, textAlign: 'center' }}>
+        <button onClick={() => { setMonth(new Date()); onSelect(format(new Date(), 'yyyy-MM-dd')) }}
+          style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#3a4455', background: 'none', border: 'none', cursor: 'pointer', transition: 'color 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
+          onMouseLeave={e => e.currentTarget.style.color='#3a4455'}>
+          Jump to today
+        </button>
       </div>
     </div>
   )
@@ -193,11 +272,7 @@ export default function Calendar() {
       {/* ── Page header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, paddingTop: 4 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <div style={{ width: 4, height: 4, background: '#a3c9ff' }} />
-            <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#a3c9ff', textTransform: 'uppercase' }}>Planner</span>
-          </div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 4 }}>My Calendar</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 6 }}>My Calendar</h1>
           <p style={{ fontFamily: MONO, fontSize: 10, color: '#5a6478' }}>
             {pendingTasks.length} tasks · {goals.filter(g=>g.progress<g.target).length} active goals · {interviews.length} interview{interviews.length!==1?'s':''} in progress
           </p>
@@ -225,9 +300,14 @@ export default function Calendar() {
 
         {/* ── Left: mini calendar + day view ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <Card accent="#a3c9ff">
+          <div style={{
+            background: 'linear-gradient(145deg, #0d1829, #070d1a)',
+            border: '0.5px solid rgba(163,201,255,0.1)',
+            boxShadow: '0 4px 32px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(163,201,255,0.04)',
+            padding: '18px 14px 14px',
+          }}>
             <MiniCal selected={selectedDate} onSelect={setSelectedDate} marked={markedDates} />
-          </Card>
+          </div>
 
           {/* Day summary */}
           <Card accent="transparent" style={{ padding: 14 }}>
