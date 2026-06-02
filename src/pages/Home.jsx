@@ -4,7 +4,7 @@ import {
   Plus, Bell, FileText, Mail, MessageSquare, Mic, DollarSign,
   TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles,
   BookOpen, Handshake, PenLine, ArrowRight, PenSquare, Library, BarChart3, GraduationCap,
-  Target, Zap, Trophy, LayoutGrid, CalendarDays, CheckSquare, PlayCircle
+  Target, Zap, Trophy, LayoutGrid, CalendarDays, CheckSquare, PlayCircle, Calendar as CalendarIcon
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {

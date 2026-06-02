@@ -3,7 +3,7 @@ import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
   ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
   Clock, Flag, Star, Circle, PlayCircle, Coffee, BookOpen,
-  BarChart3, Edit3, Calendar
+  BarChart3, Edit3, CalendarIcon
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
   isToday, addMonths, subMonths, parseISO, isFuture, isPast, startOfDay } from 'date-fns'
@@ -217,7 +217,7 @@ export default function Calendar() {
           onMouseEnter={e => { e.currentTarget.style.background = 'rgba(78,222,163,0.14)'; e.currentTarget.style.borderColor = 'rgba(78,222,163,0.5)' }}
           onMouseLeave={e => { e.currentTarget.style.background = 'rgba(78,222,163,0.08)'; e.currentTarget.style.borderColor = 'rgba(78,222,163,0.3)' }}
         >
-          <Calendar size={12} /> Open Google Calendar <ExternalLink size={10} />
+          <CalendarIcon size={12} /> Open Google Calendar <ExternalLink size={10} />
         </a>
       </div>
 
@@ -325,7 +325,7 @@ export default function Calendar() {
                     <a href={gcalUrl(t.title, t.due)} target="_blank" rel="noopener noreferrer"
                       style={{ color:'#3a4455', display:'flex', transition:'color 0.15s' }}
                       onMouseEnter={e=>e.currentTarget.style.color='#4edea3'} onMouseLeave={e=>e.currentTarget.style.color='#3a4455'}>
-                      <Calendar size={10}/>
+                      <CalendarIcon size={10}/>
                     </a>
                     <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2a3040', display:'flex', padding:0, transition:'color 0.15s' }}
                       onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
@@ -456,7 +456,7 @@ export default function Calendar() {
                         <a href={gcalUrl(`Interview – ${a.job_title} @ ${a.company}`, a.reminder_date, 60)} target="_blank" rel="noopener noreferrer"
                           style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:8, color:'#3a4455', textDecoration:'none', transition:'color 0.15s' }}
                           onMouseEnter={e=>e.currentTarget.style.color='#4edea3'} onMouseLeave={e=>e.currentTarget.style.color='#3a4455'}>
-                          <Calendar size={9}/> Add to GCal
+                          <CalendarIcon size={9}/> Add to GCal
                         </a>
                       </div>
                     )}
@@ -531,7 +531,7 @@ export default function Calendar() {
                       <a href={gcalUrl(s.label, s.date, s.duration)} target="_blank" rel="noopener noreferrer"
                         style={{ color:'#3a4455', display:'flex', transition:'color 0.15s' }}
                         onMouseEnter={e=>e.currentTarget.style.color=st.color} onMouseLeave={e=>e.currentTarget.style.color='#3a4455'}>
-                        <Calendar size={10}/>
+                        <CalendarIcon size={10}/>
                       </a>
                       <button onClick={() => deleteSession(s.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2a3040', display:'flex', padding:0, transition:'color 0.15s' }}
                         onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
