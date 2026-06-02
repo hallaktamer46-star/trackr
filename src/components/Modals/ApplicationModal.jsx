@@ -42,7 +42,7 @@ function Field({ label, icon: Icon, children }) {
         display: 'flex', alignItems: 'center', gap: 6,
         fontFamily: MONO, fontSize: 9, fontWeight: 700,
         letterSpacing: '0.12em', textTransform: 'uppercase',
-        color: '#5a6478', marginBottom: 7,
+        color: '#5a6478', marginBottom: 5,
       }}>
         {Icon && <Icon size={9} style={{ color: '#5a6478' }} />}
         {label}
@@ -57,8 +57,8 @@ function IconInput({ icon: Icon, accent, ...props }) {
   const [focused, setFocused] = useState(false)
   return (
     <div style={{ position: 'relative' }}>
-      <Icon size={13} style={{
-        position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)',
+      <Icon size={12} style={{
+        position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)',
         color: focused ? (accent || '#a3c9ff') : '#3a4455',
         transition: 'color 0.2s', pointerEvents: 'none',
       }} />
@@ -67,10 +67,10 @@ function IconInput({ icon: Icon, accent, ...props }) {
         onFocus={e => { setFocused(true); props.onFocus?.(e) }}
         onBlur={e => { setFocused(false); props.onBlur?.(e) }}
         style={{
-          width: '100%', padding: '11px 14px 11px 36px', boxSizing: 'border-box',
+          width: '100%', padding: '8px 12px 8px 32px', boxSizing: 'border-box',
           background: focused ? 'rgba(163,201,255,0.04)' : 'rgba(255,255,255,0.025)',
           border: `0.5px solid ${focused ? (accent ? accent + '55' : 'rgba(163,201,255,0.35)') : 'rgba(255,255,255,0.07)'}`,
-          color: '#e2e2e8', fontSize: 13, fontFamily: SANS, outline: 'none',
+          color: '#e2e2e8', fontSize: 12, fontFamily: SANS, outline: 'none',
           transition: 'border-color 0.2s, background 0.2s',
           boxShadow: focused ? `0 0 0 3px ${accent ? accent + '12' : 'rgba(163,201,255,0.08)'}` : 'none',
           ...props.style,
@@ -104,16 +104,16 @@ function DatePicker({ value, onChange, placeholder = 'Set date' }) {
         type="button"
         onClick={() => setOpen(v => !v)}
         style={{
-          width: '100%', padding: '11px 14px 11px 36px',
+          width: '100%', padding: '8px 12px 8px 32px',
           background: value ? 'rgba(163,201,255,0.04)' : 'rgba(255,255,255,0.025)',
           border: `0.5px solid ${value ? 'rgba(163,201,255,0.3)' : 'rgba(255,255,255,0.07)'}`,
           color: value ? '#c0c7d5' : '#3a4455',
-          fontFamily: SANS, fontSize: 13, textAlign: 'left',
+          fontFamily: SANS, fontSize: 12, textAlign: 'left',
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           transition: 'all 0.2s', position: 'relative',
         }}
       >
-        <Calendar size={13} style={{ position: 'absolute', left: 13, color: value ? '#a3c9ff' : '#3a4455', transition: 'color 0.2s' }} />
+        <Calendar size={12} style={{ position: 'absolute', left: 10, color: value ? '#a3c9ff' : '#3a4455', transition: 'color 0.2s' }} />
         <span>{value ? fmtShort(value) : placeholder}</span>
         <ChevronDown size={11} style={{ color: '#3a4455', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
       </button>
@@ -206,7 +206,7 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{
-        width: '100%', maxWidth: 520,
+        width: '100%', maxWidth: 420,
         background: 'linear-gradient(160deg, #0c1829 0%, #070d1a 100%)',
         border: `0.5px solid ${accent.border}`,
         boxShadow: `0 0 0 1px ${accent.color}08, 0 32px 80px rgba(0,0,0,0.8), 0 0 80px ${accent.color}10`,
@@ -222,23 +222,23 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
         {/* ── Header ── */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '18px 22px 16px',
+          padding: '12px 18px 10px',
           borderBottom: `0.5px solid rgba(255,255,255,0.04)`,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: accent.bg, border: `0.5px solid ${accent.border}`,
-              boxShadow: `0 0 20px ${accent.color}25`,
+              boxShadow: `0 0 14px ${accent.color}20`,
               transition: 'all 0.4s',
             }}>
-              <Sparkles size={14} style={{ color: accent.color }} />
+              <Sparkles size={12} style={{ color: accent.color }} />
             </div>
             <div>
-              <p style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: accent.color, letterSpacing: '0.06em', textTransform: 'uppercase', lineHeight: 1, transition: 'color 0.4s' }}>
+              <p style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: accent.color, letterSpacing: '0.06em', textTransform: 'uppercase', lineHeight: 1, transition: 'color 0.4s' }}>
                 {isEditing ? 'Edit Application' : 'Track a New Role'}
               </p>
-              <p style={{ fontFamily: SANS, fontSize: 11, color: '#3a4455', marginTop: 3, lineHeight: 1 }}>
+              <p style={{ fontFamily: SANS, fontSize: 10, color: '#3a4455', marginTop: 2, lineHeight: 1 }}>
                 {form.company && form.job_title
                   ? `${form.company} · ${form.job_title}`
                   : 'Fill in the details below'}
@@ -255,10 +255,10 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
             {/* Company + Role */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <Field label="Company" icon={Building2}>
                 <IconInput
                   icon={Building2}
@@ -288,20 +288,20 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
                   return (
                     <button key={s} type="button" onClick={() => set('status', s)}
                       style={{
-                        padding: '10px 6px',
+                        padding: '7px 4px',
                         border: `0.5px solid ${active ? a.border : 'rgba(255,255,255,0.06)'}`,
                         background: active ? a.bg : 'rgba(255,255,255,0.02)',
                         color: active ? a.color : '#3a4455',
-                        fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.06em',
+                        fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: '0.06em',
                         textTransform: 'uppercase', cursor: 'pointer',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                         transition: 'all 0.15s',
                         boxShadow: active ? `0 0 16px ${a.color}20, inset 0 0 20px ${a.color}06` : 'none',
                       }}
                       onMouseEnter={e => { if (!active) { e.currentTarget.style.borderColor = a.border; e.currentTarget.style.color = a.color; e.currentTarget.style.background = a.bg } }}
                       onMouseLeave={e => { if (!active) { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = '#3a4455'; e.currentTarget.style.background = 'rgba(255,255,255,0.02)' } }}
                     >
-                      <span style={{ fontSize: 16 }}>{STATUS_EMOJI[s]}</span>
+                      <span style={{ fontSize: 14 }}>{STATUS_EMOJI[s]}</span>
                       <span>{STATUS_CONFIG[s]?.label || s}</span>
                     </button>
                   )
@@ -310,7 +310,7 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
             </Field>
 
             {/* Applied Date + Reminder */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <Field label="Applied Date" icon={Calendar}>
                 <DatePicker value={form.date_applied} onChange={v => set('date_applied', v)} placeholder="When did you apply?" />
               </Field>
@@ -320,7 +320,7 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
             </div>
 
             {/* Salary + URL */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <Field label="Salary Range" icon={DollarSign}>
                 <IconInput
                   icon={DollarSign}
@@ -344,16 +344,16 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
             {/* Notes */}
             <Field label="Notes" icon={FileText}>
               <div style={{ position: 'relative' }}>
-                <FileText size={13} style={{ position: 'absolute', left: 13, top: 13, color: '#3a4455', pointerEvents: 'none' }} />
+                <FileText size={12} style={{ position: 'absolute', left: 10, top: 10, color: '#3a4455', pointerEvents: 'none' }} />
                 <textarea
-                  rows={3}
+                  rows={2}
                   value={form.notes}
                   onChange={e => set('notes', e.target.value)}
                   placeholder="Recruiter name, referral source, prep notes…"
                   style={{
-                    width: '100%', padding: '11px 14px 11px 36px', boxSizing: 'border-box',
+                    width: '100%', padding: '8px 12px 8px 30px', boxSizing: 'border-box',
                     background: 'rgba(255,255,255,0.025)', border: '0.5px solid rgba(255,255,255,0.07)',
-                    color: '#c0c7d5', fontSize: 13, fontFamily: SANS, lineHeight: 1.65,
+                    color: '#c0c7d5', fontSize: 12, fontFamily: SANS, lineHeight: 1.55,
                     outline: 'none', resize: 'none', transition: 'border-color 0.2s, background 0.2s',
                   }}
                   onFocus={e => { e.target.style.borderColor = 'rgba(163,201,255,0.35)'; e.target.style.background = 'rgba(163,201,255,0.04)' }}
@@ -366,7 +366,7 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
           {/* ── Footer ── */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '14px 22px 18px',
+            padding: '10px 18px 14px',
             borderTop: '0.5px solid rgba(255,255,255,0.04)',
           }}>
             {isEditing ? (
@@ -388,7 +388,7 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
             <div style={{ display: 'flex', gap: 8 }}>
               <button type="button" onClick={onClose}
                 style={{
-                  padding: '10px 20px',
+                  padding: '8px 16px',
                   background: 'rgba(255,255,255,0.04)',
                   border: '0.5px solid rgba(255,255,255,0.08)',
                   cursor: 'pointer', color: '#5a6478',
@@ -402,7 +402,7 @@ export default function ApplicationModal({ open, onClose, onSave, onDelete, init
               </button>
               <button type="submit"
                 style={{
-                  padding: '10px 28px',
+                  padding: '8px 22px',
                   background: `linear-gradient(135deg, ${accent.color} 0%, ${accent.color}cc 100%)`,
                   border: 'none', cursor: 'pointer',
                   color: form.status === 'rejected' ? '#fff' : '#070d1a',
