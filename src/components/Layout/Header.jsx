@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, Newspaper, Sun, Moon, FileText, Mail, PenLine, ChevronDown } from 'lucide-react'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, Newspaper, Sun, Moon, FileText, Mail, PenLine, ChevronDown, ArrowRight } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import ProfileDropdown from './ProfileDropdown'
 import { cn } from '../../lib/cn'
@@ -15,14 +15,91 @@ const nav = [
 ]
 
 const CV_TOOLS = [
-  { to: '/cv/builder',      label: 'CV Builder',   desc: 'Build a CV from scratch', icon: PenLine  },
-  { to: '/cv/reviewer',     label: 'CV Reviewer',  desc: 'Score & fix your CV',     icon: FileText },
-  { to: '/cv/cover-letter', label: 'Cover Letter', desc: 'Tailored letter drafts',  icon: Mail     },
+  { to: '/cv/builder',      label: 'CV Builder',   desc: 'Build a polished CV from scratch in minutes', icon: PenLine,  accent: '#a3c9ff', gradient: 'linear-gradient(135deg,#1493ff22,#6366f110)', tag: 'PRO'  },
+  { to: '/cv/reviewer',     label: 'CV Reviewer',  desc: 'Get an AI score and fix your CV fast',        icon: FileText, accent: '#4edea3', gradient: 'linear-gradient(135deg,#4edea322,#10b98110)', tag: 'FREE' },
+  { to: '/cv/cover-letter', label: 'Cover Letter', desc: 'Generate a tailored cover letter instantly',  icon: Mail,     accent: '#ffb689', gradient: 'linear-gradient(135deg,#ffb68922,#f59e0b10)', tag: 'PRO'  },
 ]
+
+/* ─── Magazine tile ─── */
+function CVTile({ tool, active, onClick }) {
+  const [hov, setHov] = useState(false)
+  const [pressed, setPressed] = useState(false)
+  const Icon = tool.icon
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { setHov(false); setPressed(false) }}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
+      style={{
+        flex: 1, position: 'relative', overflow: 'hidden',
+        background: active ? tool.gradient : hov ? tool.gradient : 'rgba(255,255,255,0.02)',
+        border: `0.5px solid ${active ? tool.accent + '50' : hov ? tool.accent + '35' : 'rgba(48,54,61,0.9)'}`,
+        padding: '18px 16px 16px',
+        cursor: 'pointer', textAlign: 'left',
+        transform: pressed ? 'scale(0.97)' : hov ? 'translateY(-2px)' : 'none',
+        boxShadow: hov ? `0 8px 28px rgba(0,0,0,0.4), 0 0 0 0.5px ${tool.accent}20` : 'none',
+        transition: 'all 0.2s cubic-bezier(0.34,1.4,0.64,1)',
+      }}
+    >
+      {/* flood fill from bottom on hover */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0,
+        height: hov ? '100%' : '0%',
+        background: `linear-gradient(0deg, ${tool.accent}10, transparent)`,
+        transition: 'height 0.35s ease',
+        pointerEvents: 'none',
+      }}/>
+
+      {/* top accent line */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 2,
+        background: `linear-gradient(90deg, ${tool.accent}, ${tool.accent}00)`,
+        opacity: hov || active ? 1 : 0,
+        transition: 'opacity 0.2s',
+      }}/>
+
+      {/* icon */}
+      <div style={{
+        width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: hov || active ? `${tool.accent}18` : 'rgba(138,145,159,0.07)',
+        border: `0.5px solid ${hov || active ? tool.accent + '40' : 'rgba(138,145,159,0.12)'}`,
+        marginBottom: 14,
+        boxShadow: hov ? `0 0 16px ${tool.accent}30` : 'none',
+        transition: 'all 0.2s',
+        position: 'relative',
+      }}>
+        <Icon size={18} style={{ color: hov || active ? tool.accent : '#5a6478', transition: 'color 0.2s', transform: hov ? 'scale(1.1)' : 'scale(1)', transitionProperty: 'color, transform' }}/>
+      </div>
+
+      {/* tag */}
+      <div style={{ position: 'absolute', top: 12, right: 12 }}>
+        <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 7, fontWeight: 700, letterSpacing: '0.08em', color: tool.accent, background: `${tool.accent}15`, border: `0.5px solid ${tool.accent}30`, padding: '2px 5px', opacity: hov || active ? 1 : 0.5, transition: 'opacity 0.2s' }}>
+          {tool.tag}
+        </span>
+      </div>
+
+      <p style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 700, color: hov || active ? '#e2e2e8' : '#c0c7d5', letterSpacing: '-0.01em', marginBottom: 5, transition: 'color 0.2s', position: 'relative' }}>
+        {tool.label}
+      </p>
+      <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, color: hov ? tool.accent + 'bb' : '#404753', lineHeight: 1.5, transition: 'color 0.25s', position: 'relative' }}>
+        {tool.desc}
+      </p>
+
+      {/* arrow */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 12, position: 'relative', opacity: hov ? 1 : 0, transform: hov ? 'translateX(0)' : 'translateX(-6px)', transition: 'all 0.2s' }}>
+        <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 8, fontWeight: 700, color: tool.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>Open</span>
+        <ArrowRight size={10} style={{ color: tool.accent }}/>
+      </div>
+    </button>
+  )
+}
 
 export default function Header() {
   const { dark, toggle } = useTheme()
   const location = useLocation()
+  const navigate = useNavigate()
   const [cvOpen, setCvOpen] = useState(false)
   const cvRef = useRef(null)
 
@@ -112,68 +189,46 @@ export default function Header() {
               <span>CV Builder</span>
             </button>
 
-            {/* Dropdown panel */}
+            {/* Dropdown panel — magazine tiles */}
             {cvOpen && (
-              <div className="absolute top-[calc(100%+1px)] left-1/2 -translate-x-1/2 w-64 z-50"
+              <div
                 style={{
-                  background: '#0d1117',
+                  position: 'absolute', top: 'calc(100% + 1px)',
+                  left: '50%', transform: 'translateX(-50%)',
+                  width: 420, zIndex: 50,
+                  background: '#0a0f1a',
                   border: '0.5px solid rgba(48,54,61,0.9)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.7), 0 0 0 0.5px rgba(163,201,255,0.06)',
+                  padding: 8,
+                  display: 'flex', gap: 6,
+                  animation: 'dropIn 0.18s cubic-bezier(0.34,1.4,0.64,1)',
                 }}
               >
-                {CV_TOOLS.map((t, i) => {
-                  const Icon = t.icon
+                {/* top shimmer line */}
+                <div style={{ position:'absolute', top:0, left:'10%', right:'10%', height:1, background:'linear-gradient(90deg,transparent,rgba(163,201,255,0.2),transparent)', pointerEvents:'none' }}/>
+
+                {CV_TOOLS.map((t) => {
                   const active = location.pathname === t.to || location.pathname.startsWith(t.to + '/')
                   return (
-                    <NavLink
+                    <CVTile
                       key={t.to}
-                      to={t.to}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        padding: '12px 16px',
-                        borderBottom: i < CV_TOOLS.length - 1 ? '0.5px solid rgba(48,54,61,0.6)' : 'none',
-                        background: active ? 'rgba(163,201,255,0.06)' : 'transparent',
-                        borderLeft: active ? '2px solid #a3c9ff' : '2px solid transparent',
-                        textDecoration: 'none',
-                        transition: 'background 0.15s',
-                      }}
-                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
-                      onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
-                    >
-                      <div style={{
-                        width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: active ? 'rgba(163,201,255,0.1)' : 'rgba(138,145,159,0.07)',
-                        border: `0.5px solid ${active ? 'rgba(163,201,255,0.3)' : 'rgba(138,145,159,0.15)'}`,
-                        flexShrink: 0,
-                      }}>
-                        <Icon size={14} style={{ color: active ? '#a3c9ff' : '#8a919f' }} />
-                      </div>
-                      <div>
-                        <p style={{
-                          fontFamily: 'Geist, Inter, sans-serif',
-                          fontSize: 12, fontWeight: 600,
-                          color: active ? '#e2e2e8' : '#c0c7d5',
-                          lineHeight: 1.2, marginBottom: 2,
-                        }}>
-                          {t.label}
-                        </p>
-                        <p style={{
-                          fontFamily: 'Geist Mono, monospace',
-                          fontSize: 9, color: active ? 'rgba(163,201,255,0.7)' : '#404753',
-                          letterSpacing: '0.02em',
-                        }}>
-                          {t.desc}
-                        </p>
-                      </div>
-                    </NavLink>
+                      tool={t}
+                      active={active}
+                      onClick={() => { navigate(t.to); setCvOpen(false) }}
+                    />
                   )
                 })}
               </div>
             )}
           </div>
         </nav>
+
+        <style>{`
+          @keyframes dropIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.97); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0)     scale(1);    }
+          }
+        `}</style>
 
         {/* Right actions */}
         <div className="flex items-center gap-2 shrink-0">
