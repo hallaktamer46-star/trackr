@@ -12,6 +12,7 @@ import Stats from './pages/Stats'
 import Jobs from './pages/Jobs'
 import Blog from './pages/Blog'
 import Calendar from './pages/Calendar'
+import Roadmap from './pages/Roadmap'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -88,6 +89,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Blog />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/roadmap" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <Roadmap />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
