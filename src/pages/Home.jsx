@@ -4,7 +4,7 @@ import {
   Plus, Bell, FileText, Mail, MessageSquare, Mic, DollarSign,
   TrendingUp, Building2, Link2, AlertTriangle, ChevronRight, Sparkles,
   BookOpen, Handshake, PenLine, ArrowRight, PenSquare, Library, BarChart3, GraduationCap,
-  Target, Zap, Trophy, LayoutGrid
+  Target, Zap, Trophy, LayoutGrid, CalendarDays, CheckSquare, PlayCircle
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -82,6 +82,95 @@ const CustomTooltip = ({ active, payload, label }) => {
       <p style={{ color: '#c0c7d5', fontFamily: 'Geist Mono, monospace', fontSize: 10, marginBottom: 2 }}>{label}</p>
       <p style={{ color: '#a3c9ff', fontFamily: 'Geist Mono, monospace', fontSize: 13, fontWeight: 600 }}>{payload[0].value}</p>
     </div>
+  )
+}
+
+function useLocalStorage(key, initial) {
+  const [val, setVal] = useState(() => {
+    try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : initial }
+    catch { return initial }
+  })
+  return [val]
+}
+
+function CalendarWidget({ navigate }) {
+  const [tasks]    = useLocalStorage('trackr_tasks',    [])
+  const [goals]    = useLocalStorage('trackr_goals',    [])
+  const [sessions] = useLocalStorage('trackr_sessions', [])
+  const today = new Date()
+  const todayStr = format(today, 'yyyy-MM-dd')
+
+  const pendingTasks   = tasks.filter(t => !t.done)
+  const todayTasks     = tasks.filter(t => !t.done && t.due === todayStr)
+  const overdueTasks   = tasks.filter(t => !t.done && t.due < todayStr)
+  const todaySessions  = sessions.filter(s => s.date === todayStr)
+  const activeGoals    = goals.filter(g => Number(g.progress) < Number(g.target))
+  const completedGoals = goals.filter(g => Number(g.progress) >= Number(g.target) && g.target > 0)
+
+  const isEmpty = pendingTasks.length === 0 && goals.length === 0 && sessions.length === 0
+
+  const ROWS = [
+    { icon: CheckSquare, color: '#a3c9ff', label: 'Tasks',    value: pendingTasks.length,  sub: overdueTasks.length > 0 ? `${overdueTasks.length} overdue` : todayTasks.length > 0 ? `${todayTasks.length} due today` : 'all clear' },
+    { icon: Target,      color: '#4edea3', label: 'Goals',    value: activeGoals.length,    sub: completedGoals.length > 0 ? `${completedGoals.length} completed` : 'set your targets' },
+    { icon: PlayCircle,  color: '#c4b5fd', label: 'Sessions', value: todaySessions.length,  sub: todaySessions.length > 0 ? `${todaySessions.reduce((s,x)=>s+x.duration,0)}m scheduled today` : 'none today' },
+  ]
+
+  return (
+    <section style={{
+      background: 'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)',
+      border: '0.5px solid rgba(163,201,255,0.07)',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+    }}>
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px 12px', borderBottom:'0.5px solid rgba(163,201,255,0.05)' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <CalendarDays size={13} style={{ color:'#a3c9ff' }} />
+          <p style={{ fontFamily:'Geist Mono, monospace', fontSize:9, fontWeight:700, letterSpacing:'0.12em', color:'rgba(163,201,255,0.6)', textTransform:'uppercase' }}>
+            My Calendar
+          </p>
+        </div>
+        <button onClick={() => navigate('/calendar')}
+          style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:9, fontWeight:700, letterSpacing:'0.08em', color:'#3a4455', textTransform:'uppercase', background:'none', border:'none', cursor:'pointer', transition:'color 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
+          onMouseLeave={e => e.currentTarget.style.color='#3a4455'}>
+          Open full view <ArrowRight size={10} />
+        </button>
+      </div>
+
+      {isEmpty ? (
+        /* Empty state */
+        <div style={{ padding:'24px 20px', display:'flex', alignItems:'center', gap:16 }}>
+          <div style={{ width:36, height:36, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(163,201,255,0.06)', border:'0.5px solid rgba(163,201,255,0.1)', flexShrink:0 }}>
+            <CalendarDays size={16} style={{ color:'rgba(163,201,255,0.3)' }} />
+          </div>
+          <div>
+            <p style={{ fontSize:13, fontWeight:600, color:'#3a4455', marginBottom:2 }}>No tasks, goals, or sessions yet</p>
+            <button onClick={() => navigate('/calendar')} style={{ fontFamily:'Geist Mono, monospace', fontSize:9, color:'#a3c9ff', background:'none', border:'none', cursor:'pointer', padding:0, letterSpacing:'0.06em', textTransform:'uppercase' }}>
+              Set up your planner →
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Stats row */
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'0.5px', background:'rgba(163,201,255,0.04)' }}>
+          {ROWS.map(({ icon: Icon, color, label, value, sub }) => (
+            <button key={label} onClick={() => navigate('/calendar')}
+              style={{ padding:'14px 18px', background:'linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)', border:'none', cursor:'pointer', textAlign:'left', transition:'background 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.background=`linear-gradient(160deg, ${color}08 0%, #080f1e 100%)`}
+              onMouseLeave={e => e.currentTarget.style.background='linear-gradient(160deg, #0d1f3c 0%, #080f1e 100%)'}>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+                <Icon size={11} style={{ color }} />
+                <span style={{ fontFamily:'Geist Mono, monospace', fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:`${color}80`, textTransform:'uppercase' }}>{label}</span>
+              </div>
+              <p style={{ fontFamily:'Geist Mono, monospace', fontSize:28, fontWeight:800, letterSpacing:'-0.05em', lineHeight:1, marginBottom:4, background:`linear-gradient(135deg, #fff 0%, ${color} 100%)`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                {value}
+              </p>
+              <p style={{ fontFamily:'Geist Mono, monospace', fontSize:9, color: sub.includes('overdue') ? '#ffb4ab' : '#3a4455' }}>{sub}</p>
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
   )
 }
 
@@ -752,6 +841,9 @@ export default function Home() {
           </BarChart>
         </ResponsiveContainer>
       </section>
+
+      {/* Calendar widget */}
+      <CalendarWidget navigate={navigate} />
 
       {/* AI Tools — full width, hero cards + more row */}
       <section>

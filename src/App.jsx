@@ -11,6 +11,7 @@ import CVHub from './pages/CVHub'
 import Stats from './pages/Stats'
 import Jobs from './pages/Jobs'
 import Blog from './pages/Blog'
+import Calendar from './pages/Calendar'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -87,6 +88,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Blog />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/calendar" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <Calendar />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
