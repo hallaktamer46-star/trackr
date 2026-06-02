@@ -102,6 +102,7 @@ export default function Header() {
   const navigate = useNavigate()
   const [cvOpen, setCvOpen] = useState(false)
   const cvRef = useRef(null)
+  const cvTimer = useRef(null)
 
   // close on outside click
   useEffect(() => {
@@ -169,8 +170,8 @@ export default function Header() {
 
           {/* CV Builder dropdown */}
           <div className="relative h-full flex items-end" ref={cvRef}
-            onMouseEnter={() => setCvOpen(true)}
-            onMouseLeave={() => setCvOpen(false)}
+            onMouseEnter={() => { clearTimeout(cvTimer.current); cvTimer.current = setTimeout(() => setCvOpen(true), 220) }}
+            onMouseLeave={() => { clearTimeout(cvTimer.current); cvTimer.current = setTimeout(() => setCvOpen(false), 280) }}
           >
             <button
               onClick={() => setCvOpen(v => !v)}
