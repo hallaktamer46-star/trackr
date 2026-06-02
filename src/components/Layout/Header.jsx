@@ -168,7 +168,10 @@ export default function Header() {
           ))}
 
           {/* CV Builder dropdown */}
-          <div className="relative h-full flex items-end" ref={cvRef}>
+          <div className="relative h-full flex items-end" ref={cvRef}
+            onMouseEnter={() => setCvOpen(true)}
+            onMouseLeave={() => setCvOpen(false)}
+          >
             <button
               onClick={() => setCvOpen(v => !v)}
               className={cn(
