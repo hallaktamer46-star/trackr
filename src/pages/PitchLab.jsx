@@ -87,8 +87,8 @@ function SectionCard({ section, index }) {
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       style={{
-        background: hov ? meta.gradient : 'rgba(22,27,34,0.95)',
-        border: `0.5px solid ${hov ? meta.accent + '40' : 'rgba(48,54,61,0.9)'}`,
+        background: hov ? meta.gradient : `linear-gradient(145deg,${meta.accent}06,rgba(7,13,22,0.97))`,
+        border: `0.5px solid ${hov ? meta.accent + '50' : meta.accent + '20'}`,
         borderLeft: `3px solid ${rating.color}`,
         overflow:'hidden',
         transition:'all 0.22s ease',
@@ -199,45 +199,34 @@ export default function PitchLab() {
   return (
     <div style={{ fontFamily:SANS, maxWidth:940, margin:'0 auto', paddingTop:4 }}>
 
-      {/* ══ HERO HEADER ══ */}
-      <div style={{ position:'relative', marginBottom:32, overflow:'hidden', background:'linear-gradient(145deg,#0c1829,#070d1a)', border:'0.5px solid rgba(163,201,255,0.1)', padding:'32px 36px', animation:'heroIn 0.5s ease both' }}>
-        {/* ambient orbs */}
-        <div style={{ position:'absolute', top:-60, left:-60, width:220, height:220, borderRadius:'50%', background:'radial-gradient(circle,rgba(20,147,255,0.12),transparent 70%)', filter:'blur(30px)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', bottom:-40, right:-40, width:180, height:180, borderRadius:'50%', background:'radial-gradient(circle,rgba(78,222,163,0.1),transparent 70%)', filter:'blur(24px)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', top:0, left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(163,201,255,0.3),rgba(78,222,163,0.2),transparent)', pointerEvents:'none' }}/>
-
-        <div style={{ position:'relative', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24 }}>
-          <div>
-            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
-              <div style={{ width:40, height:40, display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(135deg,rgba(20,147,255,0.2),rgba(78,222,163,0.1))', border:'0.5px solid rgba(163,201,255,0.3)', boxShadow:'0 0 24px rgba(20,147,255,0.2)' }}>
-                <Building2 size={18} style={{ color:'#a3c9ff' }}/>
-              </div>
-              <div>
-                <h1 style={{ fontSize:24, fontWeight:900, letterSpacing:'-0.03em', color:'#e2e2e8', lineHeight:1 }}>AI Pitch Lab</h1>
-                <p style={{ fontFamily:MONO, fontSize:8, color:'#5a6478', marginTop:3, letterSpacing:'0.06em' }}>POWERED BY KPMG DEAL ADVISORY FRAMEWORK</p>
-              </div>
+      {/* ── Lean header ── */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24, animation:'heroIn 0.4s ease both' }}>
+        <div>
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+            <div style={{ width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(135deg,rgba(147,197,253,0.2),rgba(249,168,212,0.1))', border:'0.5px solid rgba(147,197,253,0.35)', boxShadow:'0 0 18px rgba(147,197,253,0.15)' }}>
+              <Building2 size={16} style={{ color:'#93c5fd' }}/>
             </div>
-            <p style={{ fontSize:14, color:'#8a919f', lineHeight:1.7, maxWidth:460 }}>
-              Pitch your business idea. Get the same structured, brutal feedback a KPMG Senior Partner would deliver in a real due diligence meeting — no flattery, no fluff.
-            </p>
+            <div>
+              <h1 style={{ fontSize:22, fontWeight:900, letterSpacing:'-0.03em', color:'#e2e2e8', lineHeight:1 }}>AI Pitch Lab</h1>
+              <p style={{ fontFamily:MONO, fontSize:8, color:'#5a6478', marginTop:2, letterSpacing:'0.08em' }}>KPMG DEAL ADVISORY FRAMEWORK</p>
+            </div>
           </div>
-
-          {/* 3 criteria pills */}
-          <div style={{ display:'flex', flexDirection:'column', gap:6, flexShrink:0 }}>
-            {[
-              { label:'Market Analysis',   color:'#7ab4ff' },
-              { label:'Business Model',    color:'#4edea3' },
-              { label:'Risk Assessment',   color:'#ffb689' },
-              { label:'Competitive Moat',  color:'#c4b5fd' },
-              { label:'Financial Viability',color:'#67e8f9' },
-              { label:'GTM Strategy',      color:'#ffb4ab' },
-            ].map(p => (
-              <div key={p.label} style={{ display:'flex', alignItems:'center', gap:7, padding:'5px 12px', background:`${p.color}0c`, border:`0.5px solid ${p.color}25` }}>
-                <div style={{ width:5, height:5, borderRadius:'50%', background:p.color, boxShadow:`0 0 6px ${p.color}` }}/>
-                <span style={{ fontFamily:MONO, fontSize:8, fontWeight:700, color:p.color, letterSpacing:'0.06em' }}>{p.label}</span>
-              </div>
-            ))}
-          </div>
+          <p style={{ fontSize:13, color:'#8a919f', lineHeight:1.6, maxWidth:480 }}>
+            Pitch your idea — get brutal, structured feedback like a real investor meeting. No flattery.
+          </p>
+        </div>
+        {/* Criteria pills inline */}
+        <div style={{ display:'flex', gap:6, flexWrap:'wrap', maxWidth:280, justifyContent:'flex-end', flexShrink:0 }}>
+          {[
+            { label:'Market',      color:'#93c5fd' },
+            { label:'Business Model', color:'#f9a8d4' },
+            { label:'Risk',        color:'#fda4af' },
+            { label:'Competitive', color:'#c4b5fd' },
+            { label:'Finance',     color:'#6ee7b7' },
+            { label:'GTM',         color:'#fcd34d' },
+          ].map(p => (
+            <span key={p.label} style={{ fontFamily:MONO, fontSize:8, fontWeight:700, color:p.color, background:`${p.color}12`, border:`0.5px solid ${p.color}35`, padding:'3px 9px', letterSpacing:'0.06em' }}>{p.label}</span>
+          ))}
         </div>
       </div>
 
@@ -245,39 +234,31 @@ export default function PitchLab() {
         /* ══ INPUT FORM ══ */
         <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-          {/* Pitch textarea — full width hero input */}
-          <div style={{ position:'relative', background:'rgba(22,27,34,0.97)', border:'0.5px solid rgba(48,54,61,0.9)', borderTop:'2px solid #a3c9ff', overflow:'hidden', animation:'sectionIn 0.4s ease 0.1s both' }}>
-            <div style={{ padding:'18px 20px 0' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-                <Sparkles size={13} style={{ color:'#a3c9ff' }}/>
-                <label style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.12em', color:'#a3c9ff', textTransform:'uppercase' }}>Your Business Pitch</label>
-                <span style={{ marginLeft:'auto', fontFamily:MONO, fontSize:8, color: charCount < 40 ? '#ff6b6b' : charCount > 200 ? '#4edea3' : '#5a6478', transition:'color 0.3s' }}>{charCount} chars {charCount < 40 ? `· ${40-charCount} more needed` : '· looks good'}</span>
+          {/* Pitch textarea */}
+          <div style={{ position:'relative', background:'linear-gradient(145deg,rgba(14,25,50,0.97),rgba(20,14,40,0.97))', border:'0.5px solid rgba(147,197,253,0.2)', borderTop:'2px solid #93c5fd', overflow:'hidden', animation:'sectionIn 0.4s ease 0.1s both', boxShadow:'0 4px 32px rgba(147,197,253,0.06)' }}>
+            <div style={{ padding:'16px 20px 0' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+                <Sparkles size={12} style={{ color:'#93c5fd' }}/>
+                <label style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.12em', color:'#93c5fd', textTransform:'uppercase' }}>Your Business Pitch</label>
+                <span style={{ marginLeft:'auto', fontFamily:MONO, fontSize:8, color: charCount < 40 ? '#fda4af' : charCount > 200 ? '#6ee7b7' : '#93c5fd80', transition:'color 0.3s' }}>
+                  {charCount < 40 ? `${40 - charCount} more characters` : '✓ looks good'}
+                </span>
               </div>
             </div>
-            <textarea
-              ref={textRef}
-              rows={9}
-              value={pitch}
-              onChange={e => setPitch(e.target.value)}
+            <textarea ref={textRef} rows={9} value={pitch} onChange={e => setPitch(e.target.value)}
               placeholder={"Describe your business idea in detail.\n\nWhat problem does it solve? Who is the customer? How does it make money? What's your unfair advantage? What traction do you have?\n\nWrite like you're pitching to an investor — no holding back."}
-              style={{
-                width:'100%', boxSizing:'border-box', padding:'0 20px 18px',
-                background:'transparent', border:'none', color:'#e2e2e8',
-                fontSize:13, fontFamily:SANS, lineHeight:1.75, outline:'none', resize:'none',
-              }}
-            />
-            {/* char progress bar */}
-            <div style={{ height:2, background:'rgba(255,255,255,0.04)' }}>
-              <div style={{ height:'100%', width:`${Math.min(100,(charCount/500)*100)}%`, background: charCount < 40 ? '#ff6b6b' : 'linear-gradient(90deg,#a3c9ff,#4edea3)', transition:'width 0.3s, background 0.3s' }}/>
+              style={{ width:'100%', boxSizing:'border-box', padding:'0 20px 16px', background:'transparent', border:'none', color:'#e2e2e8', fontSize:13, fontFamily:SANS, lineHeight:1.75, outline:'none', resize:'none' }}/>
+            <div style={{ height:2, background:'rgba(147,197,253,0.06)' }}>
+              <div style={{ height:'100%', width:`${Math.min(100,(charCount/500)*100)}%`, background: charCount < 40 ? '#fda4af' : 'linear-gradient(90deg,#93c5fd,#f9a8d4)', transition:'width 0.3s, background 0.3s' }}/>
             </div>
           </div>
 
           {/* Context row */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, animation:'sectionIn 0.4s ease 0.15s both' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, animation:'sectionIn 0.4s ease 0.15s both' }}>
 
             {/* Industry */}
-            <div style={{ background:'rgba(22,27,34,0.97)', border:'0.5px solid rgba(48,54,61,0.9)', padding:'16px 18px' }}>
-              <label style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#7ab4ff', textTransform:'uppercase', display:'flex', alignItems:'center', gap:6, marginBottom:12 }}>
+            <div style={{ background:'linear-gradient(145deg,rgba(14,25,50,0.95),rgba(8,14,30,0.97))', border:'0.5px solid rgba(147,197,253,0.18)', padding:'16px 18px' }}>
+              <label style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#93c5fd', textTransform:'uppercase', display:'flex', alignItems:'center', gap:6, marginBottom:12 }}>
                 <Globe size={9}/> Industry
               </label>
               <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
@@ -285,11 +266,11 @@ export default function PitchLab() {
                   <button key={ind} onClick={() => setIndustry(industry===ind?'':ind)}
                     style={{
                       padding:'5px 11px', fontFamily:MONO, fontSize:8, fontWeight:600, cursor:'pointer', transition:'all 0.18s', letterSpacing:'0.04em',
-                      background: industry===ind ? 'rgba(122,180,255,0.14)' : 'rgba(255,255,255,0.025)',
-                      border: `0.5px solid ${industry===ind ? 'rgba(122,180,255,0.5)' : 'rgba(48,54,61,0.9)'}`,
-                      color: industry===ind ? '#7ab4ff' : '#5a6478',
+                      background: industry===ind ? 'rgba(147,197,253,0.18)' : 'rgba(147,197,253,0.04)',
+                      border: `0.5px solid ${industry===ind ? 'rgba(147,197,253,0.6)' : 'rgba(147,197,253,0.15)'}`,
+                      color: industry===ind ? '#93c5fd' : '#5a7090',
                       transform: industry===ind ? 'translateY(-1px)' : 'none',
-                      boxShadow: industry===ind ? '0 2px 12px rgba(122,180,255,0.2)' : 'none',
+                      boxShadow: industry===ind ? '0 2px 14px rgba(147,197,253,0.25)' : 'none',
                     }}>
                     {ind}
                   </button>
@@ -299,8 +280,8 @@ export default function PitchLab() {
 
             <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
               {/* Stage */}
-              <div style={{ background:'rgba(22,27,34,0.97)', border:'0.5px solid rgba(48,54,61,0.9)', padding:'14px 16px' }}>
-                <label style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#4edea3', textTransform:'uppercase', display:'flex', alignItems:'center', gap:6, marginBottom:10 }}>
+              <div style={{ background:'linear-gradient(145deg,rgba(35,10,40,0.95),rgba(20,8,28,0.97))', border:'0.5px solid rgba(249,168,212,0.2)', padding:'14px 16px' }}>
+                <label style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#f9a8d4', textTransform:'uppercase', display:'flex', alignItems:'center', gap:6, marginBottom:10 }}>
                   <Rocket size={9}/> Stage
                 </label>
                 <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
@@ -308,11 +289,11 @@ export default function PitchLab() {
                     <button key={s} onClick={() => setStage(stage===s?'':s)}
                       style={{
                         padding:'5px 12px', fontFamily:MONO, fontSize:8, fontWeight:600, cursor:'pointer', transition:'all 0.18s',
-                        background: stage===s ? 'rgba(78,222,163,0.14)' : 'rgba(255,255,255,0.025)',
-                        border: `0.5px solid ${stage===s ? 'rgba(78,222,163,0.5)' : 'rgba(48,54,61,0.9)'}`,
-                        color: stage===s ? '#4edea3' : '#5a6478',
+                        background: stage===s ? 'rgba(249,168,212,0.18)' : 'rgba(249,168,212,0.05)',
+                        border: `0.5px solid ${stage===s ? 'rgba(249,168,212,0.6)' : 'rgba(249,168,212,0.18)'}`,
+                        color: stage===s ? '#f9a8d4' : '#806070',
                         transform: stage===s ? 'translateY(-1px)' : 'none',
-                        boxShadow: stage===s ? '0 2px 12px rgba(78,222,163,0.2)' : 'none',
+                        boxShadow: stage===s ? '0 2px 14px rgba(249,168,212,0.25)' : 'none',
                       }}>
                       {s}
                     </button>
@@ -323,16 +304,17 @@ export default function PitchLab() {
               {/* Funding + Market */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 {[
-                  { key:'fundingAsk',   val:fundingAsk,   set:setFundingAsk,   label:'Funding Ask',    ph:'e.g. $500k',      color:'#ffb689', icon:DollarSign },
-                  { key:'targetMarket', val:targetMarket, set:setTargetMarket, label:'Target Market',  ph:'e.g. SMBs in MENA', color:'#c4b5fd', icon:Target },
+                  { key:'fundingAsk',   val:fundingAsk,   set:setFundingAsk,   label:'Funding Ask',   ph:'e.g. $500k',       color:'#fcd34d', borderColor:'rgba(252,211,77,0.2)',  bg:'rgba(25,20,5,0.95)',  icon:DollarSign },
+                  { key:'targetMarket', val:targetMarket, set:setTargetMarket, label:'Target Market', ph:'e.g. SMBs in MENA', color:'#6ee7b7', borderColor:'rgba(110,231,183,0.2)', bg:'rgba(5,20,15,0.95)',  icon:Target },
                 ].map(f => (
-                  <div key={f.key} style={{ background:'rgba(22,27,34,0.97)', border:'0.5px solid rgba(48,54,61,0.9)', padding:'12px 14px' }}>
+                  <div key={f.key} style={{ background:`linear-gradient(145deg,${f.bg},rgba(7,13,22,0.97))`, border:`0.5px solid ${f.borderColor}`, padding:'12px 14px' }}>
                     <label style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:f.color, textTransform:'uppercase', display:'flex', alignItems:'center', gap:5, marginBottom:8 }}>
                       <f.icon size={9}/> {f.label}
                     </label>
                     <input value={f.val} onChange={e => f.set(e.target.value)} placeholder={f.ph}
-                      style={{ width:'100%', boxSizing:'border-box', padding:'7px 10px', background:'rgba(255,255,255,0.025)', border:'0.5px solid rgba(48,54,61,0.9)', color:'#e2e2e8', fontSize:12, fontFamily:SANS, outline:'none', transition:'border-color 0.2s' }}
-                      onFocus={e => e.target.style.borderColor=f.color+'60'} onBlur={e => e.target.style.borderColor='rgba(48,54,61,0.9)'}/>
+                      style={{ width:'100%', boxSizing:'border-box', padding:'7px 10px', background:`${f.color}08`, border:`0.5px solid ${f.color}25`, color:'#e2e2e8', fontSize:12, fontFamily:SANS, outline:'none', transition:'border-color 0.2s, box-shadow 0.2s' }}
+                      onFocus={e => { e.target.style.borderColor=f.color+'70'; e.target.style.boxShadow=`0 0 0 3px ${f.color}12` }}
+                      onBlur={e  => { e.target.style.borderColor=f.color+'25'; e.target.style.boxShadow='none' }}/>
                   </div>
                 ))}
               </div>
