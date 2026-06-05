@@ -155,6 +155,136 @@ function SectionCard({ section, index }) {
   )
 }
 
+/* ── $10k Submit Button ── */
+function AnalyseButton({ canSubmit, loading, onClick }) {
+  const [hov, setHov]     = useState(false)
+  const [pressed, setPressed] = useState(false)
+  const [ripples, setRipples] = useState([])
+
+  const addRipple = (e) => {
+    if (!canSubmit) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left, y = e.clientY - rect.top
+    const id = Date.now()
+    setRipples(r => [...r, { id, x, y }])
+    setTimeout(() => setRipples(r => r.filter(rr => rr.id !== id)), 900)
+  }
+
+  const STEPS = ['Parsing pitch', 'Sizing market', 'Stress-testing model', 'Mapping risk', 'Writing verdict']
+
+  return (
+    <div style={{ animation:'sectionIn 0.4s ease 0.2s both' }}>
+      <button
+        onClick={e => { addRipple(e); onClick() }}
+        disabled={!canSubmit}
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => { setHov(false); setPressed(false) }}
+        onMouseDown={() => setPressed(true)}
+        onMouseUp={() => setPressed(false)}
+        style={{
+          width:'100%', height:64, position:'relative', overflow:'hidden',
+          border:'none', cursor: canSubmit ? 'pointer' : 'not-allowed',
+          background: canSubmit
+            ? 'linear-gradient(135deg, #1a6bff 0%, #6366f1 45%, #a855f7 80%, #ec4899 100%)'
+            : 'rgba(255,255,255,0.03)',
+          boxShadow: canSubmit
+            ? hov
+              ? '0 0 0 1px rgba(139,92,246,0.6), 0 12px 48px rgba(99,102,241,0.55), 0 0 80px rgba(168,85,247,0.25)'
+              : '0 0 0 1px rgba(139,92,246,0.35), 0 6px 32px rgba(99,102,241,0.4), 0 0 48px rgba(168,85,247,0.12)'
+            : 'none',
+          transform: pressed ? 'scale(0.985)' : hov && canSubmit ? 'translateY(-2px)' : 'none',
+          transition: 'all 0.25s cubic-bezier(0.34,1.4,0.64,1)',
+        }}
+      >
+        {/* animated background gradient sweep */}
+        {canSubmit && (
+          <div style={{
+            position:'absolute', inset:0, pointerEvents:'none',
+            background:'linear-gradient(105deg,transparent 20%,rgba(255,255,255,0.18) 50%,transparent 80%)',
+            backgroundSize:'250% 100%',
+            animation:'shimmer 2.5s ease infinite',
+          }}/>
+        )}
+
+        {/* top + bottom edge glows */}
+        {canSubmit && <>
+          <div style={{ position:'absolute', top:0, left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.5),rgba(255,255,255,0.3),transparent)', pointerEvents:'none' }}/>
+          <div style={{ position:'absolute', bottom:0, left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(99,102,241,0.6),transparent)', pointerEvents:'none' }}/>
+        </>}
+
+        {/* corner orbs */}
+        {canSubmit && <>
+          <div style={{ position:'absolute', left:-20, top:-20, width:80, height:80, borderRadius:'50%', background:'rgba(26,107,255,0.3)', filter:'blur(16px)', pointerEvents:'none', opacity: hov?1:0.6, transition:'opacity 0.3s' }}/>
+          <div style={{ position:'absolute', right:-20, bottom:-20, width:80, height:80, borderRadius:'50%', background:'rgba(236,72,153,0.25)', filter:'blur(16px)', pointerEvents:'none', opacity: hov?1:0.5, transition:'opacity 0.3s' }}/>
+        </>}
+
+        {/* ripples */}
+        {ripples.map(r => (
+          <span key={r.id} style={{ position:'absolute', left:r.x, top:r.y, width:8, height:8, marginLeft:-4, marginTop:-4, borderRadius:'50%', background:'rgba(255,255,255,0.4)', animation:'btnRipple 0.9s ease-out forwards', pointerEvents:'none' }}/>
+        ))}
+
+        {/* content */}
+        {!canSubmit ? (
+          <span style={{ fontFamily:MONO, fontSize:11, fontWeight:700, color:'#2a3040', letterSpacing:'0.14em', textTransform:'uppercase' }}>
+            Write your pitch first
+          </span>
+        ) : loading ? (
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <Loader2 size={16} style={{ color:'rgba(255,255,255,0.9)', animation:'spin 1s linear infinite' }}/>
+              <span style={{ fontFamily:MONO, fontSize:11, fontWeight:800, color:'rgba(255,255,255,0.9)', letterSpacing:'0.12em', textTransform:'uppercase' }}>
+                Consulting the advisors…
+              </span>
+            </div>
+            {/* animated step dots */}
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              {STEPS.map((s, i) => (
+                <div key={s} style={{ display:'flex', alignItems:'center', gap:4 }}>
+                  <div style={{ width:4, height:4, borderRadius:'50%', background:'rgba(255,255,255,0.6)', animation:'pulseDot 1.6s ease infinite', animationDelay:`${i*0.22}s` }}/>
+                  {i < STEPS.length - 1 && <div style={{ width:12, height:0.5, background:'rgba(255,255,255,0.15)' }}/>}
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div style={{ display:'flex', alignItems:'center', gap:14, position:'relative' }}>
+            {/* left icon cluster */}
+            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+              <div style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.15)', display:'flex', alignItems:'center', justifyContent:'center', border:'0.5px solid rgba(255,255,255,0.25)', boxShadow: hov?'0 0 16px rgba(255,255,255,0.2)':'none', transition:'box-shadow 0.25s' }}>
+                <Sparkles size={14} color="#fff"/>
+              </div>
+            </div>
+
+            {/* label */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start' }}>
+              <span style={{ fontFamily:MONO, fontSize:13, fontWeight:900, color:'#fff', letterSpacing:'0.12em', textTransform:'uppercase', lineHeight:1, textShadow:'0 0 20px rgba(255,255,255,0.3)' }}>
+                Run Analysis
+              </span>
+              <span style={{ fontFamily:MONO, fontSize:8, color:'rgba(255,255,255,0.55)', letterSpacing:'0.1em', marginTop:3 }}>
+                SENIOR PARTNER · DEAL ADVISORY FRAMEWORK
+              </span>
+            </div>
+
+            {/* right arrow cluster */}
+            <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:6 }}>
+              <div style={{ width:28, height:28, borderRadius:'50%', background:'rgba(255,255,255,0.12)', display:'flex', alignItems:'center', justifyContent:'center', border:'0.5px solid rgba(255,255,255,0.2)', transform: hov?'translateX(3px)':'none', transition:'transform 0.25s' }}>
+                <Send size={12} color="#fff"/>
+              </div>
+            </div>
+          </div>
+        )}
+      </button>
+
+      {/* subtle disabled hint */}
+      {!canSubmit && (
+        <p style={{ fontFamily:MONO, fontSize:8, color:'#2a3040', textAlign:'center', marginTop:6, letterSpacing:'0.06em' }}>
+          Need at least 40 characters to run analysis
+        </p>
+      )}
+    </div>
+  )
+}
+
 /* ══════════════════════════════════════════════════════════════ */
 export default function PitchLab() {
   const [pitch,        setPitch]        = useState('')
@@ -208,7 +338,7 @@ export default function PitchLab() {
             </div>
             <div>
               <h1 style={{ fontSize:22, fontWeight:900, letterSpacing:'-0.03em', color:'#e2e2e8', lineHeight:1 }}>AI Pitch Lab</h1>
-              <p style={{ fontFamily:MONO, fontSize:8, color:'#5a6478', marginTop:2, letterSpacing:'0.08em' }}>KPMG DEAL ADVISORY FRAMEWORK</p>
+              <p style={{ fontFamily:MONO, fontSize:8, color:'#5a6478', marginTop:2, letterSpacing:'0.08em' }}>DEAL ADVISORY FRAMEWORK</p>
             </div>
           </div>
           <p style={{ fontSize:13, color:'#8a919f', lineHeight:1.6, maxWidth:480 }}>
@@ -328,43 +458,8 @@ export default function PitchLab() {
             </div>
           )}
 
-          {/* Submit button */}
-          <button onClick={handleSubmit} disabled={!canSubmit}
-            style={{
-              width:'100%', padding:'16px 0', position:'relative', overflow:'hidden',
-              background: canSubmit ? 'linear-gradient(135deg,#1a6bff,#6366f1,#8b5cf6)' : 'rgba(255,255,255,0.04)',
-              backgroundSize: '200% 100%',
-              border: canSubmit ? 'none' : '0.5px solid rgba(48,54,61,0.9)',
-              color: canSubmit ? '#fff' : '#3a4455',
-              fontFamily:MONO, fontSize:12, fontWeight:800, letterSpacing:'0.1em', textTransform:'uppercase',
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-              boxShadow: canSubmit ? '0 4px 32px rgba(99,102,241,0.4), 0 0 0 0.5px rgba(139,92,246,0.3)' : 'none',
-              display:'flex', alignItems:'center', justifyContent:'center', gap:12,
-              transition:'all 0.22s', animation:'sectionIn 0.4s ease 0.2s both',
-            }}
-            onMouseEnter={e => { if(canSubmit) e.currentTarget.style.filter='brightness(1.12)' }}
-            onMouseLeave={e => e.currentTarget.style.filter='none'}
-            onMouseDown={e => { if(canSubmit) e.currentTarget.style.transform='scale(0.99)' }}
-            onMouseUp={e => e.currentTarget.style.transform='none'}>
-            {canSubmit && !loading && <span style={{ position:'absolute', inset:0, background:'linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.12) 50%,transparent 65%)', backgroundSize:'200% 100%', animation:'shimmer 2s ease infinite', pointerEvents:'none' }}/>}
-            {loading
-              ? <><Loader2 size={16} style={{ animation:'spin 1s linear infinite' }}/> Consulting the partners…</>
-              : <><Send size={15}/> Run KPMG Analysis</>
-            }
-          </button>
-
-          {loading && (
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12, padding:'20px 0' }}>
-              <div style={{ display:'flex', gap:16 }}>
-                {['Reviewing market opportunity', 'Stress-testing the model', 'Mapping competitive risk', 'Assessing financials'].map((t,i) => (
-                  <div key={t} style={{ display:'flex', alignItems:'center', gap:6, opacity: 0.5, animation:`fadeInUp 0.4s ease ${i*0.15}s both` }}>
-                    <div style={{ width:5, height:5, borderRadius:'50%', background:'#a3c9ff', animation:'pulse 1.4s ease infinite', animationDelay:`${i*0.3}s` }}/>
-                    <span style={{ fontFamily:MONO, fontSize:8, color:'#5a6478' }}>{t}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* ── Premium submit button ── */}
+          <AnalyseButton canSubmit={canSubmit} loading={loading} onClick={handleSubmit}/>
         </div>
 
       ) : (
@@ -389,7 +484,7 @@ export default function PitchLab() {
                 <div style={{ display:'inline-flex', alignItems:'center', gap:10, padding:'6px 14px', background:`${verdict.color}15`, border:`0.5px solid ${verdict.color}50`, marginBottom:16 }}>
                   <span style={{ fontSize:14 }}>{verdict.emoji}</span>
                   <span style={{ fontFamily:MONO, fontSize:9, fontWeight:800, color:verdict.color, letterSpacing:'0.12em', textTransform:'uppercase' }}>
-                    KPMG Verdict · {verdict.label}
+                    Deal Advisory · {verdict.label}
                   </span>
                   <span style={{ fontFamily:MONO, fontSize:8, color:`${verdict.color}80` }}>·</span>
                   <span style={{ fontFamily:MONO, fontSize:8, color:`${verdict.color}80` }}>{verdict.sub}</span>
@@ -513,9 +608,11 @@ export default function PitchLab() {
         @keyframes heroIn    { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:none} }
         @keyframes sectionIn { from{opacity:0;transform:translateY(10px)}  to{opacity:1;transform:none} }
         @keyframes fadeInUp  { from{opacity:0;transform:translateY(6px)}   to{opacity:0.5;transform:none} }
-        @keyframes shimmer   { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-        @keyframes spin      { to{transform:rotate(360deg)} }
-        @keyframes pulse     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+        @keyframes shimmer    { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+        @keyframes spin       { to{transform:rotate(360deg)} }
+        @keyframes pulse      { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.5)} }
+        @keyframes btnRipple  { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(28);opacity:0} }
+        @keyframes pulseDot   { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.6)} }
       `}</style>
     </div>
   )
