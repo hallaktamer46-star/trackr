@@ -6,7 +6,7 @@ import {
   TrendingUp, TrendingDown, Briefcase, CheckCircle2,
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
-  PenSquare, Library, GraduationCap
+  PenSquare, Library, GraduationCap, Newspaper
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -223,6 +223,7 @@ export default function Home() {
     { label:'Skills',       icon:GraduationCap,  soon:true },
     { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
     { label:'Roadmap',      icon:Target,        action:()=>navigate('/roadmap') },
+    { label:'Community',    icon:Newspaper,     action:()=>navigate('/blog') },
   ]
 
   return (

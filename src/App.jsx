@@ -13,6 +13,7 @@ import Jobs from './pages/Jobs'
 import Blog from './pages/Blog'
 import Calendar from './pages/Calendar'
 import Roadmap from './pages/Roadmap'
+import PitchLab from './pages/PitchLab'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -89,6 +90,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Blog />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/pitch" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <PitchLab />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

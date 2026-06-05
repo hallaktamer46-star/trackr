@@ -921,4 +921,110 @@ Return ONLY valid JSON. No explanation, no markdown fences.`
   }
 })
 
+// POST /api/ai/pitch — KPMG-style business pitch analysis
+router.post('/pitch', async (req, res) => {
+  const { pitch, industry, stage, fundingAsk, targetMarket } = req.body
+  if (!pitch?.trim()) return res.status(400).json({ error: 'Pitch content is required' })
+
+  const groq = getGroq()
+  const prompt = `You are a Senior Partner in KPMG's Deal Advisory & Strategy practice with 20 years of experience evaluating early-stage businesses, Series A startups, and growth companies. You have assessed over 400 business plans and sat on 3 investment committees.
+
+Analyse this business pitch with the same rigorous, honest, and structured lens you would apply in a real due diligence engagement. Do NOT sugarcoat. Be direct about fatal flaws. A founder needs to hear the truth, not encouragement.
+
+PITCH:
+${pitch}
+
+CONTEXT:
+- Industry: ${industry || 'Not specified'}
+- Stage: ${stage || 'Not specified'}
+- Funding Ask: ${fundingAsk || 'Not specified'}
+- Target Market: ${targetMarket || 'Not specified'}
+
+Return ONLY valid JSON in this exact structure. No markdown, no explanation:
+{
+  "verdict": "pass" | "conditional" | "promising" | "strong",
+  "overall_score": <integer 0-100>,
+  "executive_summary": "<3-4 sentences: what this business is, what the core thesis is, and your bottom-line view as a consultant>",
+  "sections": [
+    {
+      "id": "market",
+      "title": "Market Opportunity",
+      "score": <0-100>,
+      "rating": "weak" | "moderate" | "strong",
+      "analysis": "<3-5 sentences of honest consultant analysis. Reference TAM/SAM/SOM if relevant. Call out assumptions>",
+      "flags": ["<specific concern>", "<specific concern>"],
+      "positives": ["<specific strength>"]
+    },
+    {
+      "id": "model",
+      "title": "Business Model & Unit Economics",
+      "score": <0-100>,
+      "rating": "weak" | "moderate" | "strong",
+      "analysis": "<3-5 sentences. How does it make money? Are margins defensible? What breaks the model?>",
+      "flags": ["<concern>"],
+      "positives": ["<strength>"]
+    },
+    {
+      "id": "differentiation",
+      "title": "Competitive Differentiation",
+      "score": <0-100>,
+      "rating": "weak" | "moderate" | "strong",
+      "analysis": "<3-5 sentences. What is the actual moat? Is it defensible? Who kills this in 18 months?>",
+      "flags": ["<concern>"],
+      "positives": ["<strength>"]
+    },
+    {
+      "id": "gtm",
+      "title": "Go-to-Market Strategy",
+      "score": <0-100>,
+      "rating": "weak" | "moderate" | "strong",
+      "analysis": "<3-5 sentences. How do they acquire customers? CAC assumptions? Channel risk?>",
+      "flags": ["<concern>"],
+      "positives": ["<strength>"]
+    },
+    {
+      "id": "financials",
+      "title": "Financial Viability",
+      "score": <0-100>,
+      "rating": "weak" | "moderate" | "strong",
+      "analysis": "<3-5 sentences. Are the financial assumptions realistic? Path to profitability? Burn rate concerns?>",
+      "flags": ["<concern>"],
+      "positives": ["<strength>"]
+    },
+    {
+      "id": "risk",
+      "title": "Risk Profile",
+      "score": <0-100>,
+      "rating": "low" | "medium" | "high" | "critical",
+      "analysis": "<3-5 sentences. Regulatory, execution, market timing, technology, team risks>",
+      "flags": ["<concern>"],
+      "positives": ["<strength>"]
+    }
+  ],
+  "critical_questions": [
+    "<The single most important unanswered question an investor would ask>",
+    "<Second most important question>",
+    "<Third most important question>"
+  ],
+  "fatal_flaws": ["<If any exist — the things that could kill this business. Be specific. Max 3. Empty array if none.>"],
+  "what_works": ["<Genuinely strong element 1>", "<Genuinely strong element 2>", "<Genuinely strong element 3>"],
+  "recommendation": "<2-3 sentences: your honest recommendation. What must the founder fix or prove before this is investable or viable? Speak directly to the founder.>"
+}`
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      max_tokens: 2500,
+    })
+    const raw = completion.choices[0].message.content.trim()
+    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    res.json(JSON.parse(text))
+  } catch (err) {
+    console.error('Pitch analysis error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
