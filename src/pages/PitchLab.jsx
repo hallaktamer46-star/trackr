@@ -4,7 +4,7 @@ import {
   TrendingUp, TrendingDown, Minus, Loader2, RotateCcw,
   Target, DollarSign, Globe, BarChart3, ShieldAlert, Rocket,
   MessageSquare, Star, Flag, ArrowRight, Building2, Zap,
-  Sparkles, Send, RefreshCw
+  Sparkles, Send, RefreshCw, Download, FileText
 } from 'lucide-react'
 import { apiFetch } from '../lib/api'
 
@@ -309,6 +309,47 @@ export default function PitchLab() {
 
   const verdict = result ? (VERDICT_CFG[result.verdict] || VERDICT_CFG.conditional) : null
 
+  const resultsRef = useRef(null)
+  const [exporting, setExporting] = useState(false)
+
+  const exportPDF = async () => {
+    if (!resultsRef.current || exporting) return
+    setExporting(true)
+    try {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+      const el = resultsRef.current
+      const canvas = await html2canvas(el, {
+        backgroundColor: '#0d1117',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        windowWidth: el.scrollWidth,
+        windowHeight: el.scrollHeight,
+      })
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pageW = pdf.internal.pageSize.getWidth()
+      const pageH = pdf.internal.pageSize.getHeight()
+      const imgW = pageW
+      const imgH = (canvas.height * imgW) / canvas.width
+      let y = 0
+      while (y < imgH) {
+        if (y > 0) pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, -y, imgW, imgH)
+        y += pageH
+      }
+      const label = result?.verdict ? `pitch-analysis-${result.verdict}` : 'pitch-analysis'
+      pdf.save(`${label}.pdf`)
+    } catch (err) {
+      console.error('Export failed:', err)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div style={{ fontFamily:SANS, maxWidth:940, margin:'0 auto', paddingTop:4 }}>
 
@@ -447,7 +488,7 @@ export default function PitchLab() {
 
       ) : (
         /* ══ RESULTS ══ */
-        <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+        <div ref={resultsRef} style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
           {/* ── Verdict hero ── */}
           <div style={{
@@ -582,6 +623,27 @@ export default function PitchLab() {
               onMouseEnter={e => e.currentTarget.style.background='linear-gradient(135deg,rgba(20,147,255,0.2),rgba(99,102,241,0.15))'}
               onMouseLeave={e => e.currentTarget.style.background='linear-gradient(135deg,rgba(20,147,255,0.12),rgba(99,102,241,0.08))'}>
               <RefreshCw size={13}/> New Pitch
+            </button>
+
+            {/* Export PDF */}
+            <button onClick={exportPDF} disabled={exporting}
+              style={{
+                display:'flex', alignItems:'center', gap:8, padding:'11px 20px', marginLeft:'auto',
+                background: exporting
+                  ? 'rgba(255,255,255,0.03)'
+                  : 'linear-gradient(135deg,rgba(78,222,163,0.12),rgba(16,185,129,0.08))',
+                border:'0.5px solid rgba(78,222,163,0.3)',
+                color: exporting ? '#3a4455' : '#4edea3',
+                fontFamily:MONO, fontSize:10, fontWeight:700, letterSpacing:'0.06em',
+                textTransform:'uppercase', cursor: exporting ? 'wait' : 'pointer',
+                transition:'all 0.18s', position:'relative', overflow:'hidden',
+              }}
+              onMouseEnter={e => { if(!exporting) e.currentTarget.style.background='linear-gradient(135deg,rgba(78,222,163,0.22),rgba(16,185,129,0.15))' }}
+              onMouseLeave={e => { if(!exporting) e.currentTarget.style.background='linear-gradient(135deg,rgba(78,222,163,0.12),rgba(16,185,129,0.08))' }}>
+              {exporting
+                ? <><Loader2 size={13} style={{ animation:'spin 1s linear infinite' }}/> Exporting…</>
+                : <><Download size={13}/> Export PDF</>
+              }
             </button>
           </div>
         </div>
