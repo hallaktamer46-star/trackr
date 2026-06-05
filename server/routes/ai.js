@@ -1019,8 +1019,12 @@ Return ONLY valid JSON in this exact structure. No markdown, no explanation:
       max_tokens: 2500,
     })
     const raw = completion.choices[0].message.content.trim()
-    const text = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
-    res.json(JSON.parse(text))
+    // Strip any markdown fences regardless of variant (```json, ```, ` etc.)
+    const text = raw.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/,'').trim()
+    // Extract the first { ... } block in case there's prose before/after
+    const match = text.match(/\{[\s\S]*\}/)
+    if (!match) throw new Error('No valid JSON found in response')
+    res.json(JSON.parse(match[0]))
   } catch (err) {
     console.error('Pitch analysis error:', err)
     res.status(500).json({ error: err.message })
