@@ -247,30 +247,13 @@ function AnalyseButton({ canSubmit, loading, onClick }) {
             </div>
           </div>
         ) : (
-          <div style={{ display:'flex', alignItems:'center', gap:14, position:'relative' }}>
-            {/* left icon cluster */}
-            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-              <div style={{ width:32, height:32, borderRadius:'50%', background:'rgba(255,255,255,0.15)', display:'flex', alignItems:'center', justifyContent:'center', border:'0.5px solid rgba(255,255,255,0.25)', boxShadow: hov?'0 0 16px rgba(255,255,255,0.2)':'none', transition:'box-shadow 0.25s' }}>
-                <Sparkles size={14} color="#fff"/>
-              </div>
-            </div>
-
-            {/* label */}
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start' }}>
-              <span style={{ fontFamily:MONO, fontSize:13, fontWeight:900, color:'#fff', letterSpacing:'0.12em', textTransform:'uppercase', lineHeight:1, textShadow:'0 0 20px rgba(255,255,255,0.3)' }}>
-                Run Analysis
-              </span>
-              <span style={{ fontFamily:MONO, fontSize:8, color:'rgba(255,255,255,0.55)', letterSpacing:'0.1em', marginTop:3 }}>
-                SENIOR PARTNER · DEAL ADVISORY FRAMEWORK
-              </span>
-            </div>
-
-            {/* right arrow cluster */}
-            <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:6 }}>
-              <div style={{ width:28, height:28, borderRadius:'50%', background:'rgba(255,255,255,0.12)', display:'flex', alignItems:'center', justifyContent:'center', border:'0.5px solid rgba(255,255,255,0.2)', transform: hov?'translateX(3px)':'none', transition:'transform 0.25s' }}>
-                <Send size={12} color="#fff"/>
-              </div>
-            </div>
+          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+            <span style={{ fontFamily:MONO, fontSize:14, fontWeight:900, color:'#fff', letterSpacing:'0.14em', textTransform:'uppercase', lineHeight:1, textShadow:'0 0 24px rgba(255,255,255,0.4)' }}>
+              Run Analysis
+            </span>
+            <span style={{ fontFamily:MONO, fontSize:8, color:'rgba(255,255,255,0.5)', letterSpacing:'0.1em' }}>
+              SENIOR PARTNER · DEAL ADVISORY FRAMEWORK
+            </span>
           </div>
         )}
       </button>
