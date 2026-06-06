@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Search, MapPin, DollarSign, Briefcase, Clock, Users, X,
   ChevronDown, Building2, CheckCircle2, Bookmark, Share2,
@@ -366,6 +367,7 @@ function PS({ children, ...props }) {
 
 /* ─── Main ─── */
 export default function Jobs() {
+  const navigate = useNavigate()
   const [jobs, setJobs] = useState(MOCK_JOBS)
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('All')
@@ -410,12 +412,20 @@ export default function Jobs() {
             Full-time, part-time and freelance from verified businesses.
           </p>
         </div>
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
-          <button onClick={()=>setShowPostModal(true)}
-            style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 18px', background:'linear-gradient(135deg, #a3c9ff, #7ab4ff)', border:'none', cursor:'pointer', color:'#070d1a', fontFamily:MONO, fontSize:10, fontWeight:800, letterSpacing:'0.08em', textTransform:'uppercase', boxShadow:'0 4px 20px rgba(163,201,255,0.3)', transition:'filter 0.15s, transform 0.15s' }}
-            onMouseEnter={e=>{e.currentTarget.style.filter='brightness(1.1)';e.currentTarget.style.transform='translateY(-1px)'}} onMouseLeave={e=>{e.currentTarget.style.filter='none';e.currentTarget.style.transform='none'}}>
-            <Building2 size={13}/> Hiring? Post a Job
-          </button>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:8, flexShrink:0 }}>
+          <div style={{ display:'flex', gap:8 }}>
+            <button onClick={()=>navigate('/board')}
+              style={{ display:'flex', alignItems:'center', gap:7, padding:'10px 16px', background:'rgba(163,201,255,0.07)', border:'0.5px solid rgba(163,201,255,0.25)', cursor:'pointer', color:'#a3c9ff', fontFamily:MONO, fontSize:10, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', transition:'all 0.15s' }}
+              onMouseEnter={e=>{e.currentTarget.style.background='rgba(163,201,255,0.14)';e.currentTarget.style.borderColor='rgba(163,201,255,0.45)'}}
+              onMouseLeave={e=>{e.currentTarget.style.background='rgba(163,201,255,0.07)';e.currentTarget.style.borderColor='rgba(163,201,255,0.25)'}}>
+              <LayoutGrid size={12}/> My Board
+            </button>
+            <button onClick={()=>setShowPostModal(true)}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 18px', background:'linear-gradient(135deg, #a3c9ff, #7ab4ff)', border:'none', cursor:'pointer', color:'#070d1a', fontFamily:MONO, fontSize:10, fontWeight:800, letterSpacing:'0.08em', textTransform:'uppercase', boxShadow:'0 4px 20px rgba(163,201,255,0.3)', transition:'filter 0.15s, transform 0.15s' }}
+              onMouseEnter={e=>{e.currentTarget.style.filter='brightness(1.1)';e.currentTarget.style.transform='translateY(-1px)'}} onMouseLeave={e=>{e.currentTarget.style.filter='none';e.currentTarget.style.transform='none'}}>
+              <Building2 size={13}/> Hiring? Post a Job
+            </button>
+          </div>
           <p style={{ fontFamily:MONO, fontSize:9, color:'#404753' }}>Free &amp; sponsored tiers</p>
         </div>
       </div>

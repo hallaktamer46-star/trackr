@@ -338,13 +338,6 @@ export default function GrowthLab() {
         </p>
       </div>
 
-      {/* Board button */}
-      <button onClick={() => navigate('/board')}
-        style={{ display:'flex', alignItems:'center', gap:8, padding:'9px 16px', background:'rgba(163,201,255,0.06)', border:'0.5px solid rgba(163,201,255,0.2)', color:'#a3c9ff', fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', transition:'all 0.15s', marginBottom:28 }}
-        onMouseEnter={e=>{e.currentTarget.style.background='rgba(163,201,255,0.12)';e.currentTarget.style.borderColor='rgba(163,201,255,0.35)'}}
-        onMouseLeave={e=>{e.currentTarget.style.background='rgba(163,201,255,0.06)';e.currentTarget.style.borderColor='rgba(163,201,255,0.2)'}}>
-        <LayoutGrid size={12}/> Open Board <ArrowRight size={10}/>
-      </button>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'flex-start' }}>
 
