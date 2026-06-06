@@ -222,7 +222,7 @@ export default function Home() {
     { label:'Market',       icon:BarChart3,      soon:true },
     { label:'Skills',       icon:GraduationCap,  soon:true },
     { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
-    { label:'Stats',         icon:BarChart3,      action:()=>navigate('/stats') },
+    { label:'Roadmap',       icon:Target,        action:()=>navigate('/roadmap') },
     { label:'Community',    icon:Newspaper,     action:()=>navigate('/blog') },
   ]
 
