@@ -217,7 +217,6 @@ export default function Home() {
   const maxCount     = Math.max(...weeklyData.map(d=>d.count),1)
 
   const SIDEBAR_LINKS = [
-    { label:'Board',        icon:LayoutGrid,    action:()=>navigate('/board') },
     { label:'Start a Blog', icon:PenSquare,    action:()=>setQuickPostOpen(true) },
     { label:'Library',      icon:Library,       soon:true },
     { label:'Market',       icon:BarChart3,      soon:true },

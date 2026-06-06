@@ -1031,4 +1031,127 @@ Return ONLY valid JSON in this exact structure. No markdown, no explanation:
   }
 })
 
+// POST /api/ai/dream-reverse — reverse-engineer a dream life into a timeline
+router.post('/dream-reverse', async (req, res) => {
+  const { dream } = req.body
+  if (!dream?.trim()) return res.status(400).json({ error: 'Dream description required' })
+  const groq = getGroq()
+  const prompt = `You are a world-class life strategist and execution coach. The user has described their dream life. Your job is to reverse-engineer it into a concrete, honest, actionable timeline — working backwards from the dream to what they must do TODAY.
+
+Be specific. Be brutally honest about what it actually takes. Don't be vague or generic. Reference real timelines, real effort, real sacrifices.
+
+Dream: "${dream}"
+
+Return ONLY valid JSON, no markdown:
+{
+  "dream_title": "<3-6 word title for this dream>",
+  "reality_check": "<1-2 honest sentences about what achieving this actually requires>",
+  "horizons": [
+    {
+      "id": "5yr",
+      "label": "5 Years",
+      "title": "<Where you are in 5 years if you execute>",
+      "description": "<2-3 sentences: what your life looks like, what you've achieved>",
+      "milestones": ["<specific milestone>", "<specific milestone>", "<specific milestone>"],
+      "focus": "<the one thing that matters most at this horizon>"
+    },
+    {
+      "id": "1yr",
+      "label": "1 Year",
+      "title": "<Where you are in 1 year>",
+      "description": "<2-3 sentences>",
+      "milestones": ["<milestone>", "<milestone>", "<milestone>"],
+      "focus": "<the one thing>"
+    },
+    {
+      "id": "6mo",
+      "label": "6 Months",
+      "title": "<6-month checkpoint>",
+      "description": "<2-3 sentences>",
+      "milestones": ["<milestone>", "<milestone>", "<milestone>"],
+      "focus": "<the one thing>"
+    },
+    {
+      "id": "1mo",
+      "label": "This Month",
+      "title": "<What to accomplish this month>",
+      "description": "<1-2 sentences>",
+      "milestones": ["<action>", "<action>", "<action>"],
+      "focus": "<the one thing>"
+    },
+    {
+      "id": "1wk",
+      "label": "This Week",
+      "title": "<This week's mission>",
+      "description": "<1-2 sentences>",
+      "milestones": ["<specific action>", "<specific action>", "<specific action>"],
+      "focus": "<the one thing>"
+    },
+    {
+      "id": "today",
+      "label": "Today",
+      "title": "<One specific action for today>",
+      "description": "<Exactly what to do in the next 2 hours>",
+      "milestones": ["<do this now>", "<do this now>"],
+      "focus": "<start here>"
+    }
+  ]
+}`
+  try {
+    const c = await groq.chat.completions.create({ model: MODEL, messages: [{ role:'user', content:prompt }], temperature: 0.5, max_tokens: 2000 })
+    const raw = c.choices[0].message.content.trim()
+    const match = raw.replace(/^```[a-z]*\n?/i,'').replace(/\n?```$/,'').trim().match(/\{[\s\S]*\}/)
+    if (!match) throw new Error('No JSON in response')
+    res.json(JSON.parse(match[0]))
+  } catch (err) { console.error('Dream reverse error:', err); res.status(500).json({ error: err.message }) }
+})
+
+// POST /api/ai/skill-gap — skill gap analysis + 8-week roadmap
+router.post('/skill-gap', async (req, res) => {
+  const { goal, currentSkills } = req.body
+  if (!goal?.trim()) return res.status(400).json({ error: 'Goal required' })
+  const groq = getGroq()
+  const prompt = `You are a senior learning & development strategist at McKinsey. The user has a goal/dream role. Analyse their skill gaps and build a precise, actionable 8-week learning roadmap.
+
+Goal: "${goal}"
+Current skills (self-reported): "${currentSkills || 'Not specified'}"
+
+Return ONLY valid JSON, no markdown:
+{
+  "goal_title": "<clean 3-5 word title>",
+  "summary": "<2-3 sentences: honest assessment of the gap and path>",
+  "skills": [
+    {
+      "name": "<skill name>",
+      "category": "<Technical | Soft | Domain | Tool>",
+      "current_level": <0-100 estimate based on context>,
+      "required_level": <0-100>,
+      "gap": <required - current>,
+      "roi_score": <0-100, how much this skill moves the needle toward the goal>,
+      "priority": "critical" | "high" | "medium" | "low",
+      "why": "<1 sentence: why this skill matters for this goal>",
+      "resource": "<one specific free resource: course name, book title, or practice method>"
+    }
+  ],
+  "roadmap": [
+    {
+      "week": 1,
+      "theme": "<week theme>",
+      "skills_focus": ["<skill name>"],
+      "daily_commitment": "<e.g. 45 min/day>",
+      "deliverable": "<what you produce or can do by end of week>",
+      "action": "<the single most important action this week>"
+    }
+  ]
+}
+Return 6-8 skills and exactly 8 roadmap weeks. Be specific with resource names.`
+  try {
+    const c = await groq.chat.completions.create({ model: MODEL, messages: [{ role:'user', content:prompt }], temperature: 0.4, max_tokens: 2500 })
+    const raw = c.choices[0].message.content.trim()
+    const match = raw.replace(/^```[a-z]*\n?/i,'').replace(/\n?```$/,'').trim().match(/\{[\s\S]*\}/)
+    if (!match) throw new Error('No JSON in response')
+    res.json(JSON.parse(match[0]))
+  } catch (err) { console.error('Skill gap error:', err); res.status(500).json({ error: err.message }) }
+})
+
 export default router

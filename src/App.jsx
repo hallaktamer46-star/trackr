@@ -14,7 +14,7 @@ import Blog from './pages/Blog'
 import Calendar from './pages/Calendar'
 import Roadmap from './pages/Roadmap'
 import PitchLab from './pages/PitchLab'
-import ActivityHeatmap from './pages/ActivityHeatmap'
+import GrowthLab from './pages/GrowthLab'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -95,11 +95,11 @@ function AppRoutes() {
           </ApplicationProvider>
         </ProtectedRoute>
       } />
-      <Route path="/heatmap" element={
+      <Route path="/growth" element={
         <ProtectedRoute>
           <ApplicationProvider>
             <Layout>
-              <ActivityHeatmap />
+              <GrowthLab />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
