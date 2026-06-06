@@ -32,15 +32,26 @@ const Tip = ({ active, payload, label }) => {
 
 function GradNum({ value, color, size = 36 }) {
   const empty = !value || value === 0 || value === '0' || value === '0%'
+  const str = empty ? '' : String(value)
+  const hasPercent = str.endsWith('%')
+  const numPart = hasPercent ? str.slice(0, -1) : str
+  const gradStyle = {
+    background: `linear-gradient(135deg,#fff 0%,${color} 100%)`,
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+    filter: `drop-shadow(0 0 8px ${color}40)`,
+  }
+  if (empty) return (
+    <span style={{ fontFamily:MONO, fontSize:size, fontWeight:800, color:'rgba(138,145,159,0.15)', lineHeight:1 }}>
+      {typeof value === 'string' && value.includes('%') ? '—' : '0'}
+    </span>
+  )
   return (
-    <span style={{
-      fontFamily: MONO, fontSize: size, fontWeight: 800, letterSpacing: '-0.06em', lineHeight: 1,
-      background: empty ? 'none' : `linear-gradient(135deg,#fff 0%,${color} 100%)`,
-      WebkitBackgroundClip: empty ? 'unset' : 'text',
-      WebkitTextFillColor: empty ? 'rgba(138,145,159,0.15)' : 'transparent',
-      backgroundClip: empty ? 'unset' : 'text',
-      filter: empty ? 'none' : `drop-shadow(0 0 8px ${color}40)`,
-    }}>{empty ? (typeof value === 'string' && value.includes('%') ? '—' : '0') : value}</span>
+    <span style={{ display:'inline-flex', alignItems:'baseline', gap:1, lineHeight:1 }}>
+      <span style={{ fontFamily:MONO, fontSize:size, fontWeight:800, letterSpacing:'-0.06em', ...gradStyle }}>{numPart}</span>
+      {hasPercent && <span style={{ fontFamily:MONO, fontSize:size*0.55, fontWeight:700, letterSpacing:'0', ...gradStyle }}>%</span>}
+    </span>
   )
 }
 
