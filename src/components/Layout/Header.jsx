@@ -7,12 +7,11 @@ import { cn } from '../../lib/cn'
 
 const nav = [
   { to: '/',        label: 'Home',      icon: Home,       end: true },
-  { to: '/board',   label: 'Board',     icon: LayoutGrid           },
+  { to: '/growth',  label: 'Growth Lab',icon: Telescope            },
   { to: '/stats',   label: 'Stats',     icon: BarChart3            },
   { to: '/ai/cv',   label: 'AI Tools',  icon: Sparkles             },
   { to: '/jobs',    label: 'Jobs',      icon: Briefcase            },
   { to: '/pitch',   label: 'Pitch Lab', icon: Building2            },
-  { to: '/growth',  label: 'Growth Lab',icon: Telescope            },
 ]
 
 const CV_TOOLS = [
