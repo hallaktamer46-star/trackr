@@ -11,6 +11,7 @@ const nav = [
   { to: '/stats',   label: 'Stats',     icon: BarChart3            },
   { to: '/ai/cv',   label: 'AI Tools',  icon: Sparkles             },
   { to: '/jobs',    label: 'Jobs',      icon: Briefcase            },
+  { to: '/pitch',   label: 'Pitch Lab', icon: Building2            },
   { to: '/growth',  label: 'Growth Lab',icon: Telescope            },
 ]
 
