@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, Building2, Sun, Moon, FileText, Mail, PenLine, ChevronDown, ArrowRight } from 'lucide-react'
+import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, Building2, Sun, Moon, FileText, Mail, PenLine, ChevronDown, ArrowRight, Activity } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import ProfileDropdown from './ProfileDropdown'
 import { cn } from '../../lib/cn'
 
 const nav = [
-  { to: '/',      label: 'Home',      icon: Home,       end: true },
-  { to: '/board', label: 'Board',     icon: LayoutGrid            },
-  { to: '/stats', label: 'Stats',     icon: BarChart3             },
-  { to: '/ai/cv', label: 'AI Tools',  icon: Sparkles              },
-  { to: '/jobs',  label: 'Jobs',      icon: Briefcase  },
-  { to: '/pitch', label: 'Pitch Lab', icon: Building2  },
+  { to: '/',        label: 'Home',      icon: Home,       end: true },
+  { to: '/heatmap', label: 'Activity',  icon: Activity             },
+  { to: '/stats',   label: 'Stats',     icon: BarChart3            },
+  { to: '/ai/cv',   label: 'AI Tools',  icon: Sparkles             },
+  { to: '/jobs',    label: 'Jobs',      icon: Briefcase            },
+  { to: '/pitch',   label: 'Pitch Lab', icon: Building2            },
 ]
 
 const CV_TOOLS = [

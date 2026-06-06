@@ -14,6 +14,7 @@ import Blog from './pages/Blog'
 import Calendar from './pages/Calendar'
 import Roadmap from './pages/Roadmap'
 import PitchLab from './pages/PitchLab'
+import ActivityHeatmap from './pages/ActivityHeatmap'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -90,6 +91,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Blog />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/heatmap" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <ActivityHeatmap />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
