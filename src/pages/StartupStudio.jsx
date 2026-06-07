@@ -38,12 +38,19 @@ const GLOBAL_CSS = `
     outline: none; transition: all 0.25s ease;
   }
   .ss-input::placeholder { color: #2d3748; }
+  .ss-input.filled {
+    background: rgba(255,255,255,0.07);
+    border-color: var(--sc, #a78bfa);
+    box-shadow:
+      0 0 0 2px var(--sc-bg, rgba(167,139,250,0.18)),
+      0 0 16px var(--sc-bg, rgba(167,139,250,0.12));
+  }
   .ss-input:focus {
     background: rgba(255,255,255,0.09);
     border-color: var(--sc, #a78bfa);
     box-shadow:
-      0 0 0 3px var(--sc-bg, rgba(167,139,250,0.2)),
-      0 0 24px var(--sc-bg, rgba(167,139,250,0.15)),
+      0 0 0 3px var(--sc-bg, rgba(167,139,250,0.25)),
+      0 0 28px var(--sc-bg, rgba(167,139,250,0.2)),
       inset 0 0 16px rgba(255,255,255,0.03);
   }
   .ss-pill {
@@ -119,6 +126,8 @@ function useStepVars(color, glow) {
 }
 
 function SInput({ label, textarea, rows = 4, ...props }) {
+  const isFilled = props.value != null && String(props.value).trim().length > 0
+  const cls = `ss-input${isFilled ? ' filled' : ''}`
   return (
     <div>
       {label && (
@@ -127,8 +136,8 @@ function SInput({ label, textarea, rows = 4, ...props }) {
         </label>
       )}
       {textarea
-        ? <textarea rows={rows} className="ss-input" style={{ resize: 'vertical', lineHeight: 1.7 }} {...props} />
-        : <input className="ss-input" {...props} />
+        ? <textarea rows={rows} className={cls} style={{ resize: 'vertical', lineHeight: 1.7 }} {...props} />
+        : <input className={cls} {...props} />
       }
     </div>
   )
