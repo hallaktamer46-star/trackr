@@ -1100,9 +1100,9 @@ Return ONLY valid JSON, no markdown:
   try {
     const c = await groq.chat.completions.create({ model: MODEL, messages: [{ role:'user', content:prompt }], temperature: 0.5, max_tokens: 2000 })
     const raw = c.choices[0].message.content.trim()
-    const match = raw.replace(/^```[a-z]*\n?/i,'').replace(/\n?```$/,'').trim().match(/\{[\s\S]*\}/)
-    if (!match) throw new Error('No JSON in response')
-    res.json(JSON.parse(match[0]))
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON in response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) { console.error('Dream reverse error:', err); res.status(500).json({ error: err.message }) }
 })
 
@@ -1148,9 +1148,9 @@ Return 6-8 skills and exactly 8 roadmap weeks. Be specific with resource names.`
   try {
     const c = await groq.chat.completions.create({ model: MODEL, messages: [{ role:'user', content:prompt }], temperature: 0.4, max_tokens: 2500 })
     const raw = c.choices[0].message.content.trim()
-    const match = raw.replace(/^```[a-z]*\n?/i,'').replace(/\n?```$/,'').trim().match(/\{[\s\S]*\}/)
-    if (!match) throw new Error('No JSON in response')
-    res.json(JSON.parse(match[0]))
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON in response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) { console.error('Skill gap error:', err); res.status(500).json({ error: err.message }) }
 })
 
@@ -1194,8 +1194,9 @@ Return ONLY valid JSON, no markdown:
 }
 
 Include 4-7 real competitors. If a known competitor list was provided, include all of them. Be brutally honest about threat levels.`)
-    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
-    res.json(json)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup competitor error:', err)
     res.status(500).json({ error: err.message })
@@ -1239,8 +1240,9 @@ Return ONLY valid JSON, no markdown:
     { "model": "<alternative model>", "why_not": "<why this model is worse for this specific idea>" }
   ]
 }`)
-    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
-    res.json(json)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup business model error:', err)
     res.status(500).json({ error: err.message })
@@ -1282,8 +1284,9 @@ Rules:
 - Score honestly — most names are 6-7, exceptional ones are 8-9, flawless ones are 10
 - Domain hint should reflect realistic availability (popular .com words are taken, suggest alternatives)
 - Order by score descending`)
-    const match = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim().match(/\{[\s\S]*\}/)
-    res.json(JSON.parse(match[0]))
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup name studio error:', err)
     res.status(500).json({ error: err.message })
@@ -1341,8 +1344,9 @@ Return ONLY valid JSON, no markdown:
 }
 
 Be conservative but realistic. Don't assume hockey-stick growth in Year 1.`)
-    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
-    res.json(json)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup financial error:', err)
     res.status(500).json({ error: err.message })
@@ -1392,8 +1396,9 @@ Return ONLY valid JSON, no markdown:
 }
 
 Include exactly 12 weeks. Channels should be ranked by ROI. Be brutally specific — generic advice like 'post on social media' is not acceptable.`)
-    const match = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim().match(/\{[\s\S]*\}/)
-    res.json(JSON.parse(match[0]))
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup GTM error:', err)
     res.status(500).json({ error: err.message })
@@ -1432,8 +1437,9 @@ Return ONLY valid JSON, no markdown:
   "equity_split_note": "<if multiple founders, a brief note on how to structure equity fairly and what vesting schedule to use>",
   "immediate_actions": ["<do this first — specific>", "<do this second>", "<do this third>"]
 }`)
-    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
-    res.json(json)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup legal error:', err)
     res.status(500).json({ error: err.message })
@@ -1489,8 +1495,9 @@ Return ONLY valid JSON, no markdown:
 }
 
 Each slide must be specific to this exact business — no generic templates. Bullets should be actual content the founder can use, not placeholders.`)
-    const match = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim().match(/\{[\s\S]*\}/)
-    res.json(JSON.parse(match[0]))
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup pitch builder error:', err)
     res.status(500).json({ error: err.message })
