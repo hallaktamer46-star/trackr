@@ -1091,9 +1091,10 @@ export default function StartupStudio() {
               <p style={{ fontSize: 13, color: '#7dd3fc', marginTop: 2 }}>{step.desc}</p>
             </div>
 
-            {/* progress tracker — compact inline, no card */}
-            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-              {/* 8 colored dots — each step's own color */}
+            {/* progress tracker */}
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
+
+              {/* 8 colored dots */}
               <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                 {STEPS.map(s => {
                   const isDone = done.has(s.id)
@@ -1115,32 +1116,34 @@ export default function StartupStudio() {
                 })}
               </div>
 
-              {/* count + status */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {/* count — centered below dots */}
+              <span style={{
+                fontFamily: MONO, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1,
+                fontSize: 20,
+                background: `linear-gradient(135deg, #a78bfa, ${step.color})`,
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>
+                {done.size}<span style={{ fontSize: 11, fontWeight: 700 }}>/8</span>
+              </span>
+
+              {/* status — own line, centered, only when progress made */}
+              {done.size > 0 && (
                 <span style={{
-                  fontFamily: MONO, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1,
-                  fontSize: 20,
-                  background: `linear-gradient(135deg, #a78bfa, ${step.color})`,
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                }}>
-                  {done.size}<span style={{ fontSize: 11, fontWeight: 700 }}>/8</span>
-                </span>
-                <span style={{
-                  fontFamily: MONO, fontSize: 8, fontWeight: 800, letterSpacing: '0.12em',
+                  fontFamily: MONO, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em',
                   color: done.size === 8 ? '#34d399' : step.color,
                   textTransform: 'uppercase',
                 }}>
-                  {done.size === 0 && 'LET\'S GO'}
                   {done.size === 1 && 'ROLLING'}
-                  {done.size === 2 && 'COOKING!'}
+                  {done.size === 2 && 'BUILDING'}
                   {done.size === 3 && 'ON FIRE 🔥'}
                   {done.size === 4 && 'HALFWAY!'}
                   {done.size === 5 && 'CRUSHING IT'}
                   {done.size === 6 && 'ALMOST!'}
                   {done.size === 7 && 'LAST ONE!'}
-                  {done.size === 8 && 'DONE 🚀'}
+                  {done.size === 8 && 'COMPLETE 🚀'}
                 </span>
-              </div>
+              )}
+            </div>
             </div>
           </div>
 
