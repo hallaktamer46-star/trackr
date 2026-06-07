@@ -37,40 +37,42 @@ const GLOBAL_CSS = `
     font-size: 14px; font-family: Geist, Inter, sans-serif;
     outline: none; transition: all 0.25s ease;
   }
-  .ss-input::placeholder { color: #374151; }
+  .ss-input::placeholder { color: #2d3748; }
   .ss-input:focus {
-    background: rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.09);
     border-color: var(--sc, #a78bfa);
-    box-shadow: 0 0 0 4px var(--sg, rgba(167,139,250,0.18)), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow:
+      0 0 0 3px var(--sc-bg, rgba(167,139,250,0.2)),
+      0 0 24px var(--sc-bg, rgba(167,139,250,0.15)),
+      inset 0 0 16px rgba(255,255,255,0.03);
   }
   .ss-pill {
     padding: 8px 18px; border-radius: 99px; cursor: pointer;
     font-family: Geist Mono, monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 0.04em; border: 1.5px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.04); color: #6b7280;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
   }
-  .ss-pill:hover { color: #e2e8f0; border-color: rgba(255,255,255,0.2); }
+  .ss-pill:hover { color: #e2e8f0; border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.07); }
   .ss-pill.active {
-    background: var(--sc-bg, rgba(167,139,250,0.15));
+    background: var(--sc-bg, rgba(167,139,250,0.18));
     border-color: var(--sc, #a78bfa);
     color: var(--sc, #a78bfa);
-    box-shadow: 0 0 16px var(--sg, rgba(167,139,250,0.2));
+    box-shadow: 0 0 0 3px var(--sc-bg, rgba(167,139,250,0.15)), 0 0 20px var(--sc-bg, rgba(167,139,250,0.2));
   }
   .ss-gen-btn {
     width: 100%; padding: 16px 0; border: none; border-radius: 16px;
     cursor: pointer; font-family: Geist Mono, monospace;
     font-size: 13px; font-weight: 800; letter-spacing: 0.1em;
     text-transform: uppercase; color: white;
-    background: linear-gradient(90deg, var(--sc,#a78bfa) 0%, #818cf8 35%, var(--sc,#a78bfa) 70%, #c4b5fd 100%);
-    background-size: 300% 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 32px var(--sg, rgba(167,139,250,0.4));
-    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--sc,#a78bfa), #6d6bfa);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 28px var(--sg, rgba(167,139,250,0.4));
     display: flex; align-items: center; justify-content: center; gap: 10px;
   }
-  .ss-gen-btn:hover { animation: ssShimmer 2s linear infinite; transform: translateY(-2px); box-shadow: 0 8px 40px var(--sg, rgba(167,139,250,0.5)); }
-  .ss-gen-btn:disabled { background: rgba(255,255,255,0.06); color: #374151; box-shadow: none; cursor: default; transform: none; animation: none; }
+  .ss-gen-btn:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: 0 8px 40px var(--sg, rgba(167,139,250,0.55)); }
+  .ss-gen-btn:active { transform: translateY(0); filter: brightness(0.95); }
+  .ss-gen-btn:disabled { background: rgba(255,255,255,0.06); color: #374151; box-shadow: none; cursor: default; transform: none; filter: none; }
   .ss-next-btn {
     display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
     border-radius: 12px; border: 1.5px solid var(--sc, #a78bfa);
