@@ -45,7 +45,7 @@ const GLOBAL_CSS = `
     font-size: 14px; font-family: Geist, Inter, sans-serif;
     outline: none; transition: all 0.25s ease;
   }
-  .ss-input::placeholder { color: #2d3748; }
+  .ss-input::placeholder { color: rgba(255,255,255,0.18); }
   .ss-input.filled {
     background: rgba(255,255,255,0.07);
     border-color: var(--sc, #a78bfa);
@@ -65,7 +65,7 @@ const GLOBAL_CSS = `
     padding: 8px 18px; border-radius: 99px; cursor: pointer;
     font-family: Geist Mono, monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 0.04em; border: 1.5px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04); color: #6b7280;
+    background: rgba(255,255,255,0.04); color: #93c5fd;
     transition: all 0.18s ease;
   }
   .ss-pill:hover { color: #e2e8f0; border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.07); }
@@ -87,7 +87,7 @@ const GLOBAL_CSS = `
   }
   .ss-gen-btn:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: 0 8px 40px var(--sg, rgba(167,139,250,0.55)); }
   .ss-gen-btn:active { transform: translateY(0); filter: brightness(0.95); }
-  .ss-gen-btn:disabled { background: rgba(255,255,255,0.06); color: #374151; box-shadow: none; cursor: default; transform: none; filter: none; }
+  .ss-gen-btn:disabled { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); box-shadow: none; cursor: default; transform: none; filter: none; }
   .ss-next-btn {
     display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
     border-radius: 12px; border: 1.5px solid var(--sc, #a78bfa);
@@ -116,7 +116,7 @@ const GLOBAL_CSS = `
     padding: 9px 12px; border-radius: 10px; cursor: pointer; text-align: left;
     border: 1.5px solid rgba(255,255,255,0.07);
     background: rgba(10,14,28,0.65);
-    color: #94a3b8;
+    color: #e2e8f0;
     font-family: Geist, Inter, sans-serif; font-size: 12px;
     transition: all 0.18s ease; width: 100%;
   }
@@ -135,7 +135,7 @@ const GLOBAL_CSS = `
     box-shadow: 0 0 0 2px var(--sc-bg, rgba(167,139,250,0.14)), 0 0 18px var(--sc-bg, rgba(167,139,250,0.12));
     transform: none;
   }
-  .ss-option.other-opt { color: #475569; font-style: italic; }
+  .ss-option.other-opt { color: #93c5fd; font-style: italic; }
   .ss-option.other-opt:hover { color: #f1f5f9; }
   .ss-starter {
     padding: 5px 14px; border-radius: 20px; cursor: pointer;
@@ -176,7 +176,7 @@ function SInput({ label, textarea, rows = 4, ...props }) {
   return (
     <div>
       {label && (
-        <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
+        <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#7dd3fc', textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>
           {label}
         </label>
       )}
@@ -272,7 +272,7 @@ function BulletList({ items, color }) {
   return items?.map((item, i) => (
     <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
       <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, marginTop: 6, flexShrink: 0 }} />
-      <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>{item}</p>
+      <p style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.65 }}>{item}</p>
     </div>
   ))
 }
@@ -370,10 +370,10 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
               return (
                 <div key={sec.id} style={{ padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#6b7280', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{sec.title}</p>
+                    <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{sec.title}</p>
                     <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 900, color: sc }}>{sec.score}</span>
                   </div>
-                  <p style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6 }}>{sec.analysis?.slice(0, 130)}…</p>
+                  <p style={{ fontSize: 12, color: '#7dd3fc', lineHeight: 1.6 }}>{sec.analysis?.slice(0, 130)}…</p>
                 </div>
               )
             })}
@@ -387,7 +387,7 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
               {result.critical_questions?.map((q, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
                   <AlertCircle size={12} style={{ color: '#fbbf24', marginTop: 1, flexShrink: 0 }} />
-                  <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>{q}</p>
+                  <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.6 }}>{q}</p>
                 </div>
               ))}
             </ResultSection>
@@ -441,15 +441,15 @@ function CompetitorPanel({ data, onUpdate, onNext, loading, setLoading, setError
               <div key={i} style={{ display: 'grid', gridTemplateColumns: '180px 1fr 1fr auto', gap: 16, padding: '14px 18px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', alignItems: 'start' }}>
                 <div>
                   <p style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9', marginBottom: 3 }}>{c.name}</p>
-                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#6b7280' }}>{c.founded} · {c.funding}</p>
+                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#93c5fd' }}>{c.founded} · {c.funding}</p>
                 </div>
                 <div>
                   <p style={{ fontFamily: MONO, fontSize: 8, color: '#34d399', letterSpacing: '0.1em', marginBottom: 5 }}>STRENGTH</p>
-                  <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>{c.strength}</p>
+                  <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.5 }}>{c.strength}</p>
                 </div>
                 <div>
                   <p style={{ fontFamily: MONO, fontSize: 8, color: '#fb7185', letterSpacing: '0.1em', marginBottom: 5 }}>WEAKNESS</p>
-                  <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>{c.weakness}</p>
+                  <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.5 }}>{c.weakness}</p>
                 </div>
                 <Tag label={c.threat_level?.toUpperCase()} color={threatColor[c.threat_level] || s.color} />
               </div>
@@ -474,7 +474,7 @@ function BusinessModelPanel({ data, onUpdate, onNext, loading, setLoading, setEr
   const s = STEPS[2]
   const vars = useStepVars(s.color, s.glow)
   const result = data.businessModelResult
-  const priorityColor = { Primary: '#34d399', Secondary: '#38bdf8', Future: '#6b7280' }
+  const priorityColor = { Primary: '#34d399', Secondary: '#38bdf8', Future: '#93c5fd' }
 
   async function generate() {
     setError(null); setLoading(true)
@@ -510,7 +510,7 @@ function BusinessModelPanel({ data, onUpdate, onNext, loading, setLoading, setEr
                 <Tag label={r.priority} color={priorityColor[r.priority] || s.color} />
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>{r.stream}</p>
-                  <p style={{ fontSize: 11, color: '#6b7280' }}>{r.description}</p>
+                  <p style={{ fontSize: 11, color: '#93c5fd' }}>{r.description}</p>
                 </div>
                 <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 800, color: '#34d399', whiteSpace: 'nowrap' }}>{r.typical_margin}</span>
               </div>
@@ -520,12 +520,12 @@ function BusinessModelPanel({ data, onUpdate, onNext, loading, setLoading, setEr
             <ResultSection title="Pricing Strategy" color={s.color}>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#f1f5f9', marginBottom: 6 }}>{result.pricing_strategy?.approach}</p>
               <p style={{ fontFamily: MONO, fontSize: 18, fontWeight: 900, color: s.color, marginBottom: 10 }}>{result.pricing_strategy?.suggested_price_range}</p>
-              <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>{result.pricing_strategy?.reasoning}</p>
+              <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.6 }}>{result.pricing_strategy?.reasoning}</p>
             </ResultSection>
             <ResultSection title="Unit Economics" color={s.color}>
               {[['CAC', result.unit_economics?.cac_estimate], ['LTV', result.unit_economics?.ltv_estimate], ['LTV:CAC', result.unit_economics?.ltv_cac_ratio], ['Payback', result.unit_economics?.payback_period]].map(([l, v]) => (
                 <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span style={{ fontFamily: MONO, fontSize: 9, color: '#94a3b8', letterSpacing: '0.08em' }}>{l}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 9, color: '#e2e8f0', letterSpacing: '0.08em' }}>{l}</span>
                   <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 800, color: '#e2e8f0' }}>{v}</span>
                 </div>
               ))}
@@ -542,7 +542,7 @@ function NameStudioPanel({ data, onUpdate, onNext, loading, setLoading, setError
   const s = STEPS[3]
   const vars = useStepVars(s.color, s.glow)
   const result = data.nameResult
-  const scoreColor = sc => sc >= 8 ? '#34d399' : sc >= 6 ? '#fbbf24' : '#94a3b8'
+  const scoreColor = sc => sc >= 8 ? '#34d399' : sc >= 6 ? '#fbbf24' : '#e2e8f0'
 
   async function generate() {
     setError(null); setLoading(true)
@@ -588,15 +588,15 @@ function NameStudioPanel({ data, onUpdate, onNext, loading, setLoading, setError
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                     <div>
                       <p style={{ fontSize: 20, fontWeight: 900, color: selected ? s.color : '#f1f5f9', letterSpacing: '-0.03em' }}>{n.name}</p>
-                      <p style={{ fontFamily: MONO, fontSize: 9, color: '#4b5563', marginTop: 2 }}>{n.domain_hint}</p>
+                      <p style={{ fontFamily: MONO, fontSize: 9, color: '#7dd3fc', marginTop: 2 }}>{n.domain_hint}</p>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                       <Star size={11} style={{ color: scoreColor(n.score) }} />
                       <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 900, color: scoreColor(n.score) }}>{n.score}</span>
                     </div>
                   </div>
-                  <p style={{ fontSize: 12, color: '#94a3b8', fontStyle: 'italic', marginBottom: 8 }}>"{n.tagline}"</p>
-                  <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.5 }}>{n.why}</p>
+                  <p style={{ fontSize: 12, color: '#e2e8f0', fontStyle: 'italic', marginBottom: 8 }}>"{n.tagline}"</p>
+                  <p style={{ fontSize: 11, color: '#93c5fd', lineHeight: 1.5 }}>{n.why}</p>
                   {selected && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 10 }}>
                       <Check size={12} style={{ color: s.color }} />
@@ -655,13 +655,13 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr>{['Metric', 'Year 1', 'Year 2', 'Year 3'].map(h => (
-                    <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontFamily: MONO, fontSize: 9, color: '#4b5563', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>{h}</th>
+                    <th key={h} style={{ padding: '8px 14px', textAlign: 'left', fontFamily: MONO, fontSize: 9, color: '#7dd3fc', letterSpacing: '0.1em', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>{h}</th>
                   ))}</tr>
                 </thead>
                 <tbody>
                   {[['Revenue','revenue'],['Gross Profit','gross_profit'],['Net','net'],['Customers','customers_eoy'],['MRR (EOY)','mrr_eoy']].map(([label, key]) => (
                     <tr key={key}>
-                      <td style={{ padding: '9px 14px', fontFamily: MONO, fontSize: 10, color: '#6b7280', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{label}</td>
+                      <td style={{ padding: '9px 14px', fontFamily: MONO, fontSize: 10, color: '#93c5fd', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{label}</td>
                       {['year1','year2','year3'].map(yr => {
                         const val = result[yr]?.[key] || '—'
                         const neg = key === 'net' && String(val).startsWith('-')
@@ -677,10 +677,10 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
             <ResultSection title="Startup Costs" color={s.color}>
               {result.startup_costs?.map((c, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span style={{ fontSize: 12, color: '#94a3b8' }}>{c.item}</span>
+                  <span style={{ fontSize: 12, color: '#e2e8f0' }}>{c.item}</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 800, color: '#f1f5f9' }}>{c.amount}</span>
-                    <Tag label={c.type} color="#6b7280" />
+                    <Tag label={c.type} color="#93c5fd" />
                   </div>
                 </div>
               ))}
@@ -690,7 +690,7 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
                 <p style={{ fontFamily: MONO, fontSize: 9, color: s.color, letterSpacing: '0.1em', marginBottom: 6 }}>BREAK-EVEN MONTH</p>
                 <p style={{ fontSize: 32, fontWeight: 900, color: '#f1f5f9', fontFamily: MONO }}>#{result.break_even_month}</p>
               </div>
-              <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>{result.fundraising_note}</p>
+              <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.6 }}>{result.fundraising_note}</p>
             </ResultSection>
           </div>
           <NextBtn onClick={onNext} label="Continue to Go-to-Market" color={s.color} />
@@ -755,10 +755,10 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>{w.theme}</p>
-                      <p style={{ fontFamily: MONO, fontSize: 9, color: '#94a3b8', marginTop: 1 }}>{w.milestone}</p>
+                      <p style={{ fontFamily: MONO, fontSize: 9, color: '#e2e8f0', marginTop: 1 }}>{w.milestone}</p>
                     </div>
                     <Tag label={w.focus} color={focusC[w.focus] || s.color} />
-                    {open.has(w.week) ? <ChevronUp size={13} style={{ color: '#6b7280', flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: '#6b7280', flexShrink: 0 }} />}
+                    {open.has(w.week) ? <ChevronUp size={13} style={{ color: '#93c5fd', flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: '#93c5fd', flexShrink: 0 }} />}
                   </button>
                   {open.has(w.week) && (
                     <div style={{ padding: '0 14px 12px 54px' }}>
@@ -826,7 +826,7 @@ function LegalPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
                 </div>
                 <div style={{ flex: 1 }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 4 }}>{step.action}</p>
-                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#6b7280' }}>{step.timeline} · {step.cost} · {step.service}</p>
+                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#93c5fd' }}>{step.timeline} · {step.cost} · {step.service}</p>
                 </div>
               </div>
             ))}
@@ -837,9 +837,9 @@ function LegalPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
             </ResultSection>
             <ResultSection title="Tax & IP" color={s.color}>
               <p style={{ fontFamily: MONO, fontSize: 8, color: s.color, letterSpacing: '0.1em', marginBottom: 6 }}>TAX OVERVIEW</p>
-              <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6, marginBottom: 12 }}>{result.tax_overview}</p>
+              <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.6, marginBottom: 12 }}>{result.tax_overview}</p>
               <p style={{ fontFamily: MONO, fontSize: 8, color: s.color, letterSpacing: '0.1em', marginBottom: 6 }}>IP PROTECTION</p>
-              <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>{result.ip_advice}</p>
+              <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.6 }}>{result.ip_advice}</p>
             </ResultSection>
           </div>
           <NextBtn onClick={onNext} label="Continue to Pitch Builder" color={s.color} />
@@ -899,7 +899,7 @@ function PitchBuilderPanel({ data, onUpdate, loading, setLoading, setError }) {
                 </div>
                 <div>
                   <p style={{ fontSize: 14, fontWeight: 700, color: '#f1f5f9' }}>{sl.title}</p>
-                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#6b7280' }}>{sl.key_message}</p>
+                  <p style={{ fontFamily: MONO, fontSize: 9, color: '#93c5fd' }}>{sl.key_message}</p>
                 </div>
               </div>
               <p style={{ fontSize: 13, color: slideColors[i], fontStyle: 'italic', marginBottom: 10 }}>"{sl.hook}"</p>
@@ -1001,14 +1001,14 @@ export default function StartupStudio() {
             Turn your idea into<br />a real business.
           </h1>
 
-          <p style={{ fontSize: 15, color: '#4b5563', maxWidth: 480, lineHeight: 1.75, marginBottom: 20 }}>
+          <p style={{ fontSize: 15, color: '#7dd3fc', maxWidth: 480, lineHeight: 1.75, marginBottom: 20 }}>
             8 AI-powered steps. Your context carries forward automatically — describe your idea once, get a complete business blueprint.
           </p>
 
           {/* feature pills */}
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {['8 AI-Powered Tools', 'Context Carries Forward', 'Idea → Investor Pitch'].map(f => (
-              <span key={f} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 99, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: MONO, fontSize: 10, color: '#6b7280', letterSpacing: '0.04em' }}>
+              <span key={f} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 99, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: MONO, fontSize: 10, color: '#93c5fd', letterSpacing: '0.04em' }}>
                 <Check size={10} style={{ color: '#34d399' }} /> {f}
               </span>
             ))}
@@ -1046,12 +1046,12 @@ export default function StartupStudio() {
                     }}>
                       {isDone
                         ? <CheckCircle2 size={20} style={{ color: '#fff' }} />
-                        : isLocked ? <Lock size={14} style={{ color: '#374151' }} />
-                        : <Icon size={18} style={{ color: isActive ? s.color : '#374151', transition: 'color 0.3s' }} />
+                        : isLocked ? <Lock size={14} style={{ color: 'rgba(255,255,255,0.2)' }} />
+                        : <Icon size={18} style={{ color: isActive ? s.color : 'rgba(255,255,255,0.2)', transition: 'color 0.3s' }} />
                       }
                     </div>
                   </div>
-                  <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: isActive ? s.color : isDone ? s.color + '90' : '#374151', textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.3, transition: 'color 0.3s' }}>
+                  <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 800, letterSpacing: '0.08em', color: isActive ? s.color : isDone ? s.color + '90' : 'rgba(255,255,255,0.2)', textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.3, transition: 'color 0.3s' }}>
                     {s.short}
                   </span>
                 </button>
@@ -1088,12 +1088,12 @@ export default function StartupStudio() {
                 {done.has(step.id) && <Tag label="COMPLETE" color="#34d399" />}
               </div>
               <p style={{ fontSize: 22, fontWeight: 900, color: '#f8fafc', letterSpacing: '-0.02em' }}>{step.label}</p>
-              <p style={{ fontSize: 13, color: '#4b5563', marginTop: 2 }}>{step.desc}</p>
+              <p style={{ fontSize: 13, color: '#7dd3fc', marginTop: 2 }}>{step.desc}</p>
             </div>
 
             {/* progress indicator */}
             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <p style={{ fontFamily: MONO, fontSize: 9, color: '#374151', letterSpacing: '0.08em', marginBottom: 4 }}>{done.size} / 8 COMPLETE</p>
+              <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.08em', marginBottom: 4 }}>{done.size} / 8 COMPLETE</p>
               <div style={{ width: 80, height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 99, overflow: 'hidden' }}>
                 <div style={{ height: '100%', background: `linear-gradient(90deg, #a78bfa, ${step.color})`, borderRadius: 99, transition: 'width 0.6s ease', width: `${(done.size / 8) * 100}%` }} />
               </div>
