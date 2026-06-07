@@ -394,8 +394,48 @@ export default function Jobs() {
   const sponsored = filtered.filter(j=>j.sponsored)
   const free = filtered.filter(j=>!j.sponsored)
 
+  const JOB_BOARDS = [
+    { label:'LinkedIn',   url:'https://linkedin.com/jobs',           color:'#0a66c2' },
+    { label:'Indeed',     url:'https://indeed.com',                  color:'#2164f3' },
+    { label:'Glassdoor',  url:'https://glassdoor.com/Job/index.htm', color:'#0caa41' },
+    { label:'Wellfound',  url:'https://wellfound.com/jobs',          color:'#fb4f4f' },
+    { label:'Levels.fyi', url:'https://levels.fyi/jobs',             color:'#7c3aed' },
+  ]
+
   return (
-    <div style={{ maxWidth:860, margin:'0 auto', fontFamily:SANS }}>
+    <div style={{ maxWidth:1100, margin:'0 auto', fontFamily:SANS, display:'flex', gap:24, alignItems:'flex-start' }}>
+
+      {/* ── Right sidebar ── */}
+      <aside style={{ width:160, flexShrink:0, position:'sticky', top:72, paddingTop:4 }}>
+        <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#2a3040', textTransform:'uppercase', marginBottom:8, padding:'0 8px' }}>Job Boards</p>
+        {JOB_BOARDS.map(({ label, url, color }) => (
+          <a key={label} href={url} target="_blank" rel="noopener noreferrer"
+            style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 8px', textDecoration:'none', border:'0.5px solid transparent', transition:'all 0.15s', marginBottom:2 }}
+            onMouseEnter={e => { e.currentTarget.style.background = `${color}10`; e.currentTarget.style.borderColor = `${color}25`; e.currentTarget.style.borderRadius = '6px' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' }}>
+            <div style={{ width:5, height:5, borderRadius:'50%', background:color, flexShrink:0 }}/>
+            <span style={{ fontSize:12, fontWeight:500, color:'#6b7583', whiteSpace:'nowrap' }}>{label}</span>
+          </a>
+        ))}
+
+        <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'12px 8px' }}/>
+
+        <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#2a3040', textTransform:'uppercase', marginBottom:8, padding:'0 8px' }}>Categories</p>
+        {['Engineering','Design','Product','Marketing','Data'].map(cat => (
+          <button key={cat} onClick={() => setSearch(cat === search ? '' : cat)}
+            style={{ display:'flex', alignItems:'center', gap:8, width:'100%', padding:'6px 8px', background:'transparent', border:'0.5px solid transparent', cursor:'pointer', textAlign:'left', transition:'all 0.15s', marginBottom:2 }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(163,201,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(163,201,255,0.08)'; e.currentTarget.style.borderRadius = '6px' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent' }}>
+            <span style={{ fontSize:12, fontWeight:500, color: search === cat ? '#a3c9ff' : '#6b7583' }}>{cat}</span>
+            <span style={{ fontFamily:MONO, fontSize:9, color:'#2a3040', marginLeft:'auto' }}>
+              {jobs.filter(j => j.category === cat).length}
+            </span>
+          </button>
+        ))}
+      </aside>
+
+      {/* ── Main content ── */}
+      <div style={{ flex:1, minWidth:0 }}>
 
       {/* ── Hero Header ── */}
       <div style={{ marginBottom:28, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16 }}>
@@ -547,6 +587,7 @@ export default function Jobs() {
         .job-card:hover .job-title { color: #a3c9ff !important; }
         .job-card:hover .job-arrow { color: #a3c9ff !important; transform: translateX(3px); }
       `}</style>
+      </div>
     </div>
   )
 }

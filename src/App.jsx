@@ -15,6 +15,7 @@ import Calendar from './pages/Calendar'
 import Roadmap from './pages/Roadmap'
 import PitchLab from './pages/PitchLab'
 import GrowthLab from './pages/GrowthLab'
+import StartupStudio from './pages/StartupStudio'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -136,6 +137,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <Plans />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/startup" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <StartupStudio />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

@@ -218,6 +218,7 @@ export default function Home() {
 
   const SIDEBAR_LINKS = [
     { label:'Start a Blog', icon:PenSquare,    action:()=>setQuickPostOpen(true) },
+    { label:'Jobs',         icon:Briefcase,    action:()=>navigate('/jobs') },
     { label:'Library',      icon:Library,       soon:true },
     { label:'Market',       icon:BarChart3,      soon:true },
     { label:'Skills',       icon:GraduationCap,  soon:true },
@@ -245,27 +246,6 @@ export default function Home() {
             </button>
           ))}
         </nav>
-
-        <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'10px 10px' }}/>
-
-        <div style={{ padding:'0 10px' }}>
-          <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#2a3040', textTransform:'uppercase', marginBottom:6 }}>Job Boards</p>
-          {[
-            { label:'LinkedIn',   url:'https://linkedin.com/jobs',           color:'#0a66c2' },
-            { label:'Indeed',     url:'https://indeed.com',                  color:'#2164f3' },
-            { label:'Glassdoor',  url:'https://glassdoor.com/Job/index.htm', color:'#0caa41' },
-            { label:'Wellfound',  url:'https://wellfound.com/jobs',          color:'#fb4f4f' },
-            { label:'Levels.fyi', url:'https://levels.fyi/jobs',             color:'#7c3aed' },
-          ].map(({label,url,color})=>(
-            <a key={label} href={url} target="_blank" rel="noopener noreferrer"
-              style={{ display:'flex', alignItems:'center', gap:7, padding:'5px 8px', textDecoration:'none', border:'0.5px solid transparent', transition:'all 0.15s' }}
-              onMouseEnter={e=>{ e.currentTarget.style.background=`${color}10`; e.currentTarget.style.borderColor=`${color}25` }}
-              onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent' }}>
-              <div style={{ width:4, height:4, borderRadius:'50%', background:color, flexShrink:0, opacity:0.7 }}/>
-              <span style={{ fontSize:11, fontWeight:500, color:'#6b7583', whiteSpace:'nowrap' }}>{label}</span>
-            </a>
-          ))}
-        </div>
 
         <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'10px 10px' }}/>
         <p style={{ fontFamily:MONO, fontSize:7, color:'#1e2a3a', letterSpacing:'0.08em', textTransform:'uppercase', padding:'0 10px' }}>Trackr © 2026</p>

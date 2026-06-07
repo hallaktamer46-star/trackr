@@ -1154,4 +1154,347 @@ Return 6-8 skills and exactly 8 roadmap weeks. Be specific with resource names.`
   } catch (err) { console.error('Skill gap error:', err); res.status(500).json({ error: err.message }) }
 })
 
+// ── Startup Studio routes ─────────────────────────────────────────
+
+// POST /api/ai/startup/competitor
+router.post('/startup/competitor', async (req, res) => {
+  const { idea, industry, targetMarket, knownCompetitors } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const raw = await ask(`You are a competitive intelligence analyst. Map the competitive landscape for this startup idea.
+
+Business Idea: ${idea}
+Industry: ${industry || 'Not specified'}
+Target Market: ${targetMarket || 'Not specified'}
+Known Competitors (user-provided): ${knownCompetitors || 'None'}
+
+Return ONLY valid JSON, no markdown:
+{
+  "market_overview": "<2-3 sentences: overall competitive dynamics, how crowded it is, where value is being created>",
+  "competitors": [
+    {
+      "name": "<company name>",
+      "description": "<what they do in one sentence>",
+      "founded": "<year or 'Unknown'>",
+      "funding": "<e.g. '$50M Series B' or 'Bootstrapped' or 'Public' or 'Unknown'>",
+      "strength": "<their biggest competitive advantage>",
+      "weakness": "<their most exploitable gap>",
+      "pricing": "<rough pricing model or 'Unknown'>",
+      "threat_level": "High" | "Medium" | "Low"
+    }
+  ],
+  "market_gaps": [
+    "<specific unmet need or underserved segment that existing players miss>",
+    "<gap 2>",
+    "<gap 3>"
+  ],
+  "your_angle": "<2-3 sentences: given the competition, what positioning or differentiation would actually work for this idea — be specific and honest>",
+  "red_flags": ["<genuine concern about competing in this space>"],
+  "green_flags": ["<genuine reason this idea can win despite competition>", "<reason 2>"]
+}
+
+Include 4-7 real competitors. If a known competitor list was provided, include all of them. Be brutally honest about threat levels.`)
+    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
+    res.json(json)
+  } catch (err) {
+    console.error('Startup competitor error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/startup/business-model
+router.post('/startup/business-model', async (req, res) => {
+  const { idea, industry, targetMarket, competitors } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const raw = await ask(`You are a business model strategist. Design the optimal business model for this startup.
+
+Business Idea: ${idea}
+Industry: ${industry || 'Not specified'}
+Target Market: ${targetMarket || 'Not specified'}
+Competitive Context: ${competitors ? JSON.stringify(competitors).slice(0, 500) : 'Not provided'}
+
+Return ONLY valid JSON, no markdown:
+{
+  "recommended_model": "<one of: SaaS / Marketplace / E-commerce / Freemium / Usage-based / Subscription / Services / Advertising / Licensing / Hardware + Software>",
+  "why": "<2-3 sentences: why this model fits this idea, market, and competitive landscape specifically>",
+  "revenue_streams": [
+    { "stream": "<revenue stream name>", "description": "<how it works>", "typical_margin": "<e.g. '70-80%' or '30-40%'>", "priority": "Primary" | "Secondary" | "Future" },
+    { "stream": "...", "description": "...", "typical_margin": "...", "priority": "..." }
+  ],
+  "pricing_strategy": {
+    "approach": "<e.g. 'Value-based tiered pricing' or 'Freemium with usage caps'>",
+    "suggested_price_range": "<e.g. '$29-$99/month' or '$5-$50 per transaction'>",
+    "reasoning": "<why this price point makes sense for this market>"
+  },
+  "unit_economics": {
+    "cac_estimate": "<rough cost to acquire one customer, e.g. '$150-$300'>",
+    "ltv_estimate": "<rough lifetime value, e.g. '$1,200-$2,400'>",
+    "ltv_cac_ratio": "<e.g. '4:1 (healthy)'>",
+    "payback_period": "<e.g. '6-8 months'>"
+  },
+  "monetization_timeline": "<when the first dollar comes in — e.g. 'Month 1 with first paid customer' or 'Month 6 after free beta'>",
+  "model_risks": ["<risk 1 specific to this model for this idea>", "<risk 2>"],
+  "alternatives_considered": [
+    { "model": "<alternative model>", "why_not": "<why this model is worse for this specific idea>" }
+  ]
+}`)
+    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
+    res.json(json)
+  } catch (err) {
+    console.error('Startup business model error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/startup/name-studio
+router.post('/startup/name-studio', async (req, res) => {
+  const { idea, industry, targetMarket, vibe, keywords } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const raw = await ask(`You are a world-class brand naming expert who has named startups acquired by Google, Apple, and Stripe. Generate 10 startup name options.
+
+Business Idea: ${idea}
+Industry: ${industry || 'Not specified'}
+Target Market: ${targetMarket || 'Not specified'}
+Desired Vibe: ${vibe || 'Modern'}
+Keywords to consider: ${keywords || 'None'}
+
+Return ONLY valid JSON, no markdown:
+{
+  "names": [
+    {
+      "name": "<startup name — short, memorable, unique>",
+      "tagline": "<a punchy 5-8 word tagline that captures the value prop>",
+      "domain_hint": "<likely domain format, e.g. 'getname.com' or 'nameapp.io' or 'tryname.com'>",
+      "why": "<one sentence: what makes this name work — the specific reason it fits>",
+      "style": "<e.g. 'Compound word' or 'Made-up word' or 'Metaphor' or 'Action verb' or 'Descriptive'>",
+      "score": <integer 1-10 — how strong this name is for branding, memorability, and domain availability>
+    }
+  ]
+}
+
+Rules:
+- All 10 names must be UNIQUE — no overlap in style or root word
+- Names should be 1-2 syllables ideally, max 3
+- Avoid overused tech naming patterns (add -ly, -ify, -io to random words)
+- At least 2 names should feel premium/luxury, 2 should feel approachable/friendly
+- Score honestly — most names are 6-7, exceptional ones are 8-9, flawless ones are 10
+- Domain hint should reflect realistic availability (popular .com words are taken, suggest alternatives)
+- Order by score descending`)
+    const match = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim().match(/\{[\s\S]*\}/)
+    res.json(JSON.parse(match[0]))
+  } catch (err) {
+    console.error('Startup name studio error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/startup/financial
+router.post('/startup/financial', async (req, res) => {
+  const { idea, businessModel, pricingStrategy, teamSize, location } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const raw = await ask(`You are a startup CFO and financial modeller. Build a realistic 3-year financial projection.
+
+Business Idea: ${idea}
+Business Model: ${businessModel || 'SaaS'}
+Pricing Strategy: ${pricingStrategy ? JSON.stringify(pricingStrategy) : 'Not specified'}
+Team Size: ${teamSize || '1-3 people'}
+Location: ${location || 'Not specified'}
+
+Return ONLY valid JSON, no markdown:
+{
+  "assumptions": [
+    "<key assumption 1 — e.g. 'Conservative Month 1 MRR of $0, ramping to $5k by Month 6'>",
+    "<assumption 2>",
+    "<assumption 3>",
+    "<assumption 4>"
+  ],
+  "startup_costs": [
+    { "item": "<cost item>", "amount": "<e.g. '$2,000' or '$500/mo'>", "type": "One-time" | "Monthly" | "Annual" },
+    { "item": "...", "amount": "...", "type": "..." }
+  ],
+  "year1": {
+    "revenue": "<e.g. '$48,000'>",
+    "cogs": "<e.g. '$8,000'>",
+    "gross_profit": "<e.g. '$40,000'>",
+    "operating_costs": "<e.g. '$60,000'>",
+    "net": "<e.g. '-$20,000'>",
+    "customers_eoy": "<e.g. '40'>",
+    "mrr_eoy": "<e.g. '$4,000'>"
+  },
+  "year2": {
+    "revenue": "...", "cogs": "...", "gross_profit": "...", "operating_costs": "...", "net": "...", "customers_eoy": "...", "mrr_eoy": "..."
+  },
+  "year3": {
+    "revenue": "...", "cogs": "...", "gross_profit": "...", "operating_costs": "...", "net": "...", "customers_eoy": "...", "mrr_eoy": "..."
+  },
+  "break_even_month": <integer — month number when cumulative revenue exceeds cumulative costs>,
+  "runway_months": "<how many months a typical seed round would last at this burn rate>",
+  "key_risks": [
+    "<financial risk 1 — specific to this business>",
+    "<risk 2>",
+    "<risk 3>"
+  ],
+  "fundraising_note": "<1-2 sentences: whether this business needs external funding and at what stage, or if it can be bootstrapped>"
+}
+
+Be conservative but realistic. Don't assume hockey-stick growth in Year 1.`)
+    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
+    res.json(json)
+  } catch (err) {
+    console.error('Startup financial error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/startup/gtm
+router.post('/startup/gtm', async (req, res) => {
+  const { idea, targetMarket, businessModel, budget, goal } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const raw = await ask(`You are a growth strategist who has launched 20+ startups from 0 to first 1,000 customers. Build a 12-week go-to-market plan.
+
+Business Idea: ${idea}
+Target Market: ${targetMarket || 'Not specified'}
+Business Model: ${businessModel || 'Not specified'}
+Marketing Budget: ${budget || 'Bootstrap (<$1k)'}
+Primary Goal: ${goal || 'First 10 paying customers'}
+
+Return ONLY valid JSON, no markdown:
+{
+  "strategy_summary": "<2-3 sentences: the core GTM strategy in plain English — who you're targeting, how you're reaching them, and what makes this approach right for this specific business>",
+  "first_10_customers": "<specific playbook for the very first 10 customers — exact channels, tactics, and scripts. Be hyper-specific, not generic.>",
+  "primary_channel": "<the single most important acquisition channel for this business and why>",
+  "channels": [
+    {
+      "channel": "<channel name>",
+      "tactic": "<specific tactic, not just 'use LinkedIn' but 'send 20 personalised DMs per day to CTOs at 50-200 person SaaS companies'>",
+      "timeline": "<when to start and expected results>",
+      "monthly_cost": "<e.g. '$0' or '$200/mo' or '$500/mo'>",
+      "expected_cac": "<e.g. '$50' or '$200'>",
+      "difficulty": "Easy" | "Medium" | "Hard"
+    }
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "theme": "<week theme>",
+      "actions": ["<specific action 1>", "<specific action 2>", "<specific action 3>"],
+      "milestone": "<what success looks like at end of this week>",
+      "focus": "Foundation" | "Outreach" | "Launch" | "Scale"
+    }
+  ],
+  "success_metrics": [
+    { "metric": "<metric name>", "week4_target": "<target>", "week12_target": "<target>" }
+  ]
+}
+
+Include exactly 12 weeks. Channels should be ranked by ROI. Be brutally specific — generic advice like 'post on social media' is not acceptable.`)
+    const match = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim().match(/\{[\s\S]*\}/)
+    res.json(JSON.parse(match[0]))
+  } catch (err) {
+    console.error('Startup GTM error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/startup/legal
+router.post('/startup/legal', async (req, res) => {
+  const { idea, country, founders, businessType } = req.body
+  if (!idea?.trim() || !country?.trim()) return res.status(400).json({ error: 'idea and country are required' })
+  try {
+    const raw = await ask(`You are a startup lawyer and corporate structuring expert. Advise on the optimal legal structure.
+
+Business Idea: ${idea}
+Country of Registration: ${country}
+Number of Founders: ${founders || '1'}
+Business Type: ${businessType || 'Technology / Software'}
+
+Return ONLY valid JSON, no markdown:
+{
+  "recommended_structure": "<e.g. 'LLC' or 'C-Corporation' or 'Ltd' or 'LLP' — specific to the country>",
+  "why": "<2-3 sentences: why this structure is optimal for this specific business, country, and founder count>",
+  "pros": ["<advantage 1>", "<advantage 2>", "<advantage 3>"],
+  "cons": ["<disadvantage 1>", "<disadvantage 2>"],
+  "registration_steps": [
+    { "step": 1, "action": "<specific action>", "timeline": "<e.g. '1-3 days'>", "cost": "<e.g. '$50' or 'Free'>", "service": "<where to do it, e.g. 'IRS.gov' or 'Companies House'>" },
+    { "step": 2, "action": "...", "timeline": "...", "cost": "...", "service": "..." }
+  ],
+  "key_considerations": [
+    "<important legal consideration specific to this business type and country — e.g. data privacy laws, licensing requirements>",
+    "<consideration 2>",
+    "<consideration 3>"
+  ],
+  "tax_overview": "<2-3 sentences: key tax implications, any beneficial tax treatment for startups in this country, and what to watch out for>",
+  "ip_advice": "<2-3 sentences: what IP protections to put in place immediately — patents, trademarks, copyrights — specific to this business>",
+  "equity_split_note": "<if multiple founders, a brief note on how to structure equity fairly and what vesting schedule to use>",
+  "immediate_actions": ["<do this first — specific>", "<do this second>", "<do this third>"]
+}`)
+    const json = JSON.parse(raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim())
+    res.json(json)
+  } catch (err) {
+    console.error('Startup legal error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// POST /api/ai/startup/pitch-builder
+router.post('/startup/pitch-builder', async (req, res) => {
+  const { idea, industry, targetMarket, businessModel, financials, competitors, gtm, fundingAsk, equity } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const context = [
+      `Idea: ${idea}`,
+      industry ? `Industry: ${industry}` : '',
+      targetMarket ? `Target Market: ${targetMarket}` : '',
+      businessModel ? `Business Model: ${businessModel}` : '',
+      fundingAsk ? `Funding Ask: ${fundingAsk}` : '',
+      equity ? `Equity Offered: ${equity}` : '',
+      financials ? `Financial Highlights: Year 1 revenue ${financials.year1?.revenue || 'TBD'}, Break-even Month ${financials.break_even_month || 'TBD'}` : '',
+      gtm ? `GTM: ${gtm.strategy_summary || ''}` : '',
+    ].filter(Boolean).join('\n')
+
+    const raw = await ask(`You are a partner at a top VC fund who has reviewed 2,000+ pitch decks and funded 50 startups. Build a complete investor pitch deck.
+
+${context}
+
+Return ONLY valid JSON, no markdown:
+{
+  "deck_title": "<company name or 'Your Startup Name'> Investor Pitch",
+  "one_liner": "<the ultimate 1-sentence description of the business that a VC would remember>",
+  "slides": [
+    {
+      "number": 1,
+      "title": "Problem",
+      "hook": "<one shocking or compelling opening stat/fact — make investors feel the pain>",
+      "key_message": "<the single takeaway from this slide>",
+      "bullets": ["<specific bullet point>", "<specific bullet point>", "<specific bullet point>"],
+      "design_tip": "<one specific visual or layout suggestion for this slide>"
+    },
+    { "number": 2, "title": "Solution", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 3, "title": "Market Size", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 4, "title": "Product", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 5, "title": "Business Model", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 6, "title": "Traction", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 7, "title": "Competition", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 8, "title": "Go-to-Market", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 9, "title": "Financials", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." },
+    { "number": 10, "title": "The Ask", "hook": "...", "key_message": "...", "bullets": ["..."], "design_tip": "..." }
+  ],
+  "investor_notes": "<2-3 sentences: the 1-2 things that will make or break this pitch with investors — be brutally honest>",
+  "strongest_slide": "<which slide number is the strongest and why>",
+  "weakest_slide": "<which slide number needs the most work and what it needs>"
+}
+
+Each slide must be specific to this exact business — no generic templates. Bullets should be actual content the founder can use, not placeholders.`)
+    const match = raw.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim().match(/\{[\s\S]*\}/)
+    res.json(JSON.parse(match[0]))
+  } catch (err) {
+    console.error('Startup pitch builder error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
