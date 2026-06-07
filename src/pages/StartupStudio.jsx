@@ -1193,36 +1193,39 @@ export default function StartupStudio() {
       <div style={{ position: 'relative', zIndex: 1 }}>
 
         {/* ── Hero ── */}
-        <div style={{ paddingTop: 4, paddingBottom: 36 }}>
-          {/* badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 16px', borderRadius: 99, background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.3)', marginBottom: 20 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#a78bfa', animation: 'ssBadgePulse 2s ease-in-out infinite' }} />
-            <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 800, color: '#a78bfa', letterSpacing: '0.14em' }}>STARTUP STUDIO</span>
-          </div>
-
-          {/* title */}
-          <h1 style={{
-            fontSize: 50, fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1.08, marginBottom: 16,
-            background: 'linear-gradient(135deg, #f8fafc 0%, #a78bfa 40%, #38bdf8 70%, #34d399 100%)',
-            backgroundSize: '300% 300%',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            animation: 'ssGradTitle 6s ease-in-out infinite',
+        <div style={{ paddingTop: 8, paddingBottom: 32 }}>
+          {/* eyebrow — editorial style, no badge */}
+          <p style={{
+            fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: '0.28em',
+            color: '#a78bfa', textTransform: 'uppercase', marginBottom: 18,
+            display: 'flex', alignItems: 'center', gap: 14,
           }}>
-            Turn your idea into<br />a real business.
-          </h1>
-
-          <p style={{ fontSize: 15, color: '#7dd3fc', maxWidth: 480, lineHeight: 1.75, marginBottom: 20 }}>
-            8 AI-powered steps. Your context carries forward automatically — describe your idea once, get a complete business blueprint.
+            Startup Studio
+            <span style={{ display: 'inline-block', flex: 1, maxWidth: 48, height: '0.5px', background: 'linear-gradient(90deg, #a78bfa60, transparent)' }} />
           </p>
 
-          {/* feature pills */}
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {['8 AI-Powered Tools', 'Context Carries Forward', 'Idea → Investor Pitch'].map(f => (
-              <span key={f} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 99, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontFamily: MONO, fontSize: 10, color: '#93c5fd', letterSpacing: '0.04em' }}>
-                <Check size={10} style={{ color: '#34d399' }} /> {f}
-              </span>
-            ))}
-          </div>
+          {/* title — contrast weight: italic light + heavy bold */}
+          <h1 style={{ margin: '0 0 28px', lineHeight: 1.05 }}>
+            <span style={{
+              display: 'block',
+              fontFamily: "'Georgia', 'Times New Roman', serif",
+              fontSize: 44, fontWeight: 400, fontStyle: 'italic',
+              color: 'rgba(255,255,255,0.38)', letterSpacing: '-0.01em',
+              marginBottom: 2,
+            }}>
+              Turn your idea into
+            </span>
+            <span style={{
+              display: 'block',
+              fontFamily: SANS,
+              fontSize: 60, fontWeight: 900, letterSpacing: '-0.05em',
+              background: 'linear-gradient(120deg, #c4b5fd 0%, #a78bfa 25%, #60a5fa 65%, #34d399 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              lineHeight: 0.95,
+            }}>
+              a real business.
+            </span>
+          </h1>
         </div>
 
         {/* ── Session tabs ── */}
@@ -1254,10 +1257,29 @@ export default function StartupStudio() {
 
         {/* ── Step Timeline ── */}
         <div style={{ marginBottom: 28, position: 'relative' }}>
-          {/* track line */}
-          <div style={{ position: 'absolute', top: 26, left: 26, right: 26, height: 1, background: 'rgba(255,255,255,0.05)', zIndex: 0 }} />
-          {/* fill line */}
-          <div style={{ position: 'absolute', top: 26, left: 26, height: 1, zIndex: 0, transition: 'width 0.7s ease', background: `linear-gradient(90deg, #a78bfa, ${step.color})`, width: done.size === 0 ? 0 : `${(Math.max(...[...done]) / 8) * 100}%` }} />
+          {/* wavy SVG connector — replaces straight line */}
+          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 52, zIndex: 0, overflow: 'visible' }}
+            viewBox="0 0 100 52" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="waveGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="#a78bfa" />
+                <stop offset="100%" stopColor={step.color} />
+              </linearGradient>
+            </defs>
+            {/* background wave — dim */}
+            <path
+              d="M6.25,26 C10.25,14 14.75,14 18.75,26 C22.75,38 27.25,38 31.25,26 C35.25,14 39.75,14 43.75,26 C47.75,38 52.25,38 56.25,26 C60.25,14 64.75,14 68.75,26 C72.75,38 77.25,38 81.25,26 C85.25,14 89.75,14 93.75,26"
+              fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.6" />
+            {/* progress wave — colored, animates as steps complete */}
+            <path
+              d="M6.25,26 C10.25,14 14.75,14 18.75,26 C22.75,38 27.25,38 31.25,26 C35.25,14 39.75,14 43.75,26 C47.75,38 52.25,38 56.25,26 C60.25,14 64.75,14 68.75,26 C72.75,38 77.25,38 81.25,26 C85.25,14 89.75,14 93.75,26"
+              fill="none" stroke="url(#waveGrad)" strokeWidth="1.2"
+              pathLength="100"
+              strokeDasharray="100"
+              strokeDashoffset={100 - ((active - 1) / 7) * 100}
+              style={{ transition: 'stroke-dashoffset 0.7s ease' }}
+            />
+          </svg>
 
           <div style={{ display: 'flex' }}>
             {STEPS.map(s => {
