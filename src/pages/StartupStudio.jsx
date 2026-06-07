@@ -885,6 +885,119 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
   )
 }
 
+function ProductionPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
+  const s = STEPS[5]
+  const vars = useStepVars(s.color, s.glow)
+  const result = data.productionResult
+  const [copied, setCopied] = useState(false)
+
+  async function generate() {
+    setError(null); setLoading(true)
+    try {
+      const res = await apiFetch('/api/ai/startup/production', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idea: data.pitch, industry: data.industry, businessModel: data.businessModelResult?.recommended_model,
+          pricingStrategy: data.businessModelResult?.pricing_strategy, targetMarket: data.targetMarket,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error)
+      onUpdate({ productionResult: json })
+    } catch (e) { setError(e.message) } finally { setLoading(false) }
+  }
+
+  function copyTemplate() {
+    if (!result?.outreach_template) return
+    navigator.clipboard.writeText(result.outreach_template).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) })
+  }
+
+  return (
+    <div style={vars}>
+      <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Find My Suppliers" /></div>
+
+      {result && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 28, animation: 'ssFadeUp 0.5s ease' }}>
+          <ResultSection title="Overview" color={s.color}>
+            <p style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.75 }}>{result.overview}</p>
+            <div style={{ marginTop: 8, display: 'inline-flex', alignItems: 'center', gap: 8, padding: '4px 12px', background: `${s.color}15`, border: `1px solid ${s.color}30`, borderRadius: 6 }}>
+              <Package size={12} style={{ color: s.color }} />
+              <span style={{ fontFamily: MONO, fontSize: 10, color: s.color, fontWeight: 600 }}>{result.production_type}</span>
+            </div>
+          </ResultSection>
+
+          <ResultSection title="Supplier Platforms" color={s.color}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {result.supplier_platforms?.map((p, i) => (
+                <div key={i} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '12px 14px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0' }}>{p.name}</span>
+                    <Tag label={p.cost_position} color={p.cost_position === 'Budget' ? '#34d399' : p.cost_position === 'Premium' ? '#f472b6' : s.color} />
+                  </div>
+                  <p style={{ fontSize: 12, color: '#94a3b8', marginBottom: 6 }}>{p.best_for}</p>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 10, color: '#64748b' }}>MOQ: {p.moq_range}</span>
+                    <span style={{ fontFamily: MONO, fontSize: 10, color: '#64748b' }}>{p.url}</span>
+                  </div>
+                  {p.how_to_use && <p style={{ fontSize: 11, color: '#94a3b8', marginTop: 6, fontStyle: 'italic' }}>{p.how_to_use}</p>}
+                </div>
+              ))}
+            </div>
+          </ResultSection>
+
+          <ResultSection title="Outreach Template" color="#34d399">
+            <div style={{ position: 'relative' }}>
+              <pre style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.75, whiteSpace: 'pre-wrap', fontFamily: 'Geist Mono, monospace', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px', margin: 0 }}>
+                {result.outreach_template}
+              </pre>
+              <button onClick={copyTemplate} style={{ position: 'absolute', top: 8, right: 8, display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: copied ? 'rgba(52,211,153,0.15)' : 'rgba(255,255,255,0.06)', border: `1px solid ${copied ? 'rgba(52,211,153,0.4)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 6, color: copied ? '#34d399' : '#94a3b8', fontSize: 11, cursor: 'pointer', fontFamily: MONO }}>
+                <Copy size={11} />{copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+          </ResultSection>
+
+          {result.cost_breakdown?.length > 0 && (
+            <ResultSection title="Cost Breakdown" color={s.color}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {result.cost_breakdown.map((c, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: '8px 0', borderBottom: i < result.cost_breakdown.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
+                    <div>
+                      <span style={{ fontSize: 13, color: '#e2e8f0' }}>{c.item}</span>
+                      {c.notes && <p style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{c.notes}</p>}
+                    </div>
+                    <span style={{ fontFamily: MONO, fontSize: 12, color: s.color, fontWeight: 600, whiteSpace: 'nowrap', marginLeft: 12 }}>{c.typical_range}</span>
+                  </div>
+                ))}
+              </div>
+            </ResultSection>
+          )}
+
+          {result.negotiation_tips?.length > 0 && (
+            <ResultSection title="Negotiation Tips" color="#fbbf24">
+              <BulletList items={result.negotiation_tips} color="#fbbf24" />
+            </ResultSection>
+          )}
+
+          {result.red_flags?.length > 0 && (
+            <ResultSection title="Red Flags to Watch" color="#fb7185">
+              <BulletList items={result.red_flags} color="#fb7185" />
+            </ResultSection>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'rgba(249,115,22,0.06)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: 8 }}>
+            <Package size={14} style={{ color: s.color, flexShrink: 0 }} />
+            <p style={{ fontSize: 12, color: '#cbd5e1' }}>
+              <span style={{ color: s.color, fontWeight: 600 }}>Timeline: </span>{result.total_timeline}
+            </p>
+          </div>
+
+          <NextBtn onClick={onNext} label="Continue to Go-to-Market" color={STEPS[6].color} />
+        </div>
+      )}
+    </div>
+  )
+}
+
 function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
   const s = STEPS[6]
   const vars = useStepVars(s.color, s.glow)
