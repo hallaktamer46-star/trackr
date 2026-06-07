@@ -38,6 +38,18 @@ export default function EngageWidget() {
   const [shiftStart, setShiftStart] = useState(null)
   const [, setTick]             = useState(0)
   const timer = useRef(null)
+  const widgetRef = useRef(null)
+
+  // close panel on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (widgetRef.current && !widgetRef.current.contains(e.target)) {
+        setTab(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   // hydrate
   useEffect(() => {
@@ -78,7 +90,6 @@ export default function EngageWidget() {
       return [...c, { status: key, start: now }]
     })
     setStatus(key)
-    setTab(null) // close panel after picking
   }
 
   function endShift() {
@@ -109,7 +120,7 @@ export default function EngageWidget() {
   })
 
   return (
-    <div style={{ position:'fixed', bottom:0, right:0, width:300, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column' }}>
+    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width:300, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column' }}>
 
       {/* ── TAB BAR (always on top) ──────────────────────── */}
       <div style={{
