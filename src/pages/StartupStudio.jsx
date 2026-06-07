@@ -4,7 +4,7 @@ import {
   Lightbulb, Users, BarChart2, Sparkles, DollarSign,
   Map, BookOpen, FileText, CheckCircle2, Lock,
   Loader2, ArrowRight, Check, ChevronDown, ChevronUp,
-  AlertCircle, TrendingUp, Star, Zap
+  AlertCircle, TrendingUp, Star, Zap, Package, Copy
 } from 'lucide-react'
 import { apiFetch } from '../lib/api'
 
@@ -22,6 +22,7 @@ const EMPTY_DATA = {
   marketingBudget: 'Self-funded', gtmGoal: 'First 10 customers', pitchEquity: '',
   ideaResult: null, competitorResult: null, businessModelResult: null,
   nameResult: null, selectedName: '', financialResult: null,
+  productionResult: null,
   gtmResult: null, legalResult: null, pitchBuilderResult: null,
 }
 
@@ -32,14 +33,15 @@ function readSessions() { try { return JSON.parse(localStorage.getItem(SESSIONS_
 function writeSessions(s) { try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(s)) } catch {} }
 
 const STEPS = [
-  { id: 1, label: 'Idea Validator',   short: 'Idea',       desc: 'Score your concept',      color: '#a78bfa', glow: 'rgba(167,139,250,0.35)', icon: Lightbulb  },
-  { id: 2, label: 'Competitor Intel', short: 'Compete',    desc: 'Map the competition',      color: '#fb7185', glow: 'rgba(251,113,133,0.35)', icon: Users      },
-  { id: 3, label: 'Business Model',   short: 'Model',      desc: 'Find how you make money',  color: '#38bdf8', glow: 'rgba(56,189,248,0.35)',  icon: BarChart2  },
-  { id: 4, label: 'Name Studio',      short: 'Name',       desc: 'Name your venture',        color: '#f472b6', glow: 'rgba(244,114,182,0.35)', icon: Sparkles   },
-  { id: 5, label: 'Financial Model',  short: 'Finance',    desc: 'Project your numbers',     color: '#34d399', glow: 'rgba(52,211,153,0.35)',  icon: DollarSign },
-  { id: 6, label: 'Go-to-Market',     short: 'GTM',        desc: '90-day launch plan',       color: '#fbbf24', glow: 'rgba(251,191,36,0.35)',  icon: Map        },
-  { id: 7, label: 'Legal Structure',  short: 'Legal',      desc: 'Set up properly',          color: '#22d3ee', glow: 'rgba(34,211,238,0.35)',  icon: BookOpen   },
-  { id: 8, label: 'Pitch Builder',    short: 'Pitch',      desc: 'Investor-ready pitch',     color: '#fb923c', glow: 'rgba(251,146,60,0.35)',  icon: FileText   },
+  { id: 1, label: 'Idea Validator',        short: 'Idea',    desc: 'Score your concept',      color: '#a78bfa', glow: 'rgba(167,139,250,0.35)', icon: Lightbulb  },
+  { id: 2, label: 'Competitor Intel',      short: 'Compete', desc: 'Map the competition',     color: '#fb7185', glow: 'rgba(251,113,133,0.35)', icon: Users      },
+  { id: 3, label: 'Business Model',        short: 'Model',   desc: 'Find how you make money', color: '#38bdf8', glow: 'rgba(56,189,248,0.35)',  icon: BarChart2  },
+  { id: 4, label: 'Name Studio',           short: 'Name',    desc: 'Name your venture',       color: '#f472b6', glow: 'rgba(244,114,182,0.35)', icon: Sparkles   },
+  { id: 5, label: 'Financial Model',       short: 'Finance', desc: 'Project your numbers',    color: '#34d399', glow: 'rgba(52,211,153,0.35)',  icon: DollarSign },
+  { id: 6, label: 'Production & Sourcing', short: 'Source',  desc: 'Find your suppliers',     color: '#f97316', glow: 'rgba(249,115,22,0.35)',  icon: Package    },
+  { id: 7, label: 'Go-to-Market',          short: 'GTM',     desc: '90-day launch plan',      color: '#fbbf24', glow: 'rgba(251,191,36,0.35)',  icon: Map        },
+  { id: 8, label: 'Legal Structure',       short: 'Legal',   desc: 'Set up properly',         color: '#22d3ee', glow: 'rgba(34,211,238,0.35)',  icon: BookOpen   },
+  { id: 9, label: 'Pitch Builder',         short: 'Pitch',   desc: 'Investor-ready pitch',    color: '#e879f9', glow: 'rgba(232,121,249,0.35)', icon: FileText   },
 ]
 
 const VIBES      = ['Modern', 'Bold', 'Playful', 'Professional', 'Luxury']
@@ -876,7 +878,7 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
               <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.6 }}>{result.fundraising_note}</p>
             </ResultSection>
           </div>
-          <NextBtn onClick={onNext} label="Continue to Go-to-Market" color={s.color} />
+          <NextBtn onClick={onNext} label="Continue to Production & Sourcing" color={s.color} />
         </div>
       )}
     </div>
@@ -884,7 +886,7 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
 }
 
 function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
-  const s = STEPS[5]
+  const s = STEPS[6]
   const vars = useStepVars(s.color, s.glow)
   const result = data.gtmResult
   const [open, setOpen] = useState(new Set([1, 2, 3]))
@@ -952,7 +954,7 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
               ))}
             </div>
           </ResultSection>
-          <NextBtn onClick={onNext} label="Continue to Legal Structure" color={s.color} />
+          <NextBtn onClick={onNext} label="Continue to Legal Structure" color={STEPS[7].color} />
         </div>
       )}
     </div>
@@ -960,7 +962,7 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
 }
 
 function LegalPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
-  const s = STEPS[6]
+  const s = STEPS[7]
   const vars = useStepVars(s.color, s.glow)
   const result = data.legalResult
 
@@ -1033,7 +1035,7 @@ function LegalPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
 }
 
 function PitchBuilderPanel({ data, onUpdate, loading, setLoading, setError }) {
-  const s = STEPS[7]
+  const s = STEPS[8]
   const vars = useStepVars(s.color, s.glow)
   const result = data.pitchBuilderResult
   const slideColors = ['#a78bfa','#fb7185','#38bdf8','#f472b6','#34d399','#fbbf24','#22d3ee','#fb923c','#a78bfa','#34d399']
@@ -1111,16 +1113,17 @@ function StepContent({ id, data, onUpdate, onGoTo, loading, setLoading, setError
     case 3: return <BusinessModelPanel  {...p} />
     case 4: return <NameStudioPanel     {...p} />
     case 5: return <FinancialPanel      {...p} />
-    case 6: return <GTMPanel            {...p} />
-    case 7: return <LegalPanel          {...p} />
-    case 8: return <PitchBuilderPanel   data={data} onUpdate={onUpdate} loading={loading} setLoading={setLoading} setError={setError} />
+    case 6: return <ProductionPanel     {...p} />
+    case 7: return <GTMPanel            {...p} />
+    case 8: return <LegalPanel          {...p} />
+    case 9: return <PitchBuilderPanel   data={data} onUpdate={onUpdate} loading={loading} setLoading={setLoading} setError={setError} />
     default: return null
   }
 }
 
 /* ─── MAIN ────────────────────────────────────────────────────────── */
 export default function StartupStudio() {
-  const resultKeys = ['ideaResult','competitorResult','businessModelResult','nameResult','financialResult','gtmResult','legalResult','pitchBuilderResult']
+  const resultKeys = ['ideaResult','competitorResult','businessModelResult','nameResult','financialResult','productionResult','gtmResult','legalResult','pitchBuilderResult']
 
   // ── session bootstrap ──────────────────────────────────────────
   const [sessions, setSessions] = useState(() => {

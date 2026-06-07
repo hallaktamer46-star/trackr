@@ -1504,4 +1504,82 @@ Each slide must be specific to this exact business — no generic templates. Bul
   }
 })
 
+// POST /api/ai/startup/production — supplier sourcing, MOQ, quality, shipping
+router.post('/startup/production', async (req, res) => {
+  const { idea, industry, businessModel, pricingStrategy, targetMarket } = req.body
+  if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
+  try {
+    const raw = await ask(`You are a veteran product sourcing expert and supply chain consultant who has launched 200+ physical products. Give a complete, specific, actionable production and sourcing guide.
+
+Business Idea: ${idea}
+Industry: ${industry || 'Not specified'}
+Business Model: ${businessModel || 'Not specified'}
+Target Market: ${targetMarket || 'Not specified'}
+Pricing: ${pricingStrategy ? JSON.stringify(pricingStrategy) : 'Not specified'}
+
+Return ONLY valid JSON:
+{
+  "overview": "<2-3 sentences: the production reality for this specific business — honest about complexity and costs>",
+  "production_type": "<one of: Custom Manufacturing / Private Label / White-label / Print-on-Demand / Dropshipping / Digital / Assembly>",
+  "supplier_platforms": [
+    {
+      "name": "<real platform name>",
+      "url": "<actual website>",
+      "best_for": "<what this platform excels at for this specific product>",
+      "moq_range": "<typical MOQ e.g. '100-500 units' or 'No minimum'>",
+      "cost_position": "<Budget / Mid-range / Premium>",
+      "how_to_use": "<specific tactic for this product type>"
+    }
+  ],
+  "outreach_template": "<Complete professional email to send suppliers. Include [YOUR COMPANY NAME] [PRODUCT DESCRIPTION] placeholders. Cover: who you are, exact specs, target quantity, timeline, sample request, quote request. 150-200 words. Ready to send.>",
+  "key_questions": [
+    "<specific question tailored to this product — not generic>",
+    "<question 2>", "<question 3>", "<question 4>", "<question 5>", "<question 6>"
+  ],
+  "moq_guidance": "<specific MOQ advice for this product — what is typical, how to negotiate lower, when to accept higher MOQ>",
+  "negotiation_tips": [
+    "<specific tactic for this product/industry — not generic>",
+    "<tip 2>", "<tip 3>", "<tip 4>"
+  ],
+  "quality_control": {
+    "sample_process": "<exact steps to order and evaluate samples for this product>",
+    "inspection_checklist": ["<specific check 1>", "<check 2>", "<check 3>", "<check 4>"],
+    "certifications_needed": ["<certification relevant to this product and target market>"]
+  },
+  "cost_breakdown": [
+    { "item": "<cost item>", "typical_range": "<e.g. $2-5 per unit>", "notes": "<important context>" }
+  ],
+  "shipping": {
+    "recommended_incoterms": "<e.g. FOB and why for this situation>",
+    "best_methods": ["<method with context for this product weight/volume>"],
+    "customs_tips": ["<specific tip for this product category>", "<tip 2>"]
+  },
+  "packaging": {
+    "options": ["<packaging option 1 with cost estimate>", "<option 2>"],
+    "recommendation": "<specific recommendation for this product and target market>"
+  },
+  "total_timeline": "<realistic from first supplier contact to inventory, e.g. 8-14 weeks>",
+  "action_steps": [
+    { "step": 1, "action": "<specific action>", "timeline": "<e.g. Day 1-3>", "tool": "<specific platform/resource>" },
+    { "step": 2, "action": "...", "timeline": "...", "tool": "..." },
+    { "step": 3, "action": "...", "timeline": "...", "tool": "..." },
+    { "step": 4, "action": "...", "timeline": "...", "tool": "..." },
+    { "step": 5, "action": "...", "timeline": "...", "tool": "..." },
+    { "step": 6, "action": "...", "timeline": "...", "tool": "..." },
+    { "step": 7, "action": "...", "timeline": "...", "tool": "..." },
+    { "step": 8, "action": "...", "timeline": "...", "tool": "..." }
+  ],
+  "red_flags": ["<specific warning for this product when vetting suppliers>", "<red flag 2>"]
+}
+
+All advice must be product-specific. Supplier platforms must be real sites. Cost breakdown must include all costs: manufacturing, tooling/molds, inspection, shipping, customs, warehousing.`)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON found in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
+  } catch (err) {
+    console.error('Startup production error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
