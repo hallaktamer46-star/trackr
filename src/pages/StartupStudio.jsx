@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Plus, Pencil } from 'lucide-react'
 import {
   Lightbulb, Users, BarChart2, Sparkles, DollarSign,
   Map, BookOpen, FileText, CheckCircle2, Lock,
@@ -9,6 +10,26 @@ import { apiFetch } from '../lib/api'
 
 const MONO = 'Geist Mono, monospace'
 const SANS = 'Geist, Inter, sans-serif'
+
+/* ─── localStorage session persistence ──────────────────────────── */
+const SESSIONS_KEY = 'trackr_studio_v1'
+const ACTIVE_KEY   = 'trackr_studio_active_v1'
+
+const EMPTY_DATA = {
+  pitch: '', industry: '', targetMarket: '', fundingAsk: '',
+  knownCompetitors: '', nameVibe: 'Modern', nameKeywords: '',
+  teamSize: 'Just me', location: '', legalCountry: '', founders: '1',
+  marketingBudget: 'Self-funded', gtmGoal: 'First 10 customers', pitchEquity: '',
+  ideaResult: null, competitorResult: null, businessModelResult: null,
+  nameResult: null, selectedName: '', financialResult: null,
+  gtmResult: null, legalResult: null, pitchBuilderResult: null,
+}
+
+function newSession(n = 1) {
+  return { id: `s_${Date.now()}_${Math.random().toString(36).slice(2,7)}`, name: `Pitch ${n}`, created: Date.now(), activeStep: 1, completedSteps: [], data: { ...EMPTY_DATA } }
+}
+function readSessions() { try { return JSON.parse(localStorage.getItem(SESSIONS_KEY)) || [] } catch { return [] } }
+function writeSessions(s) { try { localStorage.setItem(SESSIONS_KEY, JSON.stringify(s)) } catch {} }
 
 const STEPS = [
   { id: 1, label: 'Idea Validator',   short: 'Idea',       desc: 'Score your concept',      color: '#a78bfa', glow: 'rgba(167,139,250,0.35)', icon: Lightbulb  },
@@ -286,6 +307,57 @@ function Tag({ label, color }) {
     }}>
       {label}
     </span>
+  )
+}
+
+/* ─── Session Tab ────────────────────────────────────────────────── */
+function SessionTab({ session, isActive, stepColor, onSelect, onRename, onDelete, showDelete }) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(session.name)
+
+  function commit() {
+    const name = draft.trim() || session.name
+    setDraft(name); onRename(name); setEditing(false)
+  }
+
+  return (
+    <div style={{ position: 'relative', flexShrink: 0 }}>
+      {editing ? (
+        <input autoFocus value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={e => { if (e.key === 'Enter') commit(); if (e.key === 'Escape') { setDraft(session.name); setEditing(false) } }}
+          style={{
+            padding: '6px 14px', borderRadius: 20,
+            border: `1.5px solid ${stepColor}`,
+            background: `${stepColor}15`,
+            color: '#f1f5f9', fontFamily: SANS, fontSize: 13,
+            outline: 'none', width: 130,
+          }}
+        />
+      ) : (
+        <button onClick={onSelect}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '6px 14px 6px 16px', borderRadius: 20, cursor: 'pointer',
+            border: `1.5px solid ${isActive ? stepColor + '70' : 'rgba(255,255,255,0.1)'}`,
+            background: isActive ? `${stepColor}14` : 'rgba(255,255,255,0.04)',
+            color: isActive ? stepColor : '#93c5fd',
+            fontFamily: SANS, fontSize: 13, fontWeight: isActive ? 600 : 400,
+            transition: 'all 0.18s', boxShadow: isActive ? `0 0 16px ${stepColor}20` : 'none',
+          }}
+          onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)' } }}
+          onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' } }}
+        >
+          <span style={{ maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{session.name}</span>
+          <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: isActive ? stepColor + 'bb' : '#7dd3fc', background: isActive ? `${stepColor}18` : 'rgba(255,255,255,0.06)', padding: '2px 7px', borderRadius: 99 }}>
+            {session.completedSteps?.length || 0}/8
+          </span>
+          <Pencil size={10} style={{ color: isActive ? stepColor + '80' : 'rgba(255,255,255,0.2)', cursor: 'pointer' }}
+            onClick={e => { e.stopPropagation(); setEditing(true) }} />
+        </button>
+      )}
+    </div>
   )
 }
 
@@ -1020,31 +1092,86 @@ function StepContent({ id, data, onUpdate, onGoTo, loading, setLoading, setError
 
 /* ─── MAIN ────────────────────────────────────────────────────────── */
 export default function StartupStudio() {
-  const [active, setActive] = useState(1)
-  const [done, setDone] = useState(new Set())
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [data, setData] = useState({
-    pitch: '', industry: '', targetMarket: '', stage: 'Idea', fundingAsk: '',
-    knownCompetitors: '', nameVibe: 'Modern', nameKeywords: '',
-    teamSize: 'Just me', location: '', legalCountry: '', founders: '1',
-    marketingBudget: 'Self-funded', gtmGoal: 'First 10 customers', pitchEquity: '',
-    ideaResult: null, competitorResult: null, businessModelResult: null,
-    nameResult: null, selectedName: '', financialResult: null,
-    gtmResult: null, legalResult: null, pitchBuilderResult: null,
-  })
-
   const resultKeys = ['ideaResult','competitorResult','businessModelResult','nameResult','financialResult','gtmResult','legalResult','pitchBuilderResult']
 
+  // ── session bootstrap ──────────────────────────────────────────
+  const [sessions, setSessions] = useState(() => {
+    const saved = readSessions()
+    if (!saved.length) { const first = newSession(1); writeSessions([first]); return [first] }
+    return saved
+  })
+
+  const [currentId, setCurrentId] = useState(() => {
+    try { return localStorage.getItem(ACTIVE_KEY) || sessions[0].id } catch { return sessions[0].id }
+  })
+
+  const current = sessions.find(s => s.id === currentId) || sessions[0]
+
+  const [active, setActive]   = useState(current.activeStep || 1)
+  const [done,   setDone]     = useState(new Set(current.completedSteps || []))
+  const [data,   setData]     = useState({ ...EMPTY_DATA, ...current.data })
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState(null)
+
+  // ── persist helpers ───────────────────────────────────────────
+  function persist(newActive, newDone, newData, id = currentId) {
+    setSessions(prev => {
+      const updated = prev.map(s => s.id === id ? {
+        ...s, activeStep: newActive, completedSteps: [...newDone], data: newData, updated: Date.now()
+      } : s)
+      writeSessions(updated)
+      return updated
+    })
+  }
+
   function update(partial) {
-    setData(d => ({ ...d, ...partial }))
+    const newData = { ...data, ...partial }
+    setData(newData)
     const key = resultKeys[active - 1]
-    if (key && partial[key]) setDone(prev => new Set(prev).add(active))
+    let newDone = done
+    if (key && partial[key]) { newDone = new Set(done); newDone.add(active); setDone(newDone) }
+    persist(active, newDone, newData)
   }
 
   function goTo(id) {
     const maxReach = done.size > 0 ? Math.max(...[...done]) + 1 : 1
-    if (id <= maxReach || done.has(id)) { setActive(id); setError(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }
+    if (id <= maxReach || done.has(id)) {
+      setActive(id); setError(null)
+      persist(id, done, data)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  // ── session switching ─────────────────────────────────────────
+  function switchSession(id) {
+    persist(active, done, data)
+    const sess = sessions.find(s => s.id === id)
+    if (!sess) return
+    setCurrentId(id)
+    setActive(sess.activeStep || 1)
+    setDone(new Set(sess.completedSteps || []))
+    setData({ ...EMPTY_DATA, ...sess.data })
+    setError(null)
+    try { localStorage.setItem(ACTIVE_KEY, id) } catch {}
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function addSession() {
+    const n = sessions.length + 1
+    const sess = newSession(n)
+    const updated = [...sessions, sess]
+    setSessions(updated); writeSessions(updated)
+    setCurrentId(sess.id)
+    setActive(1); setDone(new Set()); setData({ ...EMPTY_DATA }); setError(null)
+    try { localStorage.setItem(ACTIVE_KEY, sess.id) } catch {}
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function renameSession(id, name) {
+    setSessions(prev => {
+      const updated = prev.map(s => s.id === id ? { ...s, name } : s)
+      writeSessions(updated); return updated
+    })
   }
 
   const step = STEPS[active - 1]
@@ -1096,6 +1223,33 @@ export default function StartupStudio() {
               </span>
             ))}
           </div>
+        </div>
+
+        {/* ── Session tabs ── */}
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 24, overflowX: 'auto', paddingBottom: 2 }}>
+          {sessions.map(sess => (
+            <SessionTab
+              key={sess.id}
+              session={sess}
+              isActive={sess.id === currentId}
+              stepColor={step.color}
+              onSelect={() => switchSession(sess.id)}
+              onRename={name => renameSession(sess.id, name)}
+            />
+          ))}
+          <button onClick={addSession}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '6px 16px', borderRadius: 20, cursor: 'pointer', flexShrink: 0,
+              border: '1.5px dashed rgba(255,255,255,0.18)',
+              background: 'transparent', color: '#93c5fd',
+              fontFamily: SANS, fontSize: 13, transition: 'all 0.18s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = step.color; e.currentTarget.style.color = step.color }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'; e.currentTarget.style.color = '#93c5fd' }}
+          >
+            <Plus size={13} /> New Pitch
+          </button>
         </div>
 
         {/* ── Step Timeline ── */}
