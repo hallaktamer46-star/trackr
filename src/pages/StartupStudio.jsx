@@ -23,13 +23,13 @@ const STEPS = [
 
 const VIBES      = ['Modern', 'Bold', 'Playful', 'Professional', 'Luxury']
 const TEAM_SIZES = ['Just me', '2–3', '4–10', '10+']
-const BUDGETS    = ['Bootstrap', '$1k–$5k', '$5k–$20k', '$20k+']
+const BUDGETS    = ['Self-funded', '$1k–$5k', '$5k–$20k', '$20k+']
 const GOALS      = ['First 10 customers', 'Email list', 'Go viral', 'Enterprise']
 const FOUNDERS   = ['1', '2', '3', '4+']
 
 const INDUSTRIES = ['SaaS', 'FinTech', 'HealthTech', 'E-Commerce', 'EdTech', 'AI & ML', 'Real Estate', 'Food & Beverage', 'HR Tech', 'CleanTech', 'Gaming', 'Media & Content']
 const MARKETS    = ['Consumers (B2C)', 'Small Businesses', 'Enterprise (B2B)', 'Developers', 'Freelancers', 'Students', 'Healthcare Workers', 'Creators & Influencers', 'Parents & Families']
-const FUNDING    = ['Bootstrapped', 'Under $100k', '$100k – $500k', '$500k – $2M', '$2M – $10M', '$10M+']
+const FUNDING    = ['Self-funded', 'Under $100k', '$100k – $500k', '$500k – $2M', '$2M – $10M', '$10M+']
 const LOCATIONS  = ['United States', 'United Kingdom', 'Europe', 'Middle East', 'Asia Pacific', 'Canada', 'Australia', 'Latin America']
 const COUNTRIES  = ['United States', 'United Kingdom', 'UAE', 'Canada', 'Australia', 'Singapore', 'Germany', 'Netherlands']
 
@@ -713,7 +713,7 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
     try {
       const res = await apiFetch('/api/ai/startup/gtm', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idea: data.pitch, targetMarket: data.targetMarket, businessModel: data.businessModelResult?.recommended_model, budget: data.marketingBudget || 'Bootstrap', goal: data.gtmGoal || 'First 10 customers' }),
+        body: JSON.stringify({ idea: data.pitch, targetMarket: data.targetMarket, businessModel: data.businessModelResult?.recommended_model, budget: data.marketingBudget || 'Self-funded', goal: data.gtmGoal || 'First 10 customers' }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error)
@@ -727,7 +727,7 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           <div>
             <FieldLabel color={s.color}>Budget</FieldLabel>
-            <Pills options={BUDGETS} value={data.marketingBudget || 'Bootstrap'} onChange={v => onUpdate({ marketingBudget: v })} />
+            <Pills options={BUDGETS} value={data.marketingBudget || 'Self-funded'} onChange={v => onUpdate({ marketingBudget: v })} />
           </div>
           <div>
             <FieldLabel color={s.color}>Primary Goal</FieldLabel>
@@ -945,7 +945,7 @@ export default function StartupStudio() {
     pitch: '', industry: '', targetMarket: '', stage: 'Idea', fundingAsk: '',
     knownCompetitors: '', nameVibe: 'Modern', nameKeywords: '',
     teamSize: 'Just me', location: '', legalCountry: '', founders: '1',
-    marketingBudget: 'Bootstrap', gtmGoal: 'First 10 customers', pitchEquity: '',
+    marketingBudget: 'Self-funded', gtmGoal: 'First 10 customers', pitchEquity: '',
     ideaResult: null, competitorResult: null, businessModelResult: null,
     nameResult: null, selectedName: '', financialResult: null,
     gtmResult: null, legalResult: null, pitchBuilderResult: null,
