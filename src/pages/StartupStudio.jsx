@@ -587,11 +587,31 @@ function CompetitorPanel({ data, onUpdate, onNext, loading, setLoading, setError
 
   return (
     <div style={vars}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <SInput label="Known Competitors (optional)" placeholder="e.g. Notion, Airtable — we'll discover more"
-          value={data.knownCompetitors || ''} onChange={e => onUpdate({ knownCompetitors: e.target.value })} />
-        <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Map the Competition" /></div>
+      {/* context card — shows what the AI will use */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 20 }}>
+        {[
+          { label: 'Idea', value: data.pitch?.slice(0, 60) + (data.pitch?.length > 60 ? '…' : '') },
+          { label: 'Industry', value: data.industry || '—' },
+          { label: 'Target Market', value: data.targetMarket || '—' },
+        ].map(({ label, value }) => (
+          <div key={label} style={{ padding: '12px 14px', borderRadius: 12, background: `${s.color}08`, border: `1px solid ${s.color}20` }}>
+            <p style={{ fontFamily: MONO, fontSize: 8, fontWeight: 800, color: s.color, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 5 }}>{label}</p>
+            <p style={{ fontSize: 12, color: '#e2e8f0', lineHeight: 1.5 }}>{value}</p>
+          </div>
+        ))}
       </div>
+      <p style={{ fontSize: 13, color: '#7dd3fc', lineHeight: 1.65, marginBottom: 18 }}>
+        We'll automatically identify who's competing in your space, their strengths and gaps, and where you can win — no input needed from you.
+      </p>
+
+      {result ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 20px', borderRadius: 16, background: `rgba(${s.color === '#fb7185' ? '251,113,133' : '52,211,153'},0.07)`, border: `1px solid ${s.color}30`, marginBottom: 4 }}>
+          <CheckCircle2 size={16} style={{ color: s.color, flexShrink: 0 }} />
+          <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, color: s.color, letterSpacing: '0.08em' }}>COMPETITION MAPPED — update Step 1 to re-run</span>
+        </div>
+      ) : (
+        <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Map the Competition" /></div>
+      )}
 
       {result && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 28, animation: 'ssFadeUp 0.5s ease' }}>
@@ -1360,27 +1380,37 @@ export default function StartupStudio() {
             {/* progress tracker */}
             <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
 
-              {/* 8 colored dots */}
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                {STEPS.map(s => {
+              {/* 8 colored dots — SVG circles (immune to CSS border-radius overrides) */}
+              <svg width={8*11 + 7*6} height={14} style={{ overflow: 'visible' }}>
+                {STEPS.map((s, i) => {
                   const isDone = done.has(s.id)
                   const isCurrent = s.id === active
+                  const r = isDone || isCurrent ? 5.5 : 3.5
+                  const cx = i * (11 + 6) + (isDone || isCurrent ? 5.5 : (11-7)/2 + 3.5)
+                  const cy = 7
                   return (
-                    <div key={s.id} style={{
-                      width: isDone || isCurrent ? 11 : 7,
-                      height: isDone || isCurrent ? 11 : 7,
-                      borderRadius: '50%',
-                      background: isDone ? s.color : 'transparent',
-                      border: `2px solid ${isDone ? s.color : isCurrent ? s.color : s.color + '28'}`,
-                      boxShadow: isDone
-                        ? `0 0 10px ${s.color}, 0 0 20px ${s.color}50`
-                        : isCurrent ? `0 0 8px ${s.color}70` : 'none',
-                      transition: 'all 0.45s cubic-bezier(0.34,1.56,0.64,1)',
-                      animation: isCurrent && !isDone ? 'ssBadgePulse 1.8s ease-in-out infinite' : 'none',
-                    }} />
+                    <g key={s.id}>
+                      {isCurrent && !isDone && (
+                        <circle cx={cx} cy={cy} r={r + 4} fill="none"
+                          stroke={s.color} strokeWidth="1"
+                          opacity="0.4"
+                          style={{ animation: 'ssRing 2s ease-out infinite' }} />
+                      )}
+                      <circle cx={cx} cy={cy} r={r}
+                        fill={isDone ? s.color : 'none'}
+                        stroke={isDone ? s.color : isCurrent ? s.color : s.color}
+                        strokeOpacity={isDone || isCurrent ? 1 : 0.2}
+                        strokeWidth={isDone || isCurrent ? 0 : 1.5}
+                        style={{
+                          filter: isDone ? `drop-shadow(0 0 5px ${s.color})` : isCurrent ? `drop-shadow(0 0 4px ${s.color}aa)` : 'none',
+                          transition: 'all 0.45s cubic-bezier(0.34,1.56,0.64,1)',
+                          animation: isCurrent && !isDone ? 'ssBadgePulse 1.8s ease-in-out infinite' : 'none',
+                        }}
+                      />
+                    </g>
                   )
                 })}
-              </div>
+              </svg>
 
               {/* count — centered below dots */}
               <span style={{
