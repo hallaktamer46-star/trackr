@@ -112,6 +112,43 @@ const GLOBAL_CSS = `
     border: 1.5px solid var(--sc, #a78bfa); border-opacity: 0.3;
     box-shadow: 0 0 60px var(--sg, rgba(167,139,250,0.15));
   }
+  .ss-option {
+    padding: 9px 12px; border-radius: 10px; cursor: pointer; text-align: left;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    background: rgba(10,14,28,0.65);
+    color: #94a3b8;
+    font-family: Geist, Inter, sans-serif; font-size: 12px;
+    transition: all 0.18s ease; width: 100%;
+  }
+  .ss-option:hover {
+    background: var(--sc-bg, rgba(167,139,250,0.1));
+    border-color: var(--sc, #a78bfa);
+    color: #f1f5f9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  }
+  .ss-option.sel {
+    background: var(--sc-bg, rgba(167,139,250,0.18));
+    border-color: var(--sc, #a78bfa);
+    color: var(--sc, #a78bfa);
+    font-weight: 600;
+    box-shadow: 0 0 0 2px var(--sc-bg, rgba(167,139,250,0.14)), 0 0 18px var(--sc-bg, rgba(167,139,250,0.12));
+    transform: none;
+  }
+  .ss-option.other-opt { color: #475569; font-style: italic; }
+  .ss-option.other-opt:hover { color: #f1f5f9; }
+  .ss-starter {
+    padding: 5px 14px; border-radius: 20px; cursor: pointer;
+    border: 1px solid var(--sc, rgba(167,139,250,0.3));
+    background: var(--sc-bg, rgba(167,139,250,0.07));
+    color: var(--sc, #a78bfa);
+    font-size: 11px; font-family: Geist, Inter, sans-serif;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .ss-starter:hover {
+    background: var(--sc-bg2, rgba(167,139,250,0.16));
+    color: #f1f5f9;
+  }
   @keyframes ssShimmer { 0% { background-position: -300% center } 100% { background-position: 300% center } }
   @keyframes ssOrb1 { 0%,100% { transform: translate(0,0) scale(1) } 33% { transform: translate(-60px,80px) scale(1.12) } 66% { transform: translate(40px,-40px) scale(0.92) } }
   @keyframes ssOrb2 { 0%,100% { transform: translate(0,0) scale(1) } 40% { transform: translate(70px,-50px) scale(1.08) } 80% { transform: translate(-30px,50px) scale(0.95) } }
@@ -164,65 +201,40 @@ function Pills({ options, value, onChange }) {
 }
 
 function OptionGrid({ options, value, onChange, cols = 3 }) {
-  const knownValues = options
-  const isCustom = value && !knownValues.includes(value)
+  const isCustom = value && !options.includes(value)
   const [otherOpen, setOtherOpen] = useState(isCustom)
   const [otherText, setOtherText] = useState(isCustom ? value : '')
 
-  function pick(opt) {
-    setOtherOpen(false)
-    onChange(opt)
-  }
-  function openOther() {
-    setOtherOpen(true)
-    onChange(otherText)
-  }
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
-        {options.map(opt => {
-          const selected = value === opt && !otherOpen
-          return (
-            <button key={opt} onClick={() => pick(opt)} style={{
-              padding: '11px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left',
-              border: `1.5px solid ${selected ? 'var(--sc, #a78bfa)' : 'rgba(255,255,255,0.08)'}`,
-              background: selected ? 'var(--sc-bg, rgba(167,139,250,0.18))' : 'rgba(255,255,255,0.04)',
-              color: selected ? 'var(--sc, #a78bfa)' : '#6b7280',
-              fontFamily: SANS, fontSize: 13, fontWeight: selected ? 600 : 400,
-              boxShadow: selected ? '0 0 0 2px var(--sc-bg, rgba(167,139,250,0.15))' : 'none',
-              transition: 'all 0.18s ease',
-            }}
-            onMouseEnter={e => { if (!selected) { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)' } }}
-            onMouseLeave={e => { if (!selected) { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)' } }}
-            >
-              {opt}
-            </button>
-          )
-        })}
-        <button onClick={openOther} style={{
-          padding: '11px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left',
-          border: `1.5px solid ${otherOpen ? 'var(--sc, #a78bfa)' : 'rgba(255,255,255,0.08)'}`,
-          background: otherOpen ? 'var(--sc-bg, rgba(167,139,250,0.18))' : 'rgba(255,255,255,0.04)',
-          color: otherOpen ? 'var(--sc, #a78bfa)' : '#4b5563',
-          fontFamily: SANS, fontSize: 13, fontStyle: 'italic',
-          boxShadow: otherOpen ? '0 0 0 2px var(--sc-bg, rgba(167,139,250,0.15))' : 'none',
-          transition: 'all 0.18s ease',
-        }}
-        onMouseEnter={e => { if (!otherOpen) { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)' } }}
-        onMouseLeave={e => { if (!otherOpen) { e.currentTarget.style.color = '#4b5563'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)' } }}
-        >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 6 }}>
+        {options.map(opt => (
+          <button key={opt}
+            className={`ss-option${value === opt && !otherOpen ? ' sel' : ''}`}
+            onClick={() => { setOtherOpen(false); onChange(opt) }}>
+            {opt}
+          </button>
+        ))}
+        <button
+          className={`ss-option other-opt${otherOpen ? ' sel' : ''}`}
+          onClick={() => { setOtherOpen(true); onChange(otherText) }}>
           Other…
         </button>
       </div>
       {otherOpen && (
         <input autoFocus className={`ss-input${otherText ? ' filled' : ''}`}
-          placeholder="Type your own answer…"
-          value={otherText}
-          onChange={e => { setOtherText(e.target.value); onChange(e.target.value) }}
-        />
+          placeholder="Type your own…" value={otherText}
+          onChange={e => { setOtherText(e.target.value); onChange(e.target.value) }} />
       )}
     </div>
+  )
+}
+
+function FieldLabel({ color, children }) {
+  return (
+    <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: color + 'bb', textTransform: 'uppercase', marginBottom: 8 }}>
+      {children}
+    </p>
   )
 }
 
@@ -301,45 +313,39 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
 
   return (
     <div style={vars}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 24, alignItems: 'start', marginBottom: 20 }}>
 
-        {/* Idea textarea + quick starters */}
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Your Business Idea</label>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
-            {IDEA_STARTERS.map(s => (
-              <button key={s} onClick={() => onUpdate({ pitch: s })} style={{
-                padding: '5px 12px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)', color: '#4b5563', cursor: 'pointer',
-                fontFamily: SANS, fontSize: 12, transition: 'all 0.15s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = s.color; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#e2e8f0' }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#4b5563'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
-              >{s}</button>
+        {/* LEFT — idea textarea */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <FieldLabel color={s.color}>Your Business Idea</FieldLabel>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 2 }}>
+            {IDEA_STARTERS.map(st => (
+              <button key={st} className="ss-starter" onClick={() => onUpdate({ pitch: st })}>{st}</button>
             ))}
           </div>
-          <SInput textarea rows={3}
+          <SInput textarea rows={10}
             placeholder="Describe what your business does, the problem it solves, and who it's for…"
             value={data.pitch || ''} onChange={e => onUpdate({ pitch: e.target.value })} />
         </div>
 
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Industry</label>
-          <OptionGrid options={INDUSTRIES} value={data.industry} onChange={v => onUpdate({ industry: v })} cols={3} />
+        {/* RIGHT — selectors */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div>
+            <FieldLabel color={s.color}>Industry</FieldLabel>
+            <OptionGrid options={INDUSTRIES} value={data.industry} onChange={v => onUpdate({ industry: v })} cols={3} />
+          </div>
+          <div>
+            <FieldLabel color={s.color}>Target Market</FieldLabel>
+            <OptionGrid options={MARKETS} value={data.targetMarket} onChange={v => onUpdate({ targetMarket: v })} cols={3} />
+          </div>
+          <div>
+            <FieldLabel color={s.color}>Funding Ask</FieldLabel>
+            <OptionGrid options={FUNDING} value={data.fundingAsk} onChange={v => onUpdate({ fundingAsk: v })} cols={3} />
+          </div>
         </div>
-
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Target Market</label>
-          <OptionGrid options={MARKETS} value={data.targetMarket} onChange={v => onUpdate({ targetMarket: v })} cols={3} />
-        </div>
-
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Funding Ask</label>
-          <OptionGrid options={FUNDING} value={data.fundingAsk} onChange={v => onUpdate({ fundingAsk: v })} cols={3} />
-        </div>
-
-        <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch?.trim()} label="Validate My Idea" /></div>
       </div>
+
+      <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch?.trim()} label="Validate My Idea" /></div>
 
       {result && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 28, animation: 'ssFadeUp 0.5s ease' }}>
@@ -485,9 +491,9 @@ function BusinessModelPanel({ data, onUpdate, onNext, loading, setLoading, setEr
 
   return (
     <div style={vars}>
-      <div style={{ padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', marginBottom: 18 }}>
-        <p style={{ fontFamily: MONO, fontSize: 9, color: '#4b5563', letterSpacing: '0.1em', marginBottom: 6 }}>GENERATING FOR</p>
-        <p style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{data.pitch?.slice(0, 160)}…</p>
+      <div style={{ padding: 14, borderRadius: 14, background: `${s.color}08`, border: `1px solid ${s.color}20`, marginBottom: 18 }}>
+        <p style={{ fontFamily: MONO, fontSize: 9, color: s.color + 'aa', letterSpacing: '0.1em', marginBottom: 6 }}>YOUR IDEA</p>
+        <p style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.6 }}>{data.pitch?.slice(0, 160)}…</p>
       </div>
       <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Build My Business Model" /></div>
 
@@ -519,7 +525,7 @@ function BusinessModelPanel({ data, onUpdate, onNext, loading, setLoading, setEr
             <ResultSection title="Unit Economics" color={s.color}>
               {[['CAC', result.unit_economics?.cac_estimate], ['LTV', result.unit_economics?.ltv_estimate], ['LTV:CAC', result.unit_economics?.ltv_cac_ratio], ['Payback', result.unit_economics?.payback_period]].map(([l, v]) => (
                 <div key={l} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span style={{ fontFamily: MONO, fontSize: 9, color: '#6b7280', letterSpacing: '0.08em' }}>{l}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 9, color: '#94a3b8', letterSpacing: '0.08em' }}>{l}</span>
                   <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 800, color: '#e2e8f0' }}>{v}</span>
                 </div>
               ))}
@@ -556,10 +562,10 @@ function NameStudioPanel({ data, onUpdate, onNext, loading, setLoading, setError
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
           <div>
-            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Brand Vibe</label>
+            <FieldLabel color={s.color}>Brand Vibe</FieldLabel>
             <Pills options={VIBES} value={data.nameVibe || 'Modern'} onChange={v => onUpdate({ nameVibe: v })} />
           </div>
-          <SInput label="Keywords to Include (optional)" placeholder="e.g. fast, smart, connect"
+          <SInput label="Keywords (optional)" placeholder="e.g. fast, smart, connect"
             value={data.nameKeywords || ''} onChange={e => onUpdate({ nameKeywords: e.target.value })} />
         </div>
         <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Generate 10 Brand Names" /></div>
@@ -629,13 +635,15 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
   return (
     <div style={vars}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Team Size</label>
-          <Pills options={TEAM_SIZES} value={data.teamSize || 'Just me'} onChange={v => onUpdate({ teamSize: v })} />
-        </div>
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Location / Market</label>
-          <OptionGrid options={LOCATIONS} value={data.location} onChange={v => onUpdate({ location: v })} cols={4} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+          <div>
+            <FieldLabel color={s.color}>Team Size</FieldLabel>
+            <Pills options={TEAM_SIZES} value={data.teamSize || 'Just me'} onChange={v => onUpdate({ teamSize: v })} />
+          </div>
+          <div>
+            <FieldLabel color={s.color}>Location / Market</FieldLabel>
+            <OptionGrid options={LOCATIONS} value={data.location} onChange={v => onUpdate({ location: v })} cols={2} />
+          </div>
         </div>
         <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Build Financial Projections" /></div>
       </div>
@@ -716,13 +724,13 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
   return (
     <div style={vars}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           <div>
-            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Budget</label>
+            <FieldLabel color={s.color}>Budget</FieldLabel>
             <Pills options={BUDGETS} value={data.marketingBudget || 'Bootstrap'} onChange={v => onUpdate({ marketingBudget: v })} />
           </div>
           <div>
-            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Primary Goal</label>
+            <FieldLabel color={s.color}>Primary Goal</FieldLabel>
             <Pills options={GOALS} value={data.gtmGoal || 'First 10 customers'} onChange={v => onUpdate({ gtmGoal: v })} />
           </div>
         </div>
@@ -747,7 +755,7 @@ function GTMPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
                     </div>
                     <div style={{ flex: 1 }}>
                       <p style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0' }}>{w.theme}</p>
-                      <p style={{ fontFamily: MONO, fontSize: 9, color: '#6b7280', marginTop: 1 }}>{w.milestone}</p>
+                      <p style={{ fontFamily: MONO, fontSize: 9, color: '#94a3b8', marginTop: 1 }}>{w.milestone}</p>
                     </div>
                     <Tag label={w.focus} color={focusC[w.focus] || s.color} />
                     {open.has(w.week) ? <ChevronUp size={13} style={{ color: '#6b7280', flexShrink: 0 }} /> : <ChevronDown size={13} style={{ color: '#6b7280', flexShrink: 0 }} />}
@@ -790,13 +798,15 @@ function LegalPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
   return (
     <div style={vars}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Country of Registration</label>
-          <OptionGrid options={COUNTRIES} value={data.legalCountry} onChange={v => onUpdate({ legalCountry: v })} cols={4} />
-        </div>
-        <div>
-          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Number of Founders</label>
-          <Pills options={FOUNDERS} value={data.founders || '1'} onChange={v => onUpdate({ founders: v })} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'start' }}>
+          <div>
+            <FieldLabel color={s.color}>Country of Registration</FieldLabel>
+            <OptionGrid options={COUNTRIES} value={data.legalCountry} onChange={v => onUpdate({ legalCountry: v })} cols={2} />
+          </div>
+          <div>
+            <FieldLabel color={s.color}>Number of Founders</FieldLabel>
+            <Pills options={FOUNDERS} value={data.founders || '1'} onChange={v => onUpdate({ founders: v })} />
+          </div>
         </div>
         <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Get Legal Advice" /></div>
       </div>
