@@ -885,20 +885,27 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
   )
 }
 
+const SOURCING_SCOPE = ['Global', 'Local / Regional']
+const POPULAR_COUNTRIES = ['China', 'USA', 'India', 'Germany', 'Vietnam', 'Turkey', 'Mexico', 'South Korea', 'Italy', 'Bangladesh', 'Any']
+
 function ProductionPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
   const s = STEPS[5]
   const vars = useStepVars(s.color, s.glow)
   const result = data.productionResult
   const [copied, setCopied] = useState(false)
+  const [scope, setScope] = useState(data.sourcingScope || 'Global')
+  const [country, setCountry] = useState(data.preferredCountry || 'Any')
 
   async function generate() {
     setError(null); setLoading(true)
+    onUpdate({ sourcingScope: scope, preferredCountry: country })
     try {
       const res = await apiFetch('/api/ai/startup/production', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           idea: data.pitch, industry: data.industry, businessModel: data.businessModelResult?.recommended_model,
           pricingStrategy: data.businessModelResult?.pricing_strategy, targetMarket: data.targetMarket,
+          sourcingScope: scope, preferredCountry: country === 'Any' ? null : country,
         }),
       })
       const json = await res.json()
@@ -914,6 +921,25 @@ function ProductionPanel({ data, onUpdate, onNext, loading, setLoading, setError
 
   return (
     <div style={vars}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, marginBottom: 20 }}>
+        <div>
+          <FieldLabel color={s.color}>Sourcing Scope</FieldLabel>
+          <Pills options={SOURCING_SCOPE} value={scope} onChange={setScope} />
+        </div>
+        <div>
+          <FieldLabel color={s.color}>Preferred Supplier Country</FieldLabel>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {POPULAR_COUNTRIES.map(c => (
+              <button key={c} onClick={() => setCountry(c)} style={{
+                padding: '6px 14px', fontSize: 12, fontFamily: 'Geist, Inter, sans-serif', borderRadius: 8, cursor: 'pointer', transition: 'all 0.15s',
+                background: country === c ? `${s.color}18` : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${country === c ? s.color : 'rgba(255,255,255,0.08)'}`,
+                color: country === c ? s.color : '#94a3b8', fontWeight: country === c ? 600 : 400,
+              }}>{c}</button>
+            ))}
+          </div>
+        </div>
+      </div>
       <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Find My Suppliers" /></div>
 
       {result && (
@@ -1409,25 +1435,25 @@ export default function StartupStudio() {
                 <stop offset="0%" stopColor="#a78bfa" />
                 <stop offset="100%" stopColor={step.color} />
               </linearGradient>
-              {/* mask punches out each circle so line only shows in gaps */}
+              {/* mask punches out each circle so line only shows in gaps — 9 circles */}
               <mask id="waveMask">
                 <rect x="0" y="0" width="100" height="52" fill="white" />
-                {[6.25, 18.75, 31.25, 43.75, 56.25, 68.75, 81.25, 93.75].map((cx, i) => (
-                  <ellipse key={i} cx={cx} cy={26} rx={3.4} ry={26} fill="black" />
+                {[5.56, 16.67, 27.78, 38.89, 50, 61.11, 72.22, 83.33, 94.44].map((cx, i) => (
+                  <ellipse key={i} cx={cx} cy={26} rx={3.0} ry={26} fill="black" />
                 ))}
               </mask>
             </defs>
-            {/* background wave */}
+            {/* background wave — 9 nodes */}
             <path
-              d="M6.25,26 C10.25,14 14.75,14 18.75,26 C22.75,38 27.25,38 31.25,26 C35.25,14 39.75,14 43.75,26 C47.75,38 52.25,38 56.25,26 C60.25,14 64.75,14 68.75,26 C72.75,38 77.25,38 81.25,26 C85.25,14 89.75,14 93.75,26"
+              d="M5.56,26 C8.33,14 13.89,14 16.67,26 C19.44,38 25.0,38 27.78,26 C30.56,14 36.11,14 38.89,26 C41.67,38 47.22,38 50,26 C52.78,14 58.33,14 61.11,26 C63.89,38 69.44,38 72.22,26 C75.0,14 80.56,14 83.33,26 C86.11,38 91.67,38 94.44,26"
               fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.7"
               mask="url(#waveMask)" />
             {/* progress wave */}
             <path
-              d="M6.25,26 C10.25,14 14.75,14 18.75,26 C22.75,38 27.25,38 31.25,26 C35.25,14 39.75,14 43.75,26 C47.75,38 52.25,38 56.25,26 C60.25,14 64.75,14 68.75,26 C72.75,38 77.25,38 81.25,26 C85.25,14 89.75,14 93.75,26"
+              d="M5.56,26 C8.33,14 13.89,14 16.67,26 C19.44,38 25.0,38 27.78,26 C30.56,14 36.11,14 38.89,26 C41.67,38 47.22,38 50,26 C52.78,14 58.33,14 61.11,26 C63.89,38 69.44,38 72.22,26 C75.0,14 80.56,14 83.33,26 C86.11,38 91.67,38 94.44,26"
               fill="none" stroke="url(#waveGrad)" strokeWidth="1.4"
               pathLength="100" strokeDasharray="100"
-              strokeDashoffset={100 - ((active - 1) / 7) * 100}
+              strokeDashoffset={100 - ((active - 1) / 8) * 100}
               mask="url(#waveMask)"
               style={{ transition: 'stroke-dashoffset 0.7s ease' }}
             />

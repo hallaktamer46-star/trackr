@@ -1506,7 +1506,7 @@ Each slide must be specific to this exact business — no generic templates. Bul
 
 // POST /api/ai/startup/production — supplier sourcing, MOQ, quality, shipping
 router.post('/startup/production', async (req, res) => {
-  const { idea, industry, businessModel, pricingStrategy, targetMarket } = req.body
+  const { idea, industry, businessModel, pricingStrategy, targetMarket, sourcingScope, preferredCountry } = req.body
   if (!idea?.trim()) return res.status(400).json({ error: 'idea is required' })
   try {
     const raw = await ask(`You are a veteran product sourcing expert and supply chain consultant who has launched 200+ physical products. Give a complete, specific, actionable production and sourcing guide.
@@ -1516,6 +1516,10 @@ Industry: ${industry || 'Not specified'}
 Business Model: ${businessModel || 'Not specified'}
 Target Market: ${targetMarket || 'Not specified'}
 Pricing: ${pricingStrategy ? JSON.stringify(pricingStrategy) : 'Not specified'}
+Sourcing Scope: ${sourcingScope || 'Global'}
+Preferred Supplier Country: ${preferredCountry || 'No preference — recommend the best options globally'}
+
+IMPORTANT: Tailor ALL supplier platform recommendations, outreach templates, and cost breakdowns specifically to ${sourcingScope === 'Local / Regional' ? 'local and regional suppliers' : 'global suppliers'}${preferredCountry ? ` with a strong focus on ${preferredCountry}-based manufacturers and platforms` : ''}. For supplier_platforms, prioritise the most well-known and widely-used platforms relevant to this scope and country preference (e.g. if China: Alibaba, Made-in-China, Global Sources; if USA: ThomasNet, Maker's Row; if Germany: Wer liefert was; etc.).`
 
 Return ONLY valid JSON:
 {
