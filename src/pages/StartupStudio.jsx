@@ -296,6 +296,7 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
   const vars = useStepVars(s.color, s.glow)
   const result = data.ideaResult
   const verdictColor = { pass: '#fb7185', conditional: '#fbbf24', promising: '#38bdf8', strong: '#34d399' }
+  const [activeSection, setActiveSection] = useState(null)
 
   async function generate() {
     if (!data.pitch?.trim()) return setError('Describe your idea first.')
@@ -363,21 +364,103 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
             </div>
           </div>
 
-          {/* Sections grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {/* Sections grid — click any card for full detail */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {result.sections?.map(sec => {
               const sc = sec.score >= 70 ? '#34d399' : sec.score >= 45 ? '#fbbf24' : '#fb7185'
               return (
-                <div key={sec.id} style={{ padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{sec.title}</p>
-                    <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 900, color: sc }}>{sec.score}</span>
+                <div key={sec.id} onClick={() => setActiveSection(sec)}
+                  style={{
+                    padding: '14px 16px', borderRadius: 14, cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+                    transition: 'all 0.18s ease', position: 'relative', overflow: 'hidden',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.borderColor = `${sc}40` }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)' }}
+                >
+                  {/* score bar across top */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, height: 2, background: sc, width: `${sec.score}%`, transition: 'width 1s ease', borderRadius: '14px 0 0 0' }} />
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                    <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#93c5fd', letterSpacing: '0.1em', textTransform: 'uppercase', flex: 1, paddingRight: 8 }}>{sec.title}</p>
+                    <span style={{ fontFamily: MONO, fontSize: 18, fontWeight: 900, color: sc, flexShrink: 0 }}>{sec.score}</span>
                   </div>
-                  <p style={{ fontSize: 12, color: '#7dd3fc', lineHeight: 1.6 }}>{sec.analysis?.slice(0, 130)}…</p>
+
+                  {/* 2-line clamp — no JS truncation */}
+                  <p style={{
+                    fontSize: 12, color: '#e2e8f0', lineHeight: 1.6,
+                    display: '-webkit-box', WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                  }}>{sec.analysis}</p>
+
+                  <p style={{ fontFamily: MONO, fontSize: 8, color: sc + 'aa', letterSpacing: '0.08em', marginTop: 8 }}>TAP TO READ MORE →</p>
                 </div>
               )
             })}
           </div>
+
+          {/* Section detail modal — fixed, no scroll impact */}
+          {activeSection && (() => {
+            const sc = activeSection.score >= 70 ? '#34d399' : activeSection.score >= 45 ? '#fbbf24' : '#fb7185'
+            return (
+              <div onClick={() => setActiveSection(null)} style={{
+                position: 'fixed', inset: 0, zIndex: 200,
+                background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(16px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24,
+                animation: 'ssFadeUp 0.2s ease',
+              }}>
+                <div onClick={e => e.stopPropagation()} style={{
+                  width: '100%', maxWidth: 560, maxHeight: '80vh', overflowY: 'auto',
+                  background: 'linear-gradient(160deg, #080e1e 0%, #060912 100%)',
+                  border: `1px solid ${sc}40`,
+                  borderRadius: 20, padding: 28,
+                  boxShadow: `0 0 60px ${sc}20, 0 32px 80px rgba(0,0,0,0.6)`,
+                }}>
+                  {/* top score bar */}
+                  <div style={{ height: 3, background: `linear-gradient(90deg, ${sc}, ${sc}44)`, borderRadius: 99, marginBottom: 20 }} />
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                    <div>
+                      <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#93c5fd', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 6 }}>{activeSection.title}</p>
+                      <span style={{ fontFamily: MONO, fontSize: 42, fontWeight: 900, color: sc, letterSpacing: '-0.04em', lineHeight: 1 }}>{activeSection.score}</span>
+                      <span style={{ fontFamily: MONO, fontSize: 16, color: sc + '60' }}>/100</span>
+                    </div>
+                    <button onClick={() => setActiveSection(null)} style={{
+                      width: 32, height: 32, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)',
+                      background: 'rgba(255,255,255,0.05)', color: '#e2e8f0', cursor: 'pointer',
+                      fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>×</button>
+                  </div>
+
+                  <p style={{ fontSize: 14, color: '#e2e8f0', lineHeight: 1.8, marginBottom: 20 }}>{activeSection.analysis}</p>
+
+                  {activeSection.flags?.length > 0 && (
+                    <div style={{ marginBottom: 16 }}>
+                      <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#fb7185', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Concerns</p>
+                      {activeSection.flags.map((f, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+                          <AlertCircle size={12} style={{ color: '#fb7185', marginTop: 2, flexShrink: 0 }} />
+                          <p style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.6 }}>{f}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeSection.positives?.length > 0 && (
+                    <div>
+                      <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#34d399', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Positives</p>
+                      {activeSection.positives.map((p, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8 }}>
+                          <Check size={12} style={{ color: '#34d399', marginTop: 2, flexShrink: 0 }} />
+                          <p style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.6 }}>{p}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <ResultSection title="What Works" color="#34d399">
