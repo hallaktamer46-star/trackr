@@ -1091,55 +1091,56 @@ export default function StartupStudio() {
               <p style={{ fontSize: 13, color: '#7dd3fc', marginTop: 2 }}>{step.desc}</p>
             </div>
 
-            {/* progress tracker */}
-            <div style={{
-              flexShrink: 0, padding: '14px 20px', borderRadius: 18,
-              background: done.size > 0
-                ? `linear-gradient(135deg, ${step.color}12, rgba(255,255,255,0.02))`
-                : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${done.size > 0 ? step.color + '35' : 'rgba(255,255,255,0.08)'}`,
-              boxShadow: done.size > 0 ? `0 0 32px ${step.color}18` : 'none',
-              textAlign: 'center', transition: 'all 0.5s ease',
-            }}>
-              {/* big count */}
-              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 3, marginBottom: 10 }}>
+            {/* progress tracker — compact inline, no card */}
+            <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              {/* 8 colored dots — each step's own color */}
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                {STEPS.map(s => {
+                  const isDone = done.has(s.id)
+                  const isCurrent = s.id === active
+                  return (
+                    <div key={s.id} style={{
+                      width: isDone || isCurrent ? 11 : 7,
+                      height: isDone || isCurrent ? 11 : 7,
+                      borderRadius: '50%',
+                      background: isDone ? s.color : 'transparent',
+                      border: `2px solid ${isDone ? s.color : isCurrent ? s.color : s.color + '28'}`,
+                      boxShadow: isDone
+                        ? `0 0 10px ${s.color}, 0 0 20px ${s.color}50`
+                        : isCurrent ? `0 0 8px ${s.color}70` : 'none',
+                      transition: 'all 0.45s cubic-bezier(0.34,1.56,0.64,1)',
+                      animation: isCurrent && !isDone ? 'ssBadgePulse 1.8s ease-in-out infinite' : 'none',
+                    }} />
+                  )
+                })}
+              </div>
+
+              {/* count + status */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{
-                  fontSize: 44, fontWeight: 900, fontFamily: MONO, letterSpacing: '-0.05em', lineHeight: 1,
-                  background: done.size > 0
-                    ? `linear-gradient(135deg, ${step.color}, #e2e8f0)`
-                    : 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15))',
+                  fontFamily: MONO, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1,
+                  fontSize: 20,
+                  background: `linear-gradient(135deg, #a78bfa, ${step.color})`,
                   WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                }}>{done.size}</span>
-                <span style={{ fontSize: 20, fontWeight: 700, fontFamily: MONO, color: 'rgba(255,255,255,0.2)' }}>/8</span>
+                }}>
+                  {done.size}<span style={{ fontSize: 11, fontWeight: 700 }}>/8</span>
+                </span>
+                <span style={{
+                  fontFamily: MONO, fontSize: 8, fontWeight: 800, letterSpacing: '0.12em',
+                  color: done.size === 8 ? '#34d399' : step.color,
+                  textTransform: 'uppercase',
+                }}>
+                  {done.size === 0 && 'LET\'S GO'}
+                  {done.size === 1 && 'ROLLING'}
+                  {done.size === 2 && 'COOKING!'}
+                  {done.size === 3 && 'ON FIRE 🔥'}
+                  {done.size === 4 && 'HALFWAY!'}
+                  {done.size === 5 && 'CRUSHING IT'}
+                  {done.size === 6 && 'ALMOST!'}
+                  {done.size === 7 && 'LAST ONE!'}
+                  {done.size === 8 && 'DONE 🚀'}
+                </span>
               </div>
-
-              {/* 8 step segments — each lights up in its own color */}
-              <div style={{ display: 'flex', gap: 3, justifyContent: 'center', marginBottom: 10 }}>
-                {STEPS.map(s => (
-                  <div key={s.id} style={{
-                    width: 14, height: done.has(s.id) ? 8 : 5, borderRadius: 4,
-                    background: done.has(s.id) ? s.color : 'rgba(255,255,255,0.08)',
-                    boxShadow: done.has(s.id) ? `0 0 10px ${s.color}90` : 'none',
-                    transition: 'all 0.45s cubic-bezier(0.34,1.56,0.64,1)',
-                  }} />
-                ))}
-              </div>
-
-              {/* dynamic status */}
-              <p style={{
-                fontFamily: MONO, fontSize: 8, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase',
-                color: done.size === 8 ? '#34d399' : done.size > 0 ? step.color : 'rgba(255,255,255,0.25)',
-              }}>
-                {done.size === 0 && '✦ START YOUR JOURNEY ✦'}
-                {done.size === 1 && 'MOMENTUM BUILDING'}
-                {done.size === 2 && 'KEEP GOING!'}
-                {done.size === 3 && "YOU'RE ON FIRE 🔥"}
-                {done.size === 4 && 'HALFWAY THERE!'}
-                {done.size === 5 && 'MORE THAN HALFWAY!'}
-                {done.size === 6 && 'ALMOST THERE...'}
-                {done.size === 7 && 'ONE MORE TO GO!'}
-                {done.size === 8 && '✦ BLUEPRINT COMPLETE ✦'}
-              </p>
             </div>
           </div>
 
