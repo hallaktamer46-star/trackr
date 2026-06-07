@@ -109,6 +109,7 @@ const GLOBAL_CSS = `
   .ss-gen-btn:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: 0 8px 40px var(--sg, rgba(167,139,250,0.55)); }
   .ss-gen-btn:active { transform: translateY(0); filter: brightness(0.95); }
   .ss-gen-btn:disabled { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); box-shadow: none; cursor: default; transform: none; filter: none; }
+  .ss-dot { border-radius: 50% !important; display: block; flex-shrink: 0; }
   .ss-next-btn {
     display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
     border-radius: 12px; border: 1.5px solid var(--sc, #a78bfa);
@@ -1284,7 +1285,7 @@ export default function StartupStudio() {
 
         {/* ── Step Timeline ── */}
         <div style={{ marginBottom: 28, position: 'relative' }}>
-          {/* wavy SVG connector — replaces straight line */}
+          {/* wavy SVG connector — masked so line never enters circles */}
           <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 52, zIndex: 0, overflow: 'visible' }}
             viewBox="0 0 100 52" preserveAspectRatio="none">
             <defs>
@@ -1292,18 +1293,26 @@ export default function StartupStudio() {
                 <stop offset="0%" stopColor="#a78bfa" />
                 <stop offset="100%" stopColor={step.color} />
               </linearGradient>
+              {/* mask punches out each circle so line only shows in gaps */}
+              <mask id="waveMask">
+                <rect x="0" y="0" width="100" height="52" fill="white" />
+                {[6.25, 18.75, 31.25, 43.75, 56.25, 68.75, 81.25, 93.75].map((cx, i) => (
+                  <ellipse key={i} cx={cx} cy={26} rx={3.4} ry={26} fill="black" />
+                ))}
+              </mask>
             </defs>
-            {/* background wave — dim */}
+            {/* background wave */}
             <path
               d="M6.25,26 C10.25,14 14.75,14 18.75,26 C22.75,38 27.25,38 31.25,26 C35.25,14 39.75,14 43.75,26 C47.75,38 52.25,38 56.25,26 C60.25,14 64.75,14 68.75,26 C72.75,38 77.25,38 81.25,26 C85.25,14 89.75,14 93.75,26"
-              fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.6" />
-            {/* progress wave — colored, animates as steps complete */}
+              fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="0.7"
+              mask="url(#waveMask)" />
+            {/* progress wave */}
             <path
               d="M6.25,26 C10.25,14 14.75,14 18.75,26 C22.75,38 27.25,38 31.25,26 C35.25,14 39.75,14 43.75,26 C47.75,38 52.25,38 56.25,26 C60.25,14 64.75,14 68.75,26 C72.75,38 77.25,38 81.25,26 C85.25,14 89.75,14 93.75,26"
-              fill="none" stroke="url(#waveGrad)" strokeWidth="1.2"
-              pathLength="100"
-              strokeDasharray="100"
+              fill="none" stroke="url(#waveGrad)" strokeWidth="1.4"
+              pathLength="100" strokeDasharray="100"
               strokeDashoffset={100 - ((active - 1) / 7) * 100}
+              mask="url(#waveMask)"
               style={{ transition: 'stroke-dashoffset 0.7s ease' }}
             />
           </svg>
@@ -1380,37 +1389,27 @@ export default function StartupStudio() {
             {/* progress tracker */}
             <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7 }}>
 
-              {/* 8 colored dots — SVG circles (immune to CSS border-radius overrides) */}
-              <svg width={8*11 + 7*6} height={14} style={{ overflow: 'visible' }}>
-                {STEPS.map((s, i) => {
+              {/* 8 colored dots */}
+              <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+                {STEPS.map(s => {
                   const isDone = done.has(s.id)
                   const isCurrent = s.id === active
-                  const r = isDone || isCurrent ? 5.5 : 3.5
-                  const cx = i * (11 + 6) + (isDone || isCurrent ? 5.5 : (11-7)/2 + 3.5)
-                  const cy = 7
+                  const size = isDone || isCurrent ? 11 : 8
                   return (
-                    <g key={s.id}>
-                      {isCurrent && !isDone && (
-                        <circle cx={cx} cy={cy} r={r + 4} fill="none"
-                          stroke={s.color} strokeWidth="1"
-                          opacity="0.4"
-                          style={{ animation: 'ssRing 2s ease-out infinite' }} />
-                      )}
-                      <circle cx={cx} cy={cy} r={r}
-                        fill={isDone ? s.color : 'none'}
-                        stroke={isDone ? s.color : isCurrent ? s.color : s.color}
-                        strokeOpacity={isDone || isCurrent ? 1 : 0.2}
-                        strokeWidth={isDone || isCurrent ? 0 : 1.5}
-                        style={{
-                          filter: isDone ? `drop-shadow(0 0 5px ${s.color})` : isCurrent ? `drop-shadow(0 0 4px ${s.color}aa)` : 'none',
-                          transition: 'all 0.45s cubic-bezier(0.34,1.56,0.64,1)',
-                          animation: isCurrent && !isDone ? 'ssBadgePulse 1.8s ease-in-out infinite' : 'none',
-                        }}
-                      />
-                    </g>
+                    <div key={s.id} className="ss-dot" style={{
+                      width: size, height: size,
+                      background: isDone ? s.color : 'transparent',
+                      outline: isDone ? 'none' : `${isCurrent ? 2 : 1.5}px solid ${isCurrent ? s.color : s.color + '38'}`,
+                      outlineOffset: '0px',
+                      filter: isDone
+                        ? `drop-shadow(0 0 5px ${s.color})`
+                        : isCurrent ? `drop-shadow(0 0 3px ${s.color}90)` : 'none',
+                      transition: 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+                      animation: isCurrent && !isDone ? 'ssBadgePulse 1.8s ease-in-out infinite' : 'none',
+                    }} />
                   )
                 })}
-              </svg>
+              </div>
 
               {/* count — centered below dots */}
               <span style={{
