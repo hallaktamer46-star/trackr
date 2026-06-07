@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header'
 import Onboarding from '../Onboarding'
 import UpgradeCelebration from '../UpgradeCelebration'
+import EngageWidget from '../EngageWidget'
 import { useAuth } from '../../contexts/AuthContext'
 import { isSupabaseConfigured } from '../../lib/supabase'
 
@@ -42,6 +43,7 @@ export default function Layout({ children }) {
       {upgradePlan && (
         <UpgradeCelebration plan={upgradePlan} onClose={() => setUpgradePlan(null)} />
       )}
+      <EngageWidget />
     </div>
   )
 }
