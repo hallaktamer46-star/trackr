@@ -1414,11 +1414,9 @@ export default function StartupStudio() {
               {/* count — centered below dots */}
               <span style={{
                 fontFamily: MONO, fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1,
-                fontSize: 20,
-                background: `linear-gradient(135deg, #a78bfa, ${step.color})`,
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                fontSize: 20, color: step.color,
               }}>
-                {done.size}<span style={{ fontSize: 11, fontWeight: 700 }}>/8</span>
+                {done.size}<span style={{ fontSize: 11, fontWeight: 700, opacity: 0.55 }}>/8</span>
               </span>
 
               {/* status — own line, centered, only when progress made */}
