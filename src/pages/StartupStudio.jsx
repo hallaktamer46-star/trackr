@@ -21,11 +21,19 @@ const STEPS = [
   { id: 8, label: 'Pitch Builder',    short: 'Pitch',      desc: 'Investor-ready pitch',     color: '#fb923c', glow: 'rgba(251,146,60,0.35)',  icon: FileText   },
 ]
 
-const STAGES    = ['Idea', 'Pre-seed', 'Seed', 'Series A']
-const VIBES     = ['Modern', 'Bold', 'Playful', 'Professional', 'Luxury']
+const VIBES      = ['Modern', 'Bold', 'Playful', 'Professional', 'Luxury']
 const TEAM_SIZES = ['Just me', '2–3', '4–10', '10+']
-const BUDGETS   = ['Bootstrap', '$1k–$5k', '$5k–$20k', '$20k+']
-const GOALS     = ['First 10 customers', 'Email list', 'Go viral', 'Enterprise']
+const BUDGETS    = ['Bootstrap', '$1k–$5k', '$5k–$20k', '$20k+']
+const GOALS      = ['First 10 customers', 'Email list', 'Go viral', 'Enterprise']
+const FOUNDERS   = ['1', '2', '3', '4+']
+
+const INDUSTRIES = ['SaaS', 'FinTech', 'HealthTech', 'E-Commerce', 'EdTech', 'AI & ML', 'Real Estate', 'Food & Beverage', 'HR Tech', 'CleanTech', 'Gaming', 'Media & Content']
+const MARKETS    = ['Consumers (B2C)', 'Small Businesses', 'Enterprise (B2B)', 'Developers', 'Freelancers', 'Students', 'Healthcare Workers', 'Creators & Influencers', 'Parents & Families']
+const FUNDING    = ['Bootstrapped', 'Under $100k', '$100k – $500k', '$500k – $2M', '$2M – $10M', '$10M+']
+const LOCATIONS  = ['United States', 'United Kingdom', 'Europe', 'Middle East', 'Asia Pacific', 'Canada', 'Australia', 'Latin America']
+const COUNTRIES  = ['United States', 'United Kingdom', 'UAE', 'Canada', 'Australia', 'Singapore', 'Germany', 'Netherlands']
+
+const IDEA_STARTERS = ['A marketplace for…', 'A SaaS tool that helps…', 'A mobile app for…', 'A platform connecting…', 'An AI tool that…', 'A subscription service for…']
 
 /* ─── CSS injected globally ─────────────────────────────────────── */
 const GLOBAL_CSS = `
@@ -155,6 +163,69 @@ function Pills({ options, value, onChange }) {
   )
 }
 
+function OptionGrid({ options, value, onChange, cols = 3 }) {
+  const knownValues = options
+  const isCustom = value && !knownValues.includes(value)
+  const [otherOpen, setOtherOpen] = useState(isCustom)
+  const [otherText, setOtherText] = useState(isCustom ? value : '')
+
+  function pick(opt) {
+    setOtherOpen(false)
+    onChange(opt)
+  }
+  function openOther() {
+    setOtherOpen(true)
+    onChange(otherText)
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 8 }}>
+        {options.map(opt => {
+          const selected = value === opt && !otherOpen
+          return (
+            <button key={opt} onClick={() => pick(opt)} style={{
+              padding: '11px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left',
+              border: `1.5px solid ${selected ? 'var(--sc, #a78bfa)' : 'rgba(255,255,255,0.08)'}`,
+              background: selected ? 'var(--sc-bg, rgba(167,139,250,0.18))' : 'rgba(255,255,255,0.04)',
+              color: selected ? 'var(--sc, #a78bfa)' : '#6b7280',
+              fontFamily: SANS, fontSize: 13, fontWeight: selected ? 600 : 400,
+              boxShadow: selected ? '0 0 0 2px var(--sc-bg, rgba(167,139,250,0.15))' : 'none',
+              transition: 'all 0.18s ease',
+            }}
+            onMouseEnter={e => { if (!selected) { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)' } }}
+            onMouseLeave={e => { if (!selected) { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)' } }}
+            >
+              {opt}
+            </button>
+          )
+        })}
+        <button onClick={openOther} style={{
+          padding: '11px 14px', borderRadius: 12, cursor: 'pointer', textAlign: 'left',
+          border: `1.5px solid ${otherOpen ? 'var(--sc, #a78bfa)' : 'rgba(255,255,255,0.08)'}`,
+          background: otherOpen ? 'var(--sc-bg, rgba(167,139,250,0.18))' : 'rgba(255,255,255,0.04)',
+          color: otherOpen ? 'var(--sc, #a78bfa)' : '#4b5563',
+          fontFamily: SANS, fontSize: 13, fontStyle: 'italic',
+          boxShadow: otherOpen ? '0 0 0 2px var(--sc-bg, rgba(167,139,250,0.15))' : 'none',
+          transition: 'all 0.18s ease',
+        }}
+        onMouseEnter={e => { if (!otherOpen) { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.background = 'rgba(255,255,255,0.07)' } }}
+        onMouseLeave={e => { if (!otherOpen) { e.currentTarget.style.color = '#4b5563'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)' } }}
+        >
+          Other…
+        </button>
+      </div>
+      {otherOpen && (
+        <input autoFocus className={`ss-input${otherText ? ' filled' : ''}`}
+          placeholder="Type your own answer…"
+          value={otherText}
+          onChange={e => { setOtherText(e.target.value); onChange(e.target.value) }}
+        />
+      )}
+    </div>
+  )
+}
+
 function GenBtn({ loading, disabled, label = 'Generate' }) {
   return (
     <button type="button" className="ss-gen-btn" disabled={loading || disabled}>
@@ -220,7 +291,7 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
     try {
       const res = await apiFetch('/api/ai/pitch', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pitch: data.pitch, industry: data.industry, stage: data.stage || 'Idea', fundingAsk: data.fundingAsk, targetMarket: data.targetMarket }),
+        body: JSON.stringify({ pitch: data.pitch, industry: data.industry, fundingAsk: data.fundingAsk, targetMarket: data.targetMarket }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error)
@@ -230,24 +301,43 @@ function IdeaValidatorPanel({ data, onUpdate, onNext, loading, setLoading, setEr
 
   return (
     <div style={vars}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <SInput textarea rows={4} label="Your Business Idea"
-          placeholder="Describe what your business does, the problem it solves, and who it's for…"
-          value={data.pitch || ''} onChange={e => onUpdate({ pitch: e.target.value })} />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <SInput label="Industry" placeholder="e.g. FinTech, HealthTech, SaaS"
-            value={data.industry || ''} onChange={e => onUpdate({ industry: e.target.value })} />
-          <SInput label="Target Market" placeholder="e.g. SMB founders in the US"
-            value={data.targetMarket || ''} onChange={e => onUpdate({ targetMarket: e.target.value })} />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <div>
-            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Stage</label>
-            <Pills options={STAGES} value={data.stage || 'Idea'} onChange={v => onUpdate({ stage: v })} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+
+        {/* Idea textarea + quick starters */}
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Your Business Idea</label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+            {IDEA_STARTERS.map(s => (
+              <button key={s} onClick={() => onUpdate({ pitch: s })} style={{
+                padding: '5px 12px', borderRadius: 99, border: '1px solid rgba(255,255,255,0.1)',
+                background: 'rgba(255,255,255,0.04)', color: '#4b5563', cursor: 'pointer',
+                fontFamily: SANS, fontSize: 12, transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.color = s.color; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#e2e8f0' }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#4b5563'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)' }}
+              >{s}</button>
+            ))}
           </div>
-          <SInput label="Funding Ask (optional)" placeholder="e.g. $500k"
-            value={data.fundingAsk || ''} onChange={e => onUpdate({ fundingAsk: e.target.value })} />
+          <SInput textarea rows={3}
+            placeholder="Describe what your business does, the problem it solves, and who it's for…"
+            value={data.pitch || ''} onChange={e => onUpdate({ pitch: e.target.value })} />
         </div>
+
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Industry</label>
+          <OptionGrid options={INDUSTRIES} value={data.industry} onChange={v => onUpdate({ industry: v })} cols={3} />
+        </div>
+
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Target Market</label>
+          <OptionGrid options={MARKETS} value={data.targetMarket} onChange={v => onUpdate({ targetMarket: v })} cols={3} />
+        </div>
+
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Funding Ask</label>
+          <OptionGrid options={FUNDING} value={data.fundingAsk} onChange={v => onUpdate({ fundingAsk: v })} cols={3} />
+        </div>
+
         <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch?.trim()} label="Validate My Idea" /></div>
       </div>
 
@@ -539,13 +629,13 @@ function FinancialPanel({ data, onUpdate, onNext, loading, setLoading, setError 
   return (
     <div style={vars}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <div>
-            <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Team Size</label>
-            <Pills options={TEAM_SIZES} value={data.teamSize || 'Just me'} onChange={v => onUpdate({ teamSize: v })} />
-          </div>
-          <SInput label="Location / Market" placeholder="e.g. United States, London"
-            value={data.location || ''} onChange={e => onUpdate({ location: e.target.value })} />
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Team Size</label>
+          <Pills options={TEAM_SIZES} value={data.teamSize || 'Just me'} onChange={v => onUpdate({ teamSize: v })} />
+        </div>
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Location / Market</label>
+          <OptionGrid options={LOCATIONS} value={data.location} onChange={v => onUpdate({ location: v })} cols={4} />
         </div>
         <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Build Financial Projections" /></div>
       </div>
@@ -700,11 +790,13 @@ function LegalPanel({ data, onUpdate, onNext, loading, setLoading, setError }) {
   return (
     <div style={vars}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-          <SInput label="Country of Registration" placeholder="e.g. United States, UK, UAE"
-            value={data.legalCountry || ''} onChange={e => onUpdate({ legalCountry: e.target.value })} />
-          <SInput label="Number of Founders" type="number" min="1" placeholder="1"
-            value={data.founders || ''} onChange={e => onUpdate({ founders: e.target.value })} />
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Country of Registration</label>
+          <OptionGrid options={COUNTRIES} value={data.legalCountry} onChange={v => onUpdate({ legalCountry: v })} cols={4} />
+        </div>
+        <div>
+          <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, letterSpacing: '0.14em', color: '#4b5563', textTransform: 'uppercase', display: 'block', marginBottom: 10 }}>Number of Founders</label>
+          <Pills options={FOUNDERS} value={data.founders || '1'} onChange={v => onUpdate({ founders: v })} />
         </div>
         <div onClick={generate}><GenBtn loading={loading} disabled={!data.pitch} label="Get Legal Advice" /></div>
       </div>
