@@ -1144,7 +1144,6 @@ export default function StartupStudio() {
                 </span>
               )}
             </div>
-            </div>
           </div>
 
           {/* body */}
