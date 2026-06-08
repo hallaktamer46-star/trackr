@@ -17,7 +17,7 @@ const STATUSES = [
 function fmt(s) {
   if (!s || s <= 0) return '0s'
   const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60
-  if (h > 0) return `${h}h ${String(m).padStart(2,'0')}m`
+  if (h > 0) return `${h}h ${String(m).padStart(2,'0')}m ${String(sec).padStart(2,'0')}s`
   if (m > 0) return `${m}m ${String(sec).padStart(2,'0')}s`
   return `${sec}s`
 }
@@ -94,7 +94,22 @@ export default function EngageWidget() {
 
   function endShift() {
     const now = Date.now()
-    setLog(l => { const c=[...l]; if(c.length&&!c[c.length-1].end) c[c.length-1]={...c[c.length-1],end:now}; return c })
+    // finalise log
+    const finalLog = log.map((e,i) => i===log.length-1 && !e.end ? {...e,end:now} : e)
+    // compute totals for history
+    const finalTotals = {}
+    for (const e of finalLog) { const s=Math.floor((e.end-e.start)/1000); finalTotals[e.status]=(finalTotals[e.status]||0)+s }
+    const totalSecs = shiftStart ? Math.floor((now-shiftStart)/1000) : 0
+    // save to history
+    try {
+      const hist = JSON.parse(localStorage.getItem('trackr_history')||'[]')
+      const idx = hist.findIndex(h=>h.date===today)
+      const record = { date:today, total:totalSecs, statuses:finalTotals, shiftStart, shiftEnd:now }
+      if (idx>=0) hist[idx]=record; else hist.push(record)
+      hist.sort((a,b)=>new Date(b.date)-new Date(a.date))
+      localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0,60)))
+    } catch {}
+    setLog(finalLog)
     setStatus(null); setShiftStart(null); setLog([]); setTab('activity')
   }
 

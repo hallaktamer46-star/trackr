@@ -16,6 +16,7 @@ import Roadmap from './pages/Roadmap'
 import PitchLab from './pages/PitchLab'
 import GrowthLab from './pages/GrowthLab'
 import StartupStudio from './pages/StartupStudio'
+import TimeReport from './pages/TimeReport'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -146,6 +147,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <StartupStudio />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/time-report" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <TimeReport />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
