@@ -1,397 +1,332 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { Zap, Flame, Clock, Calendar, TrendingUp } from 'lucide-react'
 
-const MONO = 'Geist Mono, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const MONO = '"Geist Mono", "JetBrains Mono", "Fira Code", monospace'
+const DISPLAY = '"Inter", "SF Pro Display", -apple-system, sans-serif'
 
-const STATUS_COLORS = {
-  not_ready: '#ff6b6b',
-  working:   '#4edea3',
-  break:     '#ffb347',
-  meeting:   '#f472b6',
-  research:  '#60a5fa',
-  clerical:  '#fbbf24',
-  coaching:  '#a78bfa',
-}
-const STATUS_LABELS = {
-  not_ready: 'Not Ready',
-  working:   'Working',
-  break:     'Break',
-  meeting:   'Meeting',
-  research:  'Research',
-  clerical:  'Clerical',
-  coaching:  'Coaching',
-}
-const STATUS_GRADIENTS = {
-  not_ready: 'linear-gradient(135deg,#ff6b6b,#ff4757)',
-  working:   'linear-gradient(135deg,#4edea3,#00d2aa)',
-  break:     'linear-gradient(135deg,#ffb347,#ff9500)',
-  meeting:   'linear-gradient(135deg,#f472b6,#ec4899)',
-  research:  'linear-gradient(135deg,#60a5fa,#3b82f6)',
-  clerical:  'linear-gradient(135deg,#fbbf24,#f59e0b)',
-  coaching:  'linear-gradient(135deg,#a78bfa,#8b5cf6)',
+const S = {
+  working:   { label:'Working',   color:'#00ffb3', dim:'rgba(0,255,179,0.12)' },
+  break:     { label:'Break',     color:'#ff9500', dim:'rgba(255,149,0,0.12)' },
+  meeting:   { label:'Meeting',   color:'#ff2d78', dim:'rgba(255,45,120,0.12)' },
+  research:  { label:'Research',  color:'#00d4ff', dim:'rgba(0,212,255,0.12)' },
+  clerical:  { label:'Clerical',  color:'#ffe600', dim:'rgba(255,230,0,0.12)' },
+  coaching:  { label:'Coaching',  color:'#bf5af2', dim:'rgba(191,90,242,0.12)' },
+  not_ready: { label:'Not Ready', color:'#ff453a', dim:'rgba(255,69,58,0.12)'  },
 }
 
 function fmtSecs(s) {
-  if (!s || s <= 0) return '0m'
-  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60)
-  if (h > 0) return `${h}h ${String(m).padStart(2,'0')}m`
-  return `${m}m`
+  if (!s || s<=0) return '0m'
+  const h=Math.floor(s/3600), m=Math.floor((s%3600)/60)
+  return h>0 ? `${h}h ${String(m).padStart(2,'0')}m` : `${m}m`
 }
 function fmtSecsShort(s) {
-  const h = Math.floor(s/3600)
-  return h > 0 ? `${h}h` : `${Math.floor(s/60)}m`
+  const h=Math.floor(s/3600)
+  return h>0 ? `${h}h` : `${Math.floor(s/60)}m`
 }
-
 function loadHistory() {
-  try { return JSON.parse(localStorage.getItem('trackr_history') || '[]') } catch { return [] }
+  try { return JSON.parse(localStorage.getItem('trackr_history')||'[]') } catch { return [] }
 }
 function loadToday() {
   try {
-    const d = JSON.parse(localStorage.getItem('trackr_engage_v2') || '{}')
-    const today = new Date().toDateString()
-    if (d.date !== today) return null
-    const now = Date.now(), t = {}
+    const d=JSON.parse(localStorage.getItem('trackr_engage_v2')||'{}')
+    if (d.date!==new Date().toDateString()) return null
+    const now=Date.now(), t={}
     for (const e of (d.log||[])) { const s=Math.floor(((e.end||now)-e.start)/1000); t[e.status]=(t[e.status]||0)+s }
-    const total = d.shiftStart ? Math.floor((now - d.shiftStart)/1000) : 0
-    return { statuses: t, total, shiftStart: d.shiftStart, live: d.status !== null }
+    return { statuses:t, total:d.shiftStart?Math.floor((now-d.shiftStart)/1000):0, shiftStart:d.shiftStart, live:d.status!==null, currentStatus:d.status }
   } catch { return null }
 }
-function getLast7Days() {
-  const days = []
-  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate()-i); days.push(d.toDateString()) }
-  return days
+function getLast7() {
+  return Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(6-i)); return d.toDateString() })
 }
 
-const CustomTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null
+const TT = ({ active, payload, label }) => {
+  if (!active||!payload?.length) return null
   return (
-    <div style={{ background:'rgba(5,8,20,0.97)', border:'1px solid rgba(96,165,250,0.25)', padding:'12px 16px', fontFamily:MONO, borderRadius:8, boxShadow:'0 8px 32px rgba(0,0,0,0.5)' }}>
-      <p style={{ fontSize:10, color:'#60a5fa', marginBottom:8, textTransform:'uppercase', letterSpacing:'0.08em' }}>{label}</p>
-      {payload.map(p => p.value > 0 && (
-        <div key={p.name} style={{ display:'flex', alignItems:'center', gap:8, marginBottom:4 }}>
-          <div style={{ width:6, height:6, borderRadius:'50%', background:STATUS_COLORS[p.name]||'#60a5fa' }}/>
-          <p style={{ fontSize:11, color: STATUS_COLORS[p.name]||'#c8d8f0' }}>
-            {STATUS_LABELS[p.name]||p.name}: {fmtSecs(p.value)}
-          </p>
+    <div style={{background:'#020408',border:'1px solid rgba(0,212,255,0.2)',padding:'10px 14px',fontFamily:MONO,boxShadow:'0 8px 32px rgba(0,0,0,0.8)'}}>
+      <p style={{fontSize:9,color:'#00d4ff',marginBottom:8,letterSpacing:'0.12em',textTransform:'uppercase'}}>{label}</p>
+      {payload.map(p=>p.value>0&&(
+        <div key={p.name} style={{display:'flex',alignItems:'center',gap:8,marginBottom:3}}>
+          <div style={{width:5,height:5,background:S[p.name]?.color||'#00d4ff'}}/>
+          <span style={{fontSize:10,color:S[p.name]?.color||'#c8d8f0'}}>{S[p.name]?.label||p.name} · {fmtSecs(p.value)}</span>
         </div>
       ))}
     </div>
   )
 }
 
-function GlowCard({ children, color = '#60a5fa', style = {} }) {
-  return (
-    <div style={{
-      background: `linear-gradient(135deg, ${color}08 0%, rgba(5,8,20,0.9) 100%)`,
-      border: `1px solid ${color}30`,
-      borderRadius: 16,
-      boxShadow: `0 0 32px ${color}12, inset 0 1px 0 ${color}15`,
-      backdropFilter: 'blur(12px)',
-      ...style,
-    }}>
-      {children}
-    </div>
-  )
-}
-
-function StatBar({ label, secs, total, color, gradient }) {
-  const pct = total > 0 ? Math.min(100, (secs/total)*100) : 0
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ width:8, height:8, borderRadius:'50%', background:color, boxShadow:`0 0 8px ${color}` }}/>
-          <span style={{ fontSize:13, fontWeight:500, color:'#c8d8f0', fontFamily:SANS }}>{label}</span>
-        </div>
-        <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-          <span style={{ fontFamily:MONO, fontSize:10, color:`${color}99` }}>{Math.round(pct)}%</span>
-          <span style={{ fontFamily:MONO, fontSize:12, fontWeight:700, color }}>{fmtSecs(secs)}</span>
-        </div>
-      </div>
-      <div style={{ height:6, background:'rgba(255,255,255,0.04)', borderRadius:99, overflow:'hidden' }}>
-        <div style={{
-          height:'100%', borderRadius:99,
-          background: gradient || color,
-          width:`${pct}%`,
-          boxShadow:`0 0 12px ${color}80`,
-          transition:'width 0.8s cubic-bezier(0.34,1.2,0.64,1)',
-          position:'relative', overflow:'hidden',
-        }}>
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)', animation:'shimmer 2s infinite' }}/>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export default function TimeReport() {
-  const [activeTab, setActiveTab] = useState('today')
-  const history  = useMemo(() => loadHistory(), [])
-  const todayData = useMemo(() => loadToday(), [])
-  const today    = new Date().toDateString()
+  const [tab, setTab]   = useState('today')
+  const [tick, setTick] = useState(0)
+  const history   = useMemo(()=>loadHistory(),[])
+  const today     = new Date().toDateString()
+  const todayData = useMemo(()=>loadToday(),[tick])
 
-  const allData = useMemo(() => {
-    const hist = [...history]
-    if (todayData) {
-      const idx = hist.findIndex(h => h.date === today)
-      const record = { date:today, ...todayData }
-      if (idx>=0) hist[idx]=record; else hist.unshift(record)
-    }
+  useEffect(()=>{
+    const t=setInterval(()=>setTick(x=>x+1),1000)
+    return ()=>clearInterval(t)
+  },[])
+
+  const allData = useMemo(()=>{
+    const hist=[...history]
+    if (todayData) { const i=hist.findIndex(h=>h.date===today); const r={date:today,...todayData}; i>=0?hist.splice(i,1,r):hist.unshift(r) }
     return hist
-  }, [history, todayData])
+  },[history,todayData,tick])
 
-  const weekDays = getLast7Days()
-  const weekData = weekDays.map(date => {
-    const d = allData.find(h => h.date === date)
-    const label = new Date(date).toLocaleDateString('en',{weekday:'short'})
-    if (!d) return { date:label, total:0 }
-    return { date:label, total:d.total, ...d.statuses }
+  const weekDays = getLast7()
+  const weekData = weekDays.map(date=>{
+    const d=allData.find(h=>h.date===date)
+    return { date:new Date(date).toLocaleDateString('en',{weekday:'short'}), total:d?.total||0, ...(d?.statuses||{}) }
   })
 
-  const overallTotals = useMemo(() => {
-    const t = {}; let grand = 0
-    for (const d of allData) for (const [k,v] of Object.entries(d.statuses||{})) { t[k]=(t[k]||0)+v; grand+=v }
-    return { statuses:t, total:grand }
-  }, [allData])
+  const overall = useMemo(()=>{
+    const t={};let g=0
+    for (const d of allData) for (const [k,v] of Object.entries(d.statuses||{})) { t[k]=(t[k]||0)+v; g+=v }
+    return {s:t,total:g}
+  },[allData])
 
-  const todayStatuses = todayData?.statuses || {}
-  const todayTotal    = todayData?.total    || 0
-  const statusKeys    = Object.keys(STATUS_LABELS)
+  const TD   = todayData?.statuses||{}
+  const TTOT = todayData?.total||0
+  const keys = Object.keys(S)
 
-  const TABS = [
-    { key:'today',   label:'Today',    icon:Zap },
-    { key:'weekly',  label:'Weekly',   icon:Calendar },
-    { key:'alltime', label:'All Time', icon:TrendingUp },
-  ]
+  const topStatus = TTOT>0 ? keys.reduce((a,b)=>(TD[a]||0)>(TD[b]||0)?a:b) : null
+
+  // ── shared pieces ────────────────────────────────────────────
+
+  const Row = ({k, secs, total}) => {
+    const def = S[k]||{label:k,color:'#00d4ff',dim:'rgba(0,212,255,0.1)'}
+    const pct = total>0 ? Math.min(100,(secs/total)*100) : 0
+    return (
+      <div style={{display:'flex',alignItems:'center',gap:0,marginBottom:2}}>
+        <div style={{width:3,alignSelf:'stretch',background:def.color,opacity:0.9,flexShrink:0}}/>
+        <div style={{flex:1,background:def.dim,padding:'10px 16px',display:'flex',alignItems:'center',gap:12}}>
+          <span style={{fontFamily:MONO,fontSize:10,color:def.color,letterSpacing:'0.06em',textTransform:'uppercase',width:80,flexShrink:0}}>{def.label}</span>
+          <div style={{flex:1,height:3,background:'rgba(255,255,255,0.05)'}}>
+            <div style={{height:'100%',background:def.color,width:`${pct}%`,boxShadow:`0 0 8px ${def.color}`,transition:'width 1s ease'}}/>
+          </div>
+          <span style={{fontFamily:MONO,fontSize:11,color:def.color,fontWeight:700,minWidth:52,textAlign:'right'}}>{fmtSecs(secs)}</span>
+          <span style={{fontFamily:MONO,fontSize:9,color:`${def.color}60`,minWidth:28,textAlign:'right'}}>{Math.round(pct)}%</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div style={{ fontFamily:SANS, maxWidth:860, margin:'0 auto', position:'relative' }}>
+    <div style={{fontFamily:DISPLAY,background:'#020408',minHeight:'100vh',margin:'-24px',padding:'0 0 80px'}}>
 
-      {/* Background orbs */}
-      <div style={{ position:'fixed', top:'10%', right:'-5%', width:500, height:500, borderRadius:'50%', background:'radial-gradient(circle,rgba(96,165,250,0.06) 0%,transparent 70%)', pointerEvents:'none', zIndex:0 }}/>
-      <div style={{ position:'fixed', bottom:'15%', left:'-8%', width:400, height:400, borderRadius:'50%', background:'radial-gradient(circle,rgba(78,222,163,0.05) 0%,transparent 70%)', pointerEvents:'none', zIndex:0 }}/>
-
-      <div style={{ position:'relative', zIndex:1 }}>
-
-        {/* Header */}
-        <div style={{ marginBottom:32 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
-            <div style={{ width:32, height:32, borderRadius:8, background:'linear-gradient(135deg,#60a5fa20,#4edea315)', border:'1px solid rgba(96,165,250,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <Clock size={14} style={{ color:'#60a5fa' }}/>
+      {/* ── TOP STRIP ───────────────────────────────────────── */}
+      <div style={{borderBottom:'1px solid rgba(0,212,255,0.1)',padding:'14px 32px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.22em',color:'rgba(0,212,255,0.4)',textTransform:'uppercase'}}>ENGAGE · TRACKER</span>
+        <div style={{display:'flex',alignItems:'center',gap:16}}>
+          {todayData?.live && (
+            <div style={{display:'flex',alignItems:'center',gap:6}}>
+              <div style={{width:5,height:5,background:'#00ffb3',boxShadow:'0 0 8px #00ffb3',animation:'pulse 1.5s ease-in-out infinite'}}/>
+              <span style={{fontFamily:MONO,fontSize:8,color:'#00ffb3',letterSpacing:'0.14em'}}>LIVE</span>
             </div>
-            <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.14em', color:'rgba(96,165,250,0.6)', textTransform:'uppercase' }}>
-              Engage Tracker
-            </p>
+          )}
+          <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.16em',color:'rgba(0,212,255,0.35)',textTransform:'uppercase'}}>
+            {new Date().toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})}
+          </span>
+        </div>
+      </div>
+
+      {/* ── HERO ────────────────────────────────────────────── */}
+      <div style={{padding:'40px 32px 0',display:'grid',gridTemplateColumns:'1fr auto',alignItems:'end',gap:24,marginBottom:0}}>
+        <div>
+          <p style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.22em',color:'rgba(255,255,255,0.2)',textTransform:'uppercase',marginBottom:16}}>TIME REPORT</p>
+          <div style={{display:'flex',alignItems:'baseline',gap:16,flexWrap:'wrap'}}>
+            <span style={{
+              fontFamily:MONO, fontWeight:900, lineHeight:0.9,
+              fontSize:'clamp(52px,8vw,88px)',
+              letterSpacing:'-0.04em',
+              background:'linear-gradient(135deg,#e8f4fd 0%,#00d4ff 60%,#00ffb3 100%)',
+              WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+            }}>
+              {TTOT>0 ? fmtSecs(TTOT) : '——'}
+            </span>
+            <div style={{paddingBottom:8}}>
+              <p style={{fontFamily:MONO,fontSize:9,color:'rgba(255,255,255,0.2)',letterSpacing:'0.14em',textTransform:'uppercase',marginBottom:4}}>TODAY</p>
+              {topStatus && (
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <div style={{width:6,height:6,background:S[topStatus]?.color}}/>
+                  <span style={{fontFamily:MONO,fontSize:10,color:S[topStatus]?.color,letterSpacing:'0.06em'}}>
+                    {S[topStatus]?.label} · {fmtSecs(TD[topStatus]||0)}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-          <h1 style={{ fontSize:30, fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, marginBottom:8, background:'linear-gradient(135deg,#e2e8f0 0%,#60a5fa 50%,#4edea3 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-            Time Report
-          </h1>
-          <p style={{ fontSize:13, color:'#4a6a8a', lineHeight:1.5 }}>
-            Your activity, patterns, and how your time is really spent.
-          </p>
         </div>
 
-        {/* Tab bar */}
-        <div style={{ display:'flex', gap:4, marginBottom:28, background:'rgba(5,8,20,0.6)', border:'1px solid rgba(96,165,250,0.12)', borderRadius:12, padding:4 }}>
-          {TABS.map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => setActiveTab(key)} style={{
-              flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-              padding:'9px 0', border:'none', borderRadius:9, cursor:'pointer', transition:'all 0.2s',
-              background: activeTab===key ? 'linear-gradient(135deg,rgba(96,165,250,0.18),rgba(78,222,163,0.12))' : 'transparent',
-              color: activeTab===key ? '#60a5fa' : '#2a4060',
-              fontFamily:MONO, fontSize:10, fontWeight:700, letterSpacing:'0.06em',
-              boxShadow: activeTab===key ? '0 2px 12px rgba(96,165,250,0.15),inset 0 1px 0 rgba(96,165,250,0.15)' : 'none',
-            }}>
-              <Icon size={12}/>{label}
-            </button>
+        {/* Quick status pills */}
+        <div style={{display:'flex',flexDirection:'column',gap:3,paddingBottom:4}}>
+          {keys.filter(k=>(TD[k]||0)>0).slice(0,4).map(k=>(
+            <div key={k} style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:16,padding:'5px 12px',background:S[k].dim,border:`1px solid ${S[k].color}25`}}>
+              <span style={{fontFamily:MONO,fontSize:9,color:S[k].color,letterSpacing:'0.08em',textTransform:'uppercase'}}>{S[k].label}</span>
+              <span style={{fontFamily:MONO,fontSize:9,color:`${S[k].color}80`}}>{fmtSecs(TD[k]||0)}</span>
+            </div>
           ))}
         </div>
+      </div>
 
-        {/* ── TODAY ── */}
-        {activeTab === 'today' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      {/* ── TABS ────────────────────────────────────────────── */}
+      <div style={{display:'flex',alignItems:'center',gap:0,padding:'32px 32px 0',marginBottom:0}}>
+        {[['today','TODAY'],['weekly','WEEKLY'],['alltime','ALL TIME']].map(([k,l],i)=>(
+          <button key={k} onClick={()=>setTab(k)} style={{
+            padding:'10px 22px', border:'none', cursor:'pointer', fontFamily:MONO,
+            fontSize:10, fontWeight:700, letterSpacing:'0.14em',
+            background:'transparent',
+            color: tab===k ? '#00d4ff' : 'rgba(255,255,255,0.18)',
+            borderBottom: tab===k ? '2px solid #00d4ff' : '2px solid transparent',
+            borderRight: i<2 ? '1px solid rgba(0,212,255,0.1)' : 'none',
+            transition:'all 0.15s',
+          }}>{l}</button>
+        ))}
+        <div style={{flex:1,height:1,background:'linear-gradient(90deg,rgba(0,212,255,0.15),transparent)',marginLeft:8}}/>
+      </div>
+
+      <div style={{padding:'24px 32px 0'}}>
+
+        {/* ── TODAY ───────────────────────────────────────── */}
+        {tab==='today' && (
+          <div>
             {!todayData ? (
-              <GlowCard color="#60a5fa" style={{ padding:'48px 32px', textAlign:'center' }}>
-                <Zap size={28} style={{ color:'#60a5fa', margin:'0 auto 16px', opacity:0.4 }}/>
-                <p style={{ fontFamily:MONO, fontSize:11, color:'#2a4a70', letterSpacing:'0.08em' }}>Clock in to start tracking today.</p>
-              </GlowCard>
+              <div style={{padding:'60px 0',textAlign:'center'}}>
+                <p style={{fontFamily:MONO,fontSize:11,color:'rgba(255,255,255,0.15)',letterSpacing:'0.14em',textTransform:'uppercase'}}>
+                  NO SHIFT STARTED · OPEN ENGAGE TO CLOCK IN
+                </p>
+              </div>
             ) : (
               <>
-                {/* Top stat cards */}
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                  <GlowCard color="#4edea3" style={{ padding:'22px 24px' }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-                      <Flame size={13} style={{ color:'#4edea3' }}/>
-                      <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(78,222,163,0.6)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Total today</p>
-                      {todayData.live && <span style={{ fontFamily:MONO, fontSize:8, color:'#4edea3', background:'rgba(78,222,163,0.12)', padding:'2px 7px', borderRadius:99, border:'1px solid rgba(78,222,163,0.3)' }}>● LIVE</span>}
+                {/* top row */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:2,marginBottom:2}}>
+                  {[
+                    {l:'TOTAL TIME',    v:fmtSecs(TTOT),  c:'#00d4ff'},
+                    {l:'SHIFT START',   v:todayData.shiftStart?new Date(todayData.shiftStart).toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}):'—', c:'#00ffb3'},
+                    {l:'STATUS',        v:todayData.currentStatus?S[todayData.currentStatus]?.label||'—':'Off', c:todayData.currentStatus?S[todayData.currentStatus]?.color:'rgba(255,255,255,0.3)'},
+                  ].map(({l,v,c})=>(
+                    <div key={l} style={{background:'rgba(255,255,255,0.02)',border:`1px solid ${c}18`,borderTop:`2px solid ${c}`,padding:'18px 20px'}}>
+                      <p style={{fontFamily:MONO,fontSize:8,color:`${c}60`,letterSpacing:'0.14em',textTransform:'uppercase',marginBottom:10}}>{l}</p>
+                      <p style={{fontFamily:MONO,fontSize:22,fontWeight:800,color:c,letterSpacing:'-0.02em'}}>{v}</p>
                     </div>
-                    <p style={{ fontFamily:MONO, fontSize:32, fontWeight:800, letterSpacing:'-0.05em', background:'linear-gradient(135deg,#4edea3,#00d2aa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-                      {fmtSecs(todayTotal)}
-                    </p>
-                  </GlowCard>
-                  <GlowCard color="#60a5fa" style={{ padding:'22px 24px' }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-                      <Clock size={13} style={{ color:'#60a5fa' }}/>
-                      <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(96,165,250,0.6)', textTransform:'uppercase', letterSpacing:'0.1em' }}>Started at</p>
-                    </div>
-                    <p style={{ fontFamily:MONO, fontSize:28, fontWeight:800, letterSpacing:'-0.04em', background:'linear-gradient(135deg,#60a5fa,#a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-                      {todayData.shiftStart ? new Date(todayData.shiftStart).toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}) : '—'}
-                    </p>
-                    <p style={{ fontFamily:MONO, fontSize:9, color:'#2a4060', marginTop:6 }}>
-                      {new Date().toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})}
-                    </p>
-                  </GlowCard>
+                  ))}
                 </div>
 
-                {/* Status breakdown */}
-                <GlowCard color="#a78bfa" style={{ padding:'24px 26px' }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:22 }}>
-                    <div style={{ width:3, height:18, borderRadius:99, background:'linear-gradient(180deg,#a78bfa,#60a5fa)' }}/>
-                    <p style={{ fontFamily:MONO, fontSize:10, color:'rgba(167,139,250,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', fontWeight:700 }}>How you spent today</p>
-                  </div>
-                  {statusKeys.map(key => {
-                    const secs = todayStatuses[key]||0; if(!secs) return null
-                    return <StatBar key={key} label={STATUS_LABELS[key]} secs={secs} total={todayTotal} color={STATUS_COLORS[key]} gradient={STATUS_GRADIENTS[key]} />
-                  })}
-                  {Object.entries(todayStatuses).filter(([k])=>!statusKeys.includes(k)).map(([key,secs])=>(
-                    <StatBar key={key} label={key} secs={secs} total={todayTotal} color="#60a5fa" gradient="linear-gradient(135deg,#60a5fa,#3b82f6)"/>
-                  ))}
-                </GlowCard>
+                {/* breakdown */}
+                <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(255,255,255,0.05)',padding:'20px 20px 16px',marginBottom:2}}>
+                  <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.2)',letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:14}}>BREAKDOWN</p>
+                  {keys.map(k=>{ const s=TD[k]||0; if(!s) return null; return <Row key={k} k={k} secs={s} total={TTOT}/> })}
+                  {Object.entries(TD).filter(([k])=>!keys.includes(k)).map(([k,s])=><Row key={k} k={k} secs={s} total={TTOT}/>)}
+                </div>
               </>
             )}
           </div>
         )}
 
-        {/* ── WEEKLY ── */}
-        {activeTab === 'weekly' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-
-            {/* Bar chart */}
-            <GlowCard color="#f472b6" style={{ padding:'24px 26px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:22 }}>
-                <div style={{ width:3, height:18, borderRadius:99, background:'linear-gradient(180deg,#f472b6,#a78bfa)' }}/>
-                <p style={{ fontFamily:MONO, fontSize:10, color:'rgba(244,114,182,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', fontWeight:700 }}>Hours — last 7 days</p>
-              </div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={weekData} barSize={32} margin={{ top:4, right:8, left:-16, bottom:0 }}>
-                  <XAxis dataKey="date" tick={{ fontFamily:MONO, fontSize:10, fill:'#2a4a70' }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={v=>fmtSecsShort(v)} tick={{ fontFamily:MONO, fontSize:9, fill:'#2a4a70' }} axisLine={false} tickLine={false} />
-                  <Tooltip content={<CustomTooltip/>} cursor={{ fill:'rgba(96,165,250,0.05)', radius:8 }} />
-                  {statusKeys.map(key => (
-                    <Bar key={key} dataKey={key} stackId="a" fill={STATUS_COLORS[key]} opacity={0.85} radius={key==='coaching'?[6,6,0,0]:[0,0,0,0]} />
-                  ))}
+        {/* ── WEEKLY ──────────────────────────────────────── */}
+        {tab==='weekly' && (
+          <div>
+            {/* chart */}
+            <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(255,255,255,0.05)',padding:'20px 20px 8px',marginBottom:2}}>
+              <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.2)',letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:18}}>LAST 7 DAYS</p>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={weekData} barSize={30} margin={{top:0,right:0,left:-20,bottom:0}}>
+                  <XAxis dataKey="date" tick={{fontFamily:MONO,fontSize:9,fill:'rgba(255,255,255,0.25)'}} axisLine={false} tickLine={false}/>
+                  <YAxis tickFormatter={v=>fmtSecsShort(v)} tick={{fontFamily:MONO,fontSize:8,fill:'rgba(255,255,255,0.2)'}} axisLine={false} tickLine={false}/>
+                  <Tooltip content={<TT/>} cursor={{fill:'rgba(0,212,255,0.04)'}}/>
+                  {keys.map(k=><Bar key={k} dataKey={k} stackId="a" fill={S[k].color} opacity={0.85} radius={k==='coaching'?[4,4,0,0]:[0,0,0,0]}/>)}
                 </BarChart>
               </ResponsiveContainer>
-            </GlowCard>
+            </div>
 
-            {/* Day cards */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:8 }}>
-              {weekData.map((d,i) => {
-                const isToday = i===6
-                const color = d.total>0 ? '#60a5fa' : '#1a2a3a'
+            {/* day grid */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:2,marginBottom:2}}>
+              {weekData.map((d,i)=>{
+                const isToday=i===6
+                const c=d.total>0?'#00d4ff':'rgba(255,255,255,0.08)'
                 return (
                   <div key={d.date} style={{
-                    background: isToday ? 'linear-gradient(135deg,rgba(96,165,250,0.15),rgba(78,222,163,0.08))' : 'rgba(5,8,20,0.7)',
-                    border: `1px solid ${isToday ? 'rgba(96,165,250,0.35)' : 'rgba(96,165,250,0.08)'}`,
-                    borderRadius:10, padding:'12px 8px', textAlign:'center',
-                    boxShadow: isToday ? '0 0 20px rgba(96,165,250,0.12)' : 'none',
+                    background: isToday?'rgba(0,212,255,0.06)':'rgba(255,255,255,0.01)',
+                    border:`1px solid ${isToday?'rgba(0,212,255,0.25)':'rgba(255,255,255,0.05)'}`,
+                    borderTop:`2px solid ${isToday?'#00d4ff':'transparent'}`,
+                    padding:'12px 10px',textAlign:'center',
                   }}>
-                    <p style={{ fontFamily:MONO, fontSize:9, color: isToday?'#60a5fa':'#2a4060', marginBottom:6, fontWeight: isToday?700:400 }}>{d.date}</p>
-                    <p style={{ fontFamily:MONO, fontSize:13, fontWeight:700, color }}>{d.total>0?fmtSecs(d.total):'—'}</p>
+                    <p style={{fontFamily:MONO,fontSize:8,color:isToday?'#00d4ff':'rgba(255,255,255,0.2)',marginBottom:6,letterSpacing:'0.1em'}}>{d.date}</p>
+                    <p style={{fontFamily:MONO,fontSize:12,fontWeight:700,color:c}}>{d.total>0?fmtSecs(d.total):'—'}</p>
                   </div>
                 )
               })}
             </div>
 
-            {/* Weekly status summary */}
-            <GlowCard color="#fbbf24" style={{ padding:'24px 26px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:22 }}>
-                <div style={{ width:3, height:18, borderRadius:99, background:'linear-gradient(180deg,#fbbf24,#ffb347)' }}/>
-                <p style={{ fontFamily:MONO, fontSize:10, color:'rgba(251,191,36,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', fontWeight:700 }}>This week by status</p>
-              </div>
-              {(() => {
-                const wt = {}; let wg = 0
+            {/* weekly status breakdown */}
+            <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(255,255,255,0.05)',padding:'20px 20px 16px'}}>
+              <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.2)',letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:14}}>THIS WEEK BY STATUS</p>
+              {(()=>{
+                const wt={};let wg=0
                 for (const d of weekData) for (const [k,v] of Object.entries(d)) { if(k==='date'||k==='total') continue; wt[k]=(wt[k]||0)+v; wg+=v }
-                return statusKeys.map(key => {
-                  const secs = wt[key]||0; if(!secs) return null
-                  return <StatBar key={key} label={STATUS_LABELS[key]} secs={secs} total={wg} color={STATUS_COLORS[key]} gradient={STATUS_GRADIENTS[key]}/>
-                })
+                return keys.map(k=>{ const s=wt[k]||0; if(!s) return null; return <Row key={k} k={k} secs={s} total={wg}/> })
               })()}
-            </GlowCard>
+            </div>
           </div>
         )}
 
-        {/* ── ALL TIME ── */}
-        {activeTab === 'alltime' && (
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            {allData.length === 0 ? (
-              <GlowCard color="#a78bfa" style={{ padding:'48px 32px', textAlign:'center' }}>
-                <TrendingUp size={28} style={{ color:'#a78bfa', margin:'0 auto 16px', opacity:0.4 }}/>
-                <p style={{ fontFamily:MONO, fontSize:11, color:'#2a4060', letterSpacing:'0.08em' }}>No history yet — start tracking.</p>
-              </GlowCard>
+        {/* ── ALL TIME ────────────────────────────────────── */}
+        {tab==='alltime' && (
+          <div>
+            {allData.length===0 ? (
+              <div style={{padding:'60px 0',textAlign:'center'}}>
+                <p style={{fontFamily:MONO,fontSize:11,color:'rgba(255,255,255,0.15)',letterSpacing:'0.14em',textTransform:'uppercase'}}>NO HISTORY YET</p>
+              </div>
             ) : (
               <>
-                {/* Big stat cards */}
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+                {/* stats row */}
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:2,marginBottom:2}}>
                   {[
-                    { label:'Total tracked', value:fmtSecs(overallTotals.total), color:'#60a5fa', gradient:'linear-gradient(135deg,#60a5fa,#3b82f6)' },
-                    { label:'Days tracked',  value:allData.length,               color:'#4edea3', gradient:'linear-gradient(135deg,#4edea3,#00d2aa)' },
-                    { label:'Avg per day',   value:allData.length>0?fmtSecs(Math.floor(overallTotals.total/allData.length)):'—', color:'#a78bfa', gradient:'linear-gradient(135deg,#a78bfa,#8b5cf6)' },
-                  ].map(({ label, value, color, gradient }) => (
-                    <GlowCard key={label} color={color} style={{ padding:'22px 24px' }}>
-                      <p style={{ fontFamily:MONO, fontSize:9, color:`${color}70`, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:12 }}>{label}</p>
-                      <p style={{ fontFamily:MONO, fontSize:26, fontWeight:800, letterSpacing:'-0.04em', background:gradient, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{value}</p>
-                    </GlowCard>
+                    {l:'TOTAL TRACKED', v:fmtSecs(overall.total),                                                     c:'#00d4ff'},
+                    {l:'DAYS LOGGED',   v:allData.length,                                                              c:'#00ffb3'},
+                    {l:'AVG / DAY',     v:allData.length>0?fmtSecs(Math.floor(overall.total/allData.length)):'—',     c:'#bf5af2'},
+                  ].map(({l,v,c})=>(
+                    <div key={l} style={{background:'rgba(255,255,255,0.02)',border:`1px solid ${c}18`,borderTop:`2px solid ${c}`,padding:'18px 20px'}}>
+                      <p style={{fontFamily:MONO,fontSize:8,color:`${c}60`,letterSpacing:'0.14em',textTransform:'uppercase',marginBottom:10}}>{l}</p>
+                      <p style={{fontFamily:MONO,fontSize:22,fontWeight:800,color:c,letterSpacing:'-0.02em'}}>{v}</p>
+                    </div>
                   ))}
                 </div>
 
-                {/* All-time distribution */}
-                <GlowCard color="#4edea3" style={{ padding:'24px 26px' }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:22 }}>
-                    <div style={{ width:3, height:18, borderRadius:99, background:'linear-gradient(180deg,#4edea3,#60a5fa)' }}/>
-                    <p style={{ fontFamily:MONO, fontSize:10, color:'rgba(78,222,163,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', fontWeight:700 }}>All-time distribution</p>
-                  </div>
-                  {statusKeys.map(key => {
-                    const secs = overallTotals.statuses[key]||0; if(!secs) return null
-                    return <StatBar key={key} label={STATUS_LABELS[key]} secs={secs} total={overallTotals.total} color={STATUS_COLORS[key]} gradient={STATUS_GRADIENTS[key]}/>
-                  })}
-                </GlowCard>
+                {/* distribution */}
+                <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(255,255,255,0.05)',padding:'20px 20px 16px',marginBottom:2}}>
+                  <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.2)',letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:14}}>ALL-TIME DISTRIBUTION</p>
+                  {keys.map(k=>{ const s=overall.s[k]||0; if(!s) return null; return <Row key={k} k={k} secs={s} total={overall.total}/> })}
+                </div>
 
-                {/* History log */}
-                <GlowCard color="#f472b6" style={{ padding:'24px 26px' }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:18 }}>
-                    <div style={{ width:3, height:18, borderRadius:99, background:'linear-gradient(180deg,#f472b6,#fbbf24)' }}/>
-                    <p style={{ fontFamily:MONO, fontSize:10, color:'rgba(244,114,182,0.7)', textTransform:'uppercase', letterSpacing:'0.1em', fontWeight:700 }}>History</p>
-                  </div>
-                  <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
-                    {allData.map((d,i) => (
-                      <div key={d.date} style={{
-                        display:'flex', alignItems:'center', justifyContent:'space-between',
-                        padding:'12px 0',
-                        borderBottom: i<allData.length-1 ? '1px solid rgba(96,165,250,0.06)' : 'none',
-                      }}>
-                        <span style={{ fontSize:12, fontWeight:500, color:'#a8c4e0', minWidth:130 }}>
-                          {new Date(d.date).toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}
-                        </span>
-                        <div style={{ display:'flex', gap:6, alignItems:'center', flexWrap:'wrap', flex:1, justifyContent:'flex-end' }}>
-                          {Object.entries(d.statuses||{}).map(([k,v]) => v>0 && (
-                            <span key={k} style={{
-                              fontFamily:MONO, fontSize:9, color:STATUS_COLORS[k]||'#60a5fa',
-                              background:`${STATUS_COLORS[k]||'#60a5fa'}15`,
-                              padding:'3px 8px', borderRadius:99,
-                              border:`1px solid ${STATUS_COLORS[k]||'#60a5fa'}30`,
-                            }}>
-                              {(STATUS_LABELS[k]||k).split(' ')[0]} {fmtSecs(v)}
-                            </span>
-                          ))}
-                          <span style={{ fontFamily:MONO, fontSize:12, fontWeight:700, color:'#60a5fa', marginLeft:8 }}>{fmtSecs(d.total)}</span>
-                        </div>
+                {/* history log */}
+                <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(255,255,255,0.05)',padding:'20px 20px 8px'}}>
+                  <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.2)',letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:14}}>HISTORY LOG</p>
+                  {allData.map((d,i)=>(
+                    <div key={d.date} style={{
+                      display:'flex',alignItems:'center',justifyContent:'space-between',
+                      padding:'10px 0',
+                      borderBottom:i<allData.length-1?'1px solid rgba(255,255,255,0.04)':'none',
+                    }}>
+                      <span style={{fontFamily:MONO,fontSize:10,color:'rgba(255,255,255,0.35)',minWidth:140,letterSpacing:'0.04em'}}>
+                        {new Date(d.date).toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})}
+                      </span>
+                      <div style={{display:'flex',gap:6,flex:1,justifyContent:'center',flexWrap:'wrap'}}>
+                        {Object.entries(d.statuses||{}).map(([k,v])=>v>0&&(
+                          <span key={k} style={{
+                            fontFamily:MONO,fontSize:8,color:S[k]?.color||'#00d4ff',
+                            background:`${S[k]?.color||'#00d4ff'}12`,
+                            padding:'2px 8px',
+                            border:`1px solid ${S[k]?.color||'#00d4ff'}25`,
+                            letterSpacing:'0.06em',textTransform:'uppercase',
+                          }}>
+                            {(S[k]?.label||k).split(' ')[0]} {fmtSecs(v)}
+                          </span>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </GlowCard>
+                      <span style={{fontFamily:MONO,fontSize:12,fontWeight:700,color:'#00d4ff',minWidth:52,textAlign:'right'}}>{fmtSecs(d.total)}</span>
+                    </div>
+                  ))}
+                </div>
               </>
             )}
           </div>
@@ -399,9 +334,9 @@ export default function TimeReport() {
       </div>
 
       <style>{`
-        @keyframes shimmer {
-          0%   { transform: translateX(-100%); }
-          100% { transform: translateX(200%); }
+        @keyframes pulse {
+          0%,100% { opacity:1; box-shadow:0 0 8px #00ffb3; }
+          50%      { opacity:0.4; box-shadow:0 0 3px #00ffb3; }
         }
       `}</style>
     </div>
