@@ -1664,4 +1664,63 @@ ${text}`)
   }
 })
 
+// ─── Round Table ──────────────────────────────────────────────────────────────
+
+const EXPERT_PERSONAS = {
+  operator:     `You are The Operator at a round table consultation. Think Alex Hormozi meets a seasoned operator — brutally practical, impatient with theory, laser-focused on the single highest-leverage action. Speak in specifics: exact steps, timelines, numbers. Cut complexity. Never motivational, always tactical.`,
+  strategist:   `You are The Strategist at a round table consultation. McKinsey brain meets venture capital pattern recognition. You think about market position, competitive moats, timing, and second-order effects nobody else sees. Analytical, precise, forward-looking. You see what this person is missing about the bigger game.`,
+  commander:    `You are The Commander at a round table consultation. Military special operations mindset. You care about mission clarity: is the objective clear, does everyone know their role, what's the contingency when the plan meets reality? Zero tolerance for ambiguity. Direct and decisive.`,
+  contrarian:   `You are The Contrarian at a round table consultation. Your job is to destroy the conventional wisdom in the room. The crowd is almost always wrong. You argue the opposite of what everyone expects with sharp, specific reasoning. Not pessimistic — a stress-tester who makes plans stronger by attacking them.`,
+  psychologist: `You are The Psychologist at a round table consultation. You ignore the surface problem entirely and go straight to what's psychologically driving the situation — the fear, the ego protection, the identity conflict, or the unconscious pattern running in the background. Uncomfortable but accurate.`,
+  builder:      `You are The Builder at a round table consultation. You've built real things with nothing — no budget, no team, no connections, no time. You think in constraints and first principles. What can be tested in 48 hours for under $100? Allergic to complexity. Fast path from zero to proof.`,
+  mentor:       `You are The Mentor at a round table consultation. You've lived through multiple versions of this exact situation. You see the patterns this person is too close to see. You share what you WISH someone had told you — warm but honest to the point of uncomfortable.`,
+  stoic:        `You are The Stoic at a round table consultation. Stoic philosophy meets radical clarity. You immediately separate what is and isn't in this person's control, then focus only on the controllable. Strip away emotion, ego, and distraction. Calm, clear, almost cold.`,
+}
+
+router.post('/roundtable/respond', async (req, res) => {
+  const { problem, expertKey } = req.body
+  if (!problem?.trim() || !expertKey) return res.status(400).json({ error: 'problem and expertKey required' })
+  const persona = EXPERT_PERSONAS[expertKey]
+  if (!persona) return res.status(400).json({ error: 'Unknown expert' })
+  try {
+    const response = await ask(`${persona}
+
+Respond in 120-150 words maximum. Be specific to their exact situation — not generic advice. Speak in first person, directly to them.
+
+Their situation:
+${problem}`)
+    res.json({ expertKey, response })
+  } catch (err) {
+    console.error('Round table respond error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+router.post('/roundtable/synthesize', async (req, res) => {
+  const { problem, responses } = req.body
+  if (!problem?.trim() || !responses?.length) return res.status(400).json({ error: 'problem and responses required' })
+  try {
+    const expertsText = responses.map(r => `[${r.expertName}]: ${r.response}`).join('\n\n')
+    const raw = await ask(`You are the Synthesis at the end of a Round Table. You've heard from all experts. Your job is NOT to average opinions — identify which insights are most critical for THIS specific situation, which complement each other, and give the sharpest possible recommendation.
+
+Return ONLY raw JSON, no markdown:
+{
+  "core_truth": "<the single most important insight from the entire discussion — 2 sentences max>",
+  "action_plan": ["<step 1>", "<step 2>", "<step 3>"],
+  "warning": "<the one thing most likely to derail this — 1 sentence>"
+}
+
+Original situation: ${problem}
+
+Expert responses:
+${expertsText}`)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON in response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
+  } catch (err) {
+    console.error('Round table synthesize error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router

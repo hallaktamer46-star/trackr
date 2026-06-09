@@ -1,7 +1,17 @@
-import { useState } from 'react'
-import { Zap, Target, Shield, Flame, Brain, Wrench, Star, Compass, Loader2, RotateCcw, Sparkles, AlertTriangle, ListOrdered, Lightbulb } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Zap, Target, Shield, Flame, Brain, Wrench, Star, Compass, Loader2, RotateCcw, Sparkles, AlertTriangle, ListOrdered, Lightbulb, History, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 import BackToHome from '../components/BackToHome'
 import { apiFetch } from '../lib/api'
+import { format } from 'date-fns'
+
+const SESSIONS_KEY = 'trackr_roundtable_sessions'
+
+function loadSessions() {
+  try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]') } catch { return [] }
+}
+function saveSessions(sessions) {
+  localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions.slice(0, 20)))
+}
 
 const SANS = 'Geist, Inter, sans-serif'
 const MONO = 'Geist Mono, monospace'
@@ -169,6 +179,117 @@ function ResponseCard({ resp, index }) {
   )
 }
 
+// ─── Session History Card ─────────────────────────────────────────────────────
+function SessionHistoryCard({ session, onRestore, onDelete }) {
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div style={{
+      background: '#0d1117',
+      border: '1px solid rgba(48,54,61,0.9)',
+      marginBottom: 8,
+      animation: 'response-in 0.3s ease both',
+    }}>
+      <div
+        onClick={() => setExpanded(p => !p)}
+        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer' }}
+      >
+        {/* Expert dots */}
+        <div style={{ display: 'flex', gap: -4, flexShrink: 0 }}>
+          {session.experts.slice(0, 4).map((eKey, i) => {
+            const e = EXPERTS.find(x => x.key === eKey)
+            if (!e) return null
+            const Icon = e.icon
+            return (
+              <div key={eKey} style={{
+                width: 22, height: 22,
+                background: `${e.color}18`, border: `1px solid ${e.color}50`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                marginLeft: i > 0 ? -6 : 0,
+              }}>
+                <Icon size={10} style={{ color: e.color }}/>
+              </div>
+            )
+          })}
+          {session.experts.length > 4 && (
+            <div style={{ width: 22, height: 22, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(48,54,61,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: -6 }}>
+              <span style={{ fontFamily: MONO, fontSize: 8, color: '#4a6080' }}>+{session.experts.length - 4}</span>
+            </div>
+          )}
+        </div>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontFamily: SANS, fontSize: 12, color: '#8090a8', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {session.problem}
+          </p>
+          <p style={{ fontFamily: MONO, fontSize: 9, color: '#2a4060', marginTop: 3, letterSpacing: '0.04em' }}>
+            {format(new Date(session.createdAt), 'MMM d, yyyy · h:mm a')}
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {expanded
+            ? <ChevronUp size={13} style={{ color: '#2a4060' }}/>
+            : <ChevronDown size={13} style={{ color: '#2a4060' }}/>}
+        </div>
+      </div>
+
+      {expanded && (
+        <div style={{ borderTop: '1px solid rgba(48,54,61,0.7)', padding: '16px 16px 12px' }}>
+          {/* Expert responses */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 14 }}>
+            {session.responses.map(r => {
+              const e = EXPERTS.find(x => x.key === r.expertKey)
+              if (!e) return null
+              const Icon = e.icon
+              return (
+                <div key={r.expertKey} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <div style={{ width: 24, height: 24, background: `${e.color}15`, border: `1px solid ${e.color}35`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon size={11} style={{ color: e.color }}/>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontFamily: MONO, fontSize: 9, color: e.color, fontWeight: 700, marginBottom: 4, letterSpacing: '0.04em' }}>{r.expertName}</p>
+                    <p style={{ fontFamily: SANS, fontSize: 12, color: '#8090a8', lineHeight: 1.6 }}>{r.response}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Synthesis */}
+          {session.synthesis && (
+            <div style={{ background: 'rgba(163,201,255,0.03)', border: '1px solid rgba(163,201,255,0.1)', padding: '12px 14px', marginBottom: 12 }}>
+              <p style={{ fontFamily: MONO, fontSize: 8, color: '#a3c9ff', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Synthesis</p>
+              <p style={{ fontFamily: SANS, fontSize: 12, color: '#8090a8', lineHeight: 1.6, marginBottom: 10 }}>{session.synthesis.core_truth}</p>
+              {session.synthesis.action_plan?.map((step, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', marginBottom: 5 }}>
+                  <div style={{ width: 16, height: 16, background: ['#60a5fa','#4edea3','#a78bfa'][i] || '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 800, color: '#000' }}>{i+1}</span>
+                  </div>
+                  <p style={{ fontFamily: SANS, fontSize: 11, color: '#6070a0', lineHeight: 1.5 }}>{step}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => onRestore(session)} style={{
+              flex: 1, padding: '7px 12px', background: 'rgba(163,201,255,0.06)', border: '1px solid rgba(163,201,255,0.15)', cursor: 'pointer',
+              fontFamily: MONO, fontSize: 10, fontWeight: 600, color: '#a3c9ff', letterSpacing: '0.06em',
+            }}>
+              VIEW FULL
+            </button>
+            <button onClick={() => onDelete(session.id)} style={{
+              width: 32, height: 32, background: 'rgba(255,107,107,0.06)', border: '1px solid rgba(255,107,107,0.15)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Trash2 size={12} style={{ color: '#ff6b6b' }}/>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function RoundTable() {
   const [selected, setSelected]   = useState(new Set())
@@ -177,6 +298,11 @@ export default function RoundTable() {
   const [responses, setResponses] = useState([])
   const [synthesis, setSynthesis] = useState(null)
   const [error, setError]         = useState('')
+  const [sessions, setSessions]   = useState(() => loadSessions())
+  const [showHistory, setShowHistory] = useState(false)
+
+  // Persist sessions whenever they change
+  useEffect(() => { saveSessions(sessions) }, [sessions])
 
   const toggleExpert = (key) => {
     setSelected(prev => {
@@ -203,18 +329,25 @@ export default function RoundTable() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ problem, expertKey: expert.key }),
         })
+        if (!res.ok) {
+          const text = await res.text()
+          throw new Error(`Server error ${res.status}`)
+        }
         const data = await res.json()
         if (data.error) throw new Error(data.error)
         const entry = { expertKey: expert.key, expertName: expert.name, response: data.response, color: expert.color, icon: expert.icon, sub: expert.sub }
         setResponses(prev => [...prev, entry])
-        return { expertName: expert.name, response: data.response }
+        return { expertKey: expert.key, expertName: expert.name, response: data.response }
       } catch (err) {
-        return { expertName: expert.name, response: `[Error: ${err.message}]` }
+        const entry = { expertKey: expert.key, expertName: expert.name, response: `[Failed to respond: ${err.message}]`, color: EXPERTS.find(e=>e.key===expert.key)?.color || '#666', icon: expert.icon, sub: expert.sub }
+        setResponses(prev => [...prev, entry])
+        return { expertKey: expert.key, expertName: expert.name, response: `[Error: ${err.message}]` }
       }
     })
 
     const all = await Promise.all(promises)
 
+    let synthData = null
     // Synthesis
     try {
       const synthRes  = await apiFetch('/api/ai/roundtable/synthesize', {
@@ -222,12 +355,24 @@ export default function RoundTable() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ problem, responses: all }),
       })
-      const synthData = await synthRes.json()
+      if (!synthRes.ok) throw new Error(`Server error ${synthRes.status}`)
+      synthData = await synthRes.json()
       if (synthData.error) throw new Error(synthData.error)
       setSynthesis(synthData)
     } catch (err) {
       setError(err.message)
     }
+
+    // Save session to localStorage
+    const newSession = {
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString(),
+      problem,
+      experts: [...selected],
+      responses: all.map(r => ({ expertKey: r.expertKey, expertName: r.expertName, response: r.response })),
+      synthesis: synthData,
+    }
+    setSessions(prev => [newSession, ...prev])
 
     setPhase('done')
   }
@@ -235,6 +380,25 @@ export default function RoundTable() {
   const reset = () => {
     setPhase('setup'); setSelected(new Set())
     setProblem(''); setResponses([]); setSynthesis(null); setError('')
+  }
+
+  const restoreSession = (session) => {
+    setSelected(new Set(session.experts))
+    setProblem(session.problem)
+    // Rehydrate responses with icon/color from EXPERTS
+    const rehydrated = session.responses.map(r => {
+      const e = EXPERTS.find(x => x.key === r.expertKey)
+      return { ...r, color: e?.color || '#666', icon: e?.icon || Zap, sub: e?.sub || '' }
+    })
+    setResponses(rehydrated)
+    setSynthesis(session.synthesis)
+    setPhase('done')
+    setError('')
+    setShowHistory(false)
+  }
+
+  const deleteSession = (id) => {
+    setSessions(prev => prev.filter(s => s.id !== id))
   }
 
   const canConvene = selected.size >= 2 && problem.trim().length > 0 && phase === 'setup'
@@ -291,14 +455,49 @@ export default function RoundTable() {
             The Round Table
           </h1>
 
-          <p style={{ fontSize: 14, color: '#4a6080', letterSpacing: '-0.01em', margin: 0 }}>
+          <p style={{ fontSize: 14, color: '#4a6080', letterSpacing: '-0.01em', margin: '0 0 16px' }}>
             {phase === 'setup'
               ? 'Choose your council. One problem. Every angle.'
               : phase === 'running'
               ? 'The council is deliberating…'
               : 'The council has spoken.'}
           </p>
+
+          {/* History toggle */}
+          {sessions.length > 0 && (
+            <button
+              onClick={() => setShowHistory(p => !p)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                padding: '6px 14px',
+                background: showHistory ? 'rgba(163,201,255,0.08)' : 'transparent',
+                border: `1px solid ${showHistory ? 'rgba(163,201,255,0.25)' : 'rgba(48,54,61,0.8)'}`,
+                cursor: 'pointer', transition: 'all 0.18s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(163,201,255,0.25)' }}
+              onMouseLeave={e => { if (!showHistory) e.currentTarget.style.borderColor = 'rgba(48,54,61,0.8)' }}
+            >
+              <History size={12} style={{ color: showHistory ? '#a3c9ff' : '#2a4060' }}/>
+              <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: showHistory ? '#a3c9ff' : '#2a4060', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                {sessions.length} Past Session{sessions.length !== 1 ? 's' : ''}
+              </span>
+            </button>
+          )}
         </div>
+
+        {/* ── History panel ── */}
+        {showHistory && (
+          <div style={{ marginBottom: 32 }}>
+            {sessions.map(s => (
+              <SessionHistoryCard
+                key={s.id}
+                session={s}
+                onRestore={restoreSession}
+                onDelete={deleteSession}
+              />
+            ))}
+          </div>
+        )}
 
         {/* ══ SETUP PHASE ══ */}
         {phase === 'setup' && (
