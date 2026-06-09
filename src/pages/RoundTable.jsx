@@ -545,6 +545,11 @@ export default function RoundTable() {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
+        @keyframes border-spin {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
       `}</style>
 
       <div style={{ maxWidth: 880, margin: '0 auto' }}>
@@ -761,54 +766,82 @@ export default function RoundTable() {
               </div>
 
               {/* Convene button */}
-              <button
-                onClick={convene}
-                disabled={!canConvene}
-                style={{
-                  width: '100%', padding: '17px 24px',
-                  background: canConvene
-                    ? 'linear-gradient(135deg, #0f2460 0%, #1a1050 40%, #200d60 70%, #0f2460 100%)'
-                    : '#080d18',
-                  border: `1.5px solid ${canConvene ? 'rgba(96,165,250,0.4)' : 'rgba(30,60,160,0.2)'}`,
-                  cursor: canConvene ? 'pointer' : 'not-allowed',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-                  position: 'relative', overflow: 'hidden',
-                  boxShadow: canConvene
-                    ? '0 0 60px rgba(96,165,250,0.15), 0 0 120px rgba(167,139,250,0.08), 0 4px 24px rgba(0,0,0,0.5)'
-                    : 'none',
-                  transition: 'all 0.25s',
-                }}
-                onMouseEnter={e => { if (canConvene) { e.currentTarget.style.filter = 'brightness(1.2)'; e.currentTarget.style.transform = 'translateY(-1px)' } }}
-                onMouseLeave={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none' }}
-              >
+              <div style={{ position: 'relative' }}>
+                {/* Outer glow halo — only when ready */}
                 {canConvene && (
-                  <>
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%)',
-                      animation: 'shimmer-sweep 2.5s ease-in-out infinite',
-                      pointerEvents: 'none',
-                    }}/>
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'radial-gradient(ellipse at center, rgba(167,139,250,0.08), transparent 70%)',
-                      pointerEvents: 'none',
-                    }}/>
-                  </>
+                  <div style={{
+                    position: 'absolute', inset: -2,
+                    background: 'linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6, #4edea3, #60a5fa)',
+                    backgroundSize: '300% 300%',
+                    animation: 'border-spin 2.5s linear infinite',
+                    zIndex: 0,
+                  }}/>
                 )}
-                <Sparkles size={18} style={{
-                  color: canConvene ? '#a3c9ff' : '#1e3a80',
-                  filter: canConvene ? 'drop-shadow(0 0 8px rgba(163,201,255,0.8))' : 'none',
-                  animation: canConvene ? 'glow-pulse 2s ease-in-out infinite' : 'none',
-                }}/>
-                <span style={{
-                  fontFamily: SANS, fontSize: 16, fontWeight: 800,
-                  color: canConvene ? '#e2e8ff' : '#1e3a80',
-                  letterSpacing: '-0.02em',
-                }}>
-                  Convene the Table
-                </span>
-              </button>
+                <button
+                  onClick={convene}
+                  disabled={!canConvene}
+                  style={{
+                    position: 'relative', zIndex: 1,
+                    width: '100%', padding: '22px 32px',
+                    background: canConvene
+                      ? 'linear-gradient(135deg, #0a1a3a 0%, #110830 35%, #1a0440 65%, #0a1a3a 100%)'
+                      : '#080d18',
+                    border: 'none',
+                    cursor: canConvene ? 'pointer' : 'not-allowed',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    position: 'relative', overflow: 'hidden',
+                    transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1), filter 0.2s',
+                  }}
+                  onMouseEnter={e => { if (canConvene) { e.currentTarget.style.transform = 'scale(1.015)'; e.currentTarget.style.filter = 'brightness(1.25)' }}}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.filter = 'none' }}
+                  onMouseDown={e => { if (canConvene) e.currentTarget.style.transform = 'scale(0.98)' }}
+                  onMouseUp={e => { if (canConvene) e.currentTarget.style.transform = 'scale(1.015)' }}
+                >
+                  {/* Active layers */}
+                  {canConvene && (
+                    <>
+                      {/* Radial center bloom */}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'radial-gradient(ellipse at 50% 120%, rgba(167,139,250,0.25) 0%, rgba(96,165,250,0.15) 40%, transparent 70%)',
+                        pointerEvents: 'none',
+                      }}/>
+                      {/* Diagonal light streak */}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%)',
+                        animation: 'shimmer-sweep 2s ease-in-out infinite',
+                        pointerEvents: 'none',
+                      }}/>
+                    </>
+                  )}
+
+                  {/* Disabled inner border */}
+                  {!canConvene && (
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      border: '1px solid rgba(30,60,160,0.2)',
+                      pointerEvents: 'none',
+                    }}/>
+                  )}
+
+                  <span style={{
+                    fontFamily: SANS, fontSize: 18, fontWeight: 900,
+                    letterSpacing: '-0.03em', position: 'relative', zIndex: 1,
+                    ...(canConvene ? {
+                      background: 'linear-gradient(135deg, #ffffff 0%, #c8e0ff 40%, #d4b8ff 70%, #ffffff 100%)',
+                      backgroundSize: '200% auto',
+                      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                      filter: 'drop-shadow(0 0 20px rgba(163,201,255,0.6))',
+                      animation: 'title-shimmer 3s linear infinite',
+                    } : {
+                      color: '#1e3a80',
+                    }),
+                  }}>
+                    Convene the Table
+                  </span>
+                </button>
+              </div>
             </div>
           </>
         )}
