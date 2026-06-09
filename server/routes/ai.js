@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import Groq from 'groq-sdk'
+import Groq, { toFile } from 'groq-sdk'
 import multer from 'multer'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
@@ -21,6 +21,16 @@ const upload = multer({
   fileFilter: (_req, file, cb) => {
     if (['application/pdf', 'text/plain'].includes(file.mimetype)) cb(null, true)
     else cb(new Error('Only PDF and TXT files are supported'))
+  },
+})
+
+// Audio upload — memory storage, 25MB max
+const audioUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('audio/') || file.mimetype === 'video/webm') cb(null, true)
+    else cb(new Error('Only audio files are supported'))
   },
 })
 
@@ -1585,6 +1595,71 @@ All advice must be product-specific. Supplier platforms must be real sites. Cost
     res.json(JSON.parse(raw.slice(s, e + 1)))
   } catch (err) {
     console.error('Startup production error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// ─── Mental Clarity ───────────────────────────────────────────────────────────
+
+// Transcribe voice recording via Groq Whisper
+router.post('/clarity/transcribe', audioUpload.single('audio'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No audio file uploaded' })
+  try {
+    const groq = getGroq()
+    const audioFile = await toFile(req.file.buffer, 'recording.webm', { type: req.file.mimetype || 'audio/webm' })
+    const transcription = await groq.audio.transcriptions.create({
+      file: audioFile,
+      model: 'whisper-large-v3-turbo',
+      response_format: 'json',
+    })
+    res.json({ text: transcription.text })
+  } catch (err) {
+    console.error('Clarity transcription error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// Analyze brain dump → categorize, control split, 3-action plan
+router.post('/clarity/analyze', async (req, res) => {
+  const { text, categories } = req.body
+  if (!text?.trim()) return res.status(400).json({ error: 'text is required' })
+  try {
+    const raw = await ask(`You are a sharp, empathetic mental clarity coach. Someone has just done a brain dump of everything stressing them out. Analyze it with precision and care.
+
+Selected stress categories: ${categories?.length ? categories.join(', ') : 'not specified'}
+
+Return ONLY a raw JSON object — no markdown, no code fences:
+{
+  "summary": "<2 sentences: empathetic acknowledgment of their specific situation, naming what they're actually dealing with>",
+  "controlled": [
+    "<specific thing from their text that IS within their power to act on — be concrete, not generic>",
+    "<controlled item 2>",
+    "<controlled item 3>"
+  ],
+  "not_controlled": [
+    "<specific thing from their text that is genuinely outside their control — name it directly>",
+    "<not controlled item 2>",
+    "<not controlled item 3>"
+  ],
+  "actions": [
+    {
+      "step": 1,
+      "title": "<short action title, 3-6 words, imperative>",
+      "action": "<specific concrete action they can take TODAY — no fluff, real step>",
+      "why": "<one sentence on the direct impact this will have on their specific situation>"
+    },
+    { "step": 2, "title": "...", "action": "...", "why": "..." },
+    { "step": 3, "title": "...", "action": "...", "why": "..." }
+  ]
+}
+
+Brain dump:
+${text}`)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON in AI response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
+  } catch (err) {
+    console.error('Clarity analyze error:', err)
     res.status(500).json({ error: err.message })
   }
 })

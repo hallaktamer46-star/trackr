@@ -17,6 +17,7 @@ import PitchLab from './pages/PitchLab'
 import GrowthLab from './pages/GrowthLab'
 import StartupStudio from './pages/StartupStudio'
 import TimeReport from './pages/TimeReport'
+import MentalClarity from './pages/MentalClarity'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -156,6 +157,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <TimeReport />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/clarity" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <MentalClarity />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

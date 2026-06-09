@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, BarChart3, Sparkles, Rocket, Building2, Sun, Moon, FileText, Mail, PenLine, ChevronDown, ArrowRight, Telescope, Map, Timer } from 'lucide-react'
+import { Home, LayoutGrid, BarChart3, Sparkles, Rocket, Building2, Sun, Moon, FileText, Mail, PenLine, ChevronDown, ArrowRight, Telescope, Map, Timer, Brain } from 'lucide-react'
 import { useTheme } from '../../contexts/ThemeContext'
 import ProfileDropdown from './ProfileDropdown'
 import { cn } from '../../lib/cn'
@@ -242,6 +242,14 @@ export default function Header() {
             aria-label="Toggle dark mode"
           >
             {dark ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
+          <button
+            onClick={() => navigate('/clarity')}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-purple-400 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+            aria-label="Mental Clarity"
+            title="Mental Clarity"
+          >
+            <Brain size={17} />
           </button>
           <button
             onClick={() => navigate('/time-report')}
