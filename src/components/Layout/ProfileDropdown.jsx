@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, UserCog, Crown, Check, X, Zap, Rocket } from 'lucide-react'
+import { LogOut, UserCog, Crown, Check, X, Zap, Rocket, Sun, Moon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApplications } from '../../contexts/ApplicationContext'
+import { useTheme } from '../../contexts/ThemeContext'
 import { supabase, isSupabaseConfigured } from '../../lib/supabase'
 
 export default function ProfileDropdown() {
   const { user, signOut } = useAuth()
   const { isPaidUser, isApexUser } = useApplications()
+  const { dark, toggle } = useTheme()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -51,13 +53,8 @@ export default function ProfileDropdown() {
       {/* Trigger — first name + avatar */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center gap-2.5 group outline-none"
+        className="flex items-center group outline-none"
       >
-        {firstName && (
-          <span className="hidden sm:block text-sm font-bold text-slate-800 dark:text-slate-100 tracking-tight">
-            {firstName}
-          </span>
-        )}
         <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-sky-400 transition-all grid place-items-center text-xs font-bold font-mono text-slate-700 dark:text-slate-200">
           {initials}
         </div>
@@ -154,6 +151,20 @@ export default function ProfileDropdown() {
           >
             {isApexUser ? <Rocket size={15} /> : isPaidUser ? <Crown size={15} /> : <Zap size={15} />}
             {isApexUser ? 'Manage Apex plan' : isPaidUser ? 'Upgrade to Apex' : 'View plans & upgrade'}
+          </button>
+
+          {/* Theme toggle */}
+          <button
+            onClick={toggle}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-slate-800"
+          >
+            <span className="flex items-center gap-2">
+              {dark ? <Sun size={15} /> : <Moon size={15} />}
+              {dark ? 'Light mode' : 'Dark mode'}
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 tracking-wider uppercase">
+              {dark ? 'Light' : 'Dark'}
+            </span>
           </button>
 
           {/* Sign out */}

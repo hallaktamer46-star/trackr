@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, BarChart3, Sparkles, Rocket, Building2, Sun, Moon, FileText, Mail, PenLine, ChevronDown, ArrowRight, Telescope, Map, Timer, Brain } from 'lucide-react'
-import { useTheme } from '../../contexts/ThemeContext'
+import { Home, LayoutGrid, BarChart3, Sparkles, Rocket, Building2, FileText, Mail, PenLine, ChevronDown, ArrowRight, Telescope, Map, Timer } from 'lucide-react'
 import ProfileDropdown from './ProfileDropdown'
 import { cn } from '../../lib/cn'
 
@@ -97,7 +96,6 @@ function CVTile({ tool, active, onClick }) {
 }
 
 export default function Header() {
-  const { dark, toggle } = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
   const [cvOpen, setCvOpen] = useState(false)
@@ -236,21 +234,6 @@ export default function Header() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={toggle}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            aria-label="Toggle dark mode"
-          >
-            {dark ? <Sun size={17} /> : <Moon size={17} />}
-          </button>
-          <button
-            onClick={() => navigate('/clarity')}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-purple-400 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            aria-label="Mental Clarity"
-            title="Mental Clarity"
-          >
-            <Brain size={17} />
-          </button>
           <button
             onClick={() => navigate('/time-report')}
             className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
