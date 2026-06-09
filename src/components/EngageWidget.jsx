@@ -146,7 +146,7 @@ export default function EngageWidget() {
   const DIVIDER = 'rgba(40,80,180,0.12)'
 
   return (
-    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width:620, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column' }}>
+    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width: tab ? 620 : 340, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column', transition:'width 0.2s cubic-bezier(0.22,1,0.36,1)' }}>
 
       {/* ── TAB BAR ── */}
       <div style={{
