@@ -6,7 +6,8 @@ import {
   TrendingUp, TrendingDown, Briefcase, CheckCircle2,
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
-  PenSquare, Library, GraduationCap, Newspaper, LayoutGrid
+  PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
+  FileText, Mail
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -227,6 +228,12 @@ export default function Home() {
     { label:'Community',    icon:Newspaper,     action:()=>navigate('/blog') },
   ]
 
+  const CV_LINKS = [
+    { label:'CV Builder',   icon:PenLine,   action:()=>navigate('/cv/builder'),      accent:'#a3c9ff', tag:'PRO'  },
+    { label:'CV Reviewer',  icon:FileText,  action:()=>navigate('/cv/reviewer'),     accent:'#4edea3', tag:'FREE' },
+    { label:'Cover Letter', icon:Mail,      action:()=>navigate('/cv/cover-letter'), accent:'#ffb689', tag:'PRO'  },
+  ]
+
   return (
     <div style={{ fontFamily:SANS, maxWidth:1280, margin:'0 auto', display:'flex', gap:20, alignItems:'flex-start', paddingTop:4 }}>
 
@@ -246,6 +253,22 @@ export default function Home() {
             </button>
           ))}
         </nav>
+
+        {/* CV Hub section */}
+        <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'10px 10px' }}/>
+        <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:'#2a3a50', letterSpacing:'0.1em', textTransform:'uppercase', padding:'6px 10px 4px' }}>CV Hub</p>
+        {CV_LINKS.map(({ label, icon:Icon, action, accent, tag }) => (
+          <button key={label} onClick={action}
+            style={{ display:'flex', alignItems:'center', gap:8, padding:'7px 10px', background:'transparent', border:'0.5px solid transparent', cursor:'pointer', textAlign:'left', transition:'all 0.15s', width:'100%' }}
+            onMouseEnter={e=>{ e.currentTarget.style.background=`${accent}06`; e.currentTarget.style.borderColor=`${accent}15` }}
+            onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent' }}>
+            <Icon size={13} style={{ color: accent, flexShrink:0 }}/>
+            <div style={{ flex:1, minWidth:0 }}>
+              <p style={{ fontSize:12, fontWeight:500, color:'#8a919f', letterSpacing:'-0.01em', whiteSpace:'nowrap' }}>{label}</p>
+            </div>
+            <span style={{ fontFamily:MONO, fontSize:6, fontWeight:700, color:accent, background:`${accent}12`, border:`0.5px solid ${accent}25`, padding:'1px 4px', letterSpacing:'0.06em', flexShrink:0 }}>{tag}</span>
+          </button>
+        ))}
 
         <div style={{ height:'0.5px', background:'rgba(163,201,255,0.05)', margin:'10px 10px' }}/>
         <p style={{ fontFamily:MONO, fontSize:7, color:'#1e2a3a', letterSpacing:'0.08em', textTransform:'uppercase', padding:'0 10px' }}>Trackr © 2026</p>
