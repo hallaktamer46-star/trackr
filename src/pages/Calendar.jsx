@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import BackToHome from '../components/BackToHome'
 import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
   ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
@@ -268,6 +269,8 @@ export default function Calendar() {
 
   return (
     <div style={{ fontFamily: SANS, maxWidth: 1100, margin: '0 auto' }}>
+
+      <BackToHome />
 
       {/* ── Page header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24, paddingTop: 4 }}>

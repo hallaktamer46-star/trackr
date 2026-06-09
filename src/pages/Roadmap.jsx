@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import BackToHome from '../components/BackToHome'
 import {
   Briefcase, BookOpen, Activity, DollarSign, Heart, Plane,
   Dumbbell, Coffee, Music, Plus, Check, X, Edit3, Trash2,
@@ -377,6 +378,8 @@ export default function Roadmap() {
 
   return (
     <div style={{ fontFamily: SANS, maxWidth: 1200, margin: '0 auto', paddingTop: 4 }}>
+
+      <BackToHome />
 
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>

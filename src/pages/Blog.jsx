@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import BackToHome from '../components/BackToHome'
 import {
   PenLine, Heart, Clock, Tag, ChevronDown, X, AlertCircle,
   Search, TrendingUp, Loader2, MessageCircle, Bookmark, Share2,
@@ -601,6 +602,8 @@ export default function Blog() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
+
+      <BackToHome />
 
       {/* ── Page header ── */}
       <div className="flex items-start justify-between gap-4 flex-wrap">

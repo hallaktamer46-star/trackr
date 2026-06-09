@@ -1,4 +1,5 @@
 import { useParams, NavLink } from 'react-router-dom'
+import BackToHome from '../components/BackToHome'
 import { PenLine, FileText, Mail } from 'lucide-react'
 import CVBuilder from '../components/AI/CVBuilder'
 import CVReviewer from '../components/AI/CVReviewer'
@@ -17,6 +18,8 @@ export default function CVHub() {
 
   return (
     <div className="max-w-4xl mx-auto" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+
+      <BackToHome />
 
       {/* Header */}
       <div className="mb-7">

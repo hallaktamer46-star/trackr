@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import BackToHome from '../components/BackToHome'
 import {
   Briefcase, Banknote, Heart, Activity, Compass, Users, User, Zap,
   Mic, MicOff, ArrowRight, RotateCcw, CheckCircle2, XCircle, Sparkles,
@@ -418,6 +419,8 @@ export default function MentalClarity() {
       `}</style>
 
       <div style={{ maxWidth: 780, margin: '0 auto' }}>
+
+        <BackToHome />
 
         {/* ── Header ── */}
         <div style={{ marginBottom: 44, textAlign: 'center' }}>

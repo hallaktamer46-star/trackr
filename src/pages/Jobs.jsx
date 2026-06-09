@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import BackToHome from '../components/BackToHome'
 import {
   Search, MapPin, DollarSign, Briefcase, Clock, Users, X,
   ChevronDown, Building2, CheckCircle2, Bookmark, Share2,
@@ -436,6 +437,8 @@ export default function Jobs() {
 
       {/* ── Main content ── */}
       <div style={{ flex:1, minWidth:0 }}>
+
+      <BackToHome />
 
       {/* ── Hero Header ── */}
       <div style={{ marginBottom:28, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16 }}>
