@@ -1685,7 +1685,7 @@ router.post('/roundtable/respond', async (req, res) => {
   try {
     const response = await ask(`${persona}
 
-Respond in 120-150 words maximum. Be specific to their exact situation — not generic advice. Speak in first person, directly to them.
+Respond with exactly 3-4 bullet points. Use • as the bullet character. Each bullet is ONE sharp, specific, actionable insight — maximum 20 words per bullet. Zero filler words. No intro sentence before the bullets. No summary after the bullets. Just the raw bullets, each on its own line. Be brutally specific to their exact situation.
 
 Their situation:
 ${problem}`)
