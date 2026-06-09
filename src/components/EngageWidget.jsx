@@ -146,7 +146,7 @@ export default function EngageWidget() {
   const DIVIDER = 'rgba(40,80,180,0.12)'
 
   return (
-    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width:340, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column' }}>
+    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width:620, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column' }}>
 
       {/* ── TAB BAR ── */}
       <div style={{
@@ -158,7 +158,6 @@ export default function EngageWidget() {
         boxShadow: status && cur ? `0 -3px 24px ${cur.color}25` : '0 -2px 16px rgba(0,0,0,0.5)',
         transition: 'box-shadow 0.4s',
       }}>
-        {/* Engage tab */}
         <button onClick={() => openTab('engage')} style={{
           flex:1, padding:'12px 0', border:'none',
           background: tab==='engage' ? `${cur?.color || '#4edea3'}10` : 'transparent',
@@ -174,8 +173,6 @@ export default function EngageWidget() {
             <span style={{fontSize:12,fontWeight:600,color: tab==='engage' ? (cur?.color||'#4edea3') : '#4a70b0'}}>Engage</span>
           )}
         </button>
-
-        {/* Activity tab */}
         <button onClick={() => openTab('activity')} style={{
           flex:1, padding:'12px 0', border:'none',
           background: tab==='activity' ? 'rgba(96,165,250,0.08)' : 'transparent',
@@ -195,151 +192,137 @@ export default function EngageWidget() {
           backdropFilter: 'blur(24px)',
           boxShadow: '-4px 0px 40px rgba(0,0,0,0.7)',
           animation: 'slideUp 0.18s cubic-bezier(0.22,1,0.36,1)',
-          maxHeight: '80vh',
-          overflowY: 'auto',
         }}>
 
-          {/* ══ ENGAGE PANEL ══ */}
+          {/* ══ ENGAGE PANEL — two columns ══ */}
           {tab === 'engage' && (
-            <>
-              {/* Clock In / Out */}
-              <div style={{display:'flex',borderBottom:`1px solid ${DIVIDER}`}}>
-                <button onClick={endShift} disabled={status===null}
-                  style={{
-                    flex:1, padding:'13px 0', border:'none',
-                    borderRight:`1px solid ${DIVIDER}`,
-                    background: status!==null ? 'rgba(255,107,107,0.07)' : 'transparent',
-                    color: status!==null ? '#ff6b6b' : '#1e3a70',
-                    cursor: status!==null ? 'pointer' : 'default',
-                    display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-                    fontSize:11, fontFamily:BODY, fontWeight:700, letterSpacing:'0.02em',
-                    transition:'background 0.15s',
-                  }}
-                  onMouseEnter={e=>{ if(status!==null) e.currentTarget.style.background='rgba(255,107,107,0.15)' }}
-                  onMouseLeave={e=>{ if(status!==null) e.currentTarget.style.background='rgba(255,107,107,0.07)' }}>
-                  <Power size={13}/> Clock out
-                </button>
-                <button onClick={() => { if(status===null) pickStatus('not_ready') }} disabled={status!==null}
-                  style={{
-                    flex:1, padding:'13px 0', border:'none',
-                    background: status===null ? 'rgba(78,222,163,0.08)' : 'transparent',
-                    color: status===null ? '#4edea3' : '#1e3a70',
-                    cursor: status===null ? 'pointer' : 'default',
-                    display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-                    fontSize:11, fontFamily:BODY, fontWeight:700, letterSpacing:'0.02em',
-                    transition:'background 0.15s',
-                  }}
-                  onMouseEnter={e=>{ if(status===null) e.currentTarget.style.background='rgba(78,222,163,0.15)' }}
-                  onMouseLeave={e=>{ if(status===null) e.currentTarget.style.background='rgba(78,222,163,0.08)' }}>
-                  <Play size={13} fill={status===null?'#4edea3':'#1e3a70'}/> Clock in
-                </button>
+            <div style={{ display:'flex', alignItems:'stretch' }}>
+
+              {/* ── LEFT: Status switcher ── */}
+              <div style={{ flex:'0 0 300px', borderRight:`1px solid ${DIVIDER}` }}>
+
+                {/* Clock In / Out */}
+                <div style={{display:'flex',borderBottom:`1px solid ${DIVIDER}`}}>
+                  <button onClick={endShift} disabled={status===null}
+                    style={{
+                      flex:1, padding:'12px 0', border:'none',
+                      borderRight:`1px solid ${DIVIDER}`,
+                      background: status!==null ? 'rgba(255,107,107,0.07)' : 'transparent',
+                      color: status!==null ? '#ff6b6b' : '#1e3a70',
+                      cursor: status!==null ? 'pointer' : 'default',
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                      fontSize:11, fontFamily:BODY, fontWeight:700, letterSpacing:'0.02em',
+                      transition:'background 0.15s',
+                    }}
+                    onMouseEnter={e=>{ if(status!==null) e.currentTarget.style.background='rgba(255,107,107,0.15)' }}
+                    onMouseLeave={e=>{ if(status!==null) e.currentTarget.style.background='rgba(255,107,107,0.07)' }}>
+                    <Power size={12}/> Clock out
+                  </button>
+                  <button onClick={() => { if(status===null) pickStatus('not_ready') }} disabled={status!==null}
+                    style={{
+                      flex:1, padding:'12px 0', border:'none',
+                      background: status===null ? 'rgba(78,222,163,0.08)' : 'transparent',
+                      color: status===null ? '#4edea3' : '#1e3a70',
+                      cursor: status===null ? 'pointer' : 'default',
+                      display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                      fontSize:11, fontFamily:BODY, fontWeight:700, letterSpacing:'0.02em',
+                      transition:'background 0.15s',
+                    }}
+                    onMouseEnter={e=>{ if(status===null) e.currentTarget.style.background='rgba(78,222,163,0.15)' }}
+                    onMouseLeave={e=>{ if(status===null) e.currentTarget.style.background='rgba(78,222,163,0.08)' }}>
+                    <Play size={12} fill={status===null?'#4edea3':'#1e3a70'}/> Clock in
+                  </button>
+                </div>
+
+                {/* Active status */}
+                {cur && (
+                  <div style={{
+                    display:'flex', alignItems:'center', justifyContent:'space-between',
+                    padding:'10px 14px',
+                    background:`linear-gradient(135deg, ${cur.color}12, ${cur.color}06)`,
+                    borderBottom:`1px solid ${cur.color}20`,
+                  }}>
+                    <div style={{display:'flex',alignItems:'center',gap:8}}>
+                      <div style={{width:7,height:7,borderRadius:'50%',background:cur.color,boxShadow:`0 0 8px ${cur.color}`,animation:'status-pulse 2s ease-in-out infinite'}}/>
+                      <span style={{fontSize:13,fontWeight:800,color:cur.color,letterSpacing:'-0.01em'}}>{cur.label}</span>
+                    </div>
+                    <span style={{fontFamily:NUM,fontSize:12,fontWeight:700,color:cur.color}}>{fmt(curSecs)}</span>
+                  </div>
+                )}
+
+                {/* Switch to */}
+                {cur && (
+                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px 3px'}}>
+                    <div style={{flex:1,height:'1px',background:`linear-gradient(90deg, ${cur.color}30, transparent)`}}/>
+                    <span style={{fontFamily:NUM,fontSize:7,fontWeight:800,color:'#3a70d0',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>switch to</span>
+                    <div style={{flex:1,height:'1px',background:`linear-gradient(270deg, ${cur.color}30, transparent)`}}/>
+                  </div>
+                )}
+
+                {/* Status list */}
+                <div style={{ maxHeight: 260, overflowY: 'auto' }}>
+                  {allStatuses.filter(s => s.key !== status).map((s, i, arr) => (
+                    <div key={s.key} onClick={() => status !== null ? pickStatus(s.key) : null}
+                      style={{
+                        display:'flex', alignItems:'center', justifyContent:'space-between',
+                        padding:'9px 14px',
+                        borderBottom: i < arr.length-1 ? `1px solid ${DIVIDER}` : 'none',
+                        cursor: status!==null ? 'pointer' : 'default',
+                        opacity: status===null ? 0.3 : 1,
+                        transition:'background 0.12s',
+                      }}
+                      onMouseEnter={e=>{ if(status!==null) e.currentTarget.style.background=`${s.color}10` }}
+                      onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                        <div style={{width:7,height:7,borderRadius:'50%',background:s.color,boxShadow:`0 0 5px ${s.color}80`}}/>
+                        <span style={{fontSize:12,fontWeight:600,color:'#d0e4ff'}}>{s.label}</span>
+                      </div>
+                      <span style={{fontFamily:NUM,fontSize:10,fontWeight:600,color: T[s.key] ? s.color+'cc' : '#2a4898'}}>
+                        {fmt(T[s.key]||0)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add custom status */}
+                {showAdd ? (
+                  <div style={{display:'flex',alignItems:'center',gap:5,padding:'8px 14px',borderTop:`1px solid ${DIVIDER}`}}>
+                    <input autoFocus value={newLabel} onChange={e=>setNewLabel(e.target.value)}
+                      onKeyDown={e=>{if(e.key==='Enter')addCustom();if(e.key==='Escape'){setShowAdd(false);setNewLabel('')}}}
+                      placeholder="Status name…"
+                      style={{flex:1,padding:'6px 8px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:11,fontFamily:BODY,outline:'none'}}/>
+                    <button onClick={addCustom} style={{padding:'6px 8px',background:'#4edea3',border:'none',color:'#07090f',cursor:'pointer',display:'flex',alignItems:'center'}}><Check size={11}/></button>
+                    <button onClick={()=>{setShowAdd(false);setNewLabel('')}} style={{padding:'6px 8px',background:'transparent',border:`1px solid rgba(60,120,255,0.25)`,color:'#60a5fa',cursor:'pointer',display:'flex',alignItems:'center'}}><X size={11}/></button>
+                  </div>
+                ) : (
+                  <div style={{display:'flex',justifyContent:'flex-end',padding:'7px 14px',borderTop:`1px solid ${DIVIDER}`}}>
+                    <button onClick={()=>setShowAdd(true)}
+                      style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
+                      <Plus size={9}/> Add status
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* Active status bar */}
-              {cur && (
-                <div style={{
-                  display:'flex', alignItems:'center', justifyContent:'space-between',
-                  padding:'12px 18px',
-                  background:`linear-gradient(135deg, ${cur.color}12, ${cur.color}06)`,
-                  borderBottom:`1px solid ${cur.color}20`,
-                }}>
-                  <div style={{display:'flex',alignItems:'center',gap:9}}>
-                    <div style={{
-                      width:8, height:8, borderRadius:'50%',
-                      background:cur.color,
-                      boxShadow:`0 0 10px ${cur.color}, 0 0 20px ${cur.color}60`,
-                      animation:'status-pulse 2s ease-in-out infinite',
-                    }}/>
-                    <span style={{fontSize:14,fontWeight:800,color:cur.color,letterSpacing:'-0.01em'}}>{cur.label}</span>
-                  </div>
-                  <span style={{fontFamily:NUM,fontSize:13,fontWeight:700,color:cur.color,letterSpacing:'-0.02em'}}>{fmt(curSecs)}</span>
-                </div>
-              )}
-
-              {/* Switch to divider */}
-              {cur && (
-                <div style={{display:'flex',alignItems:'center',gap:10,padding:'8px 18px 4px'}}>
-                  <div style={{flex:1,height:'1px',background:`linear-gradient(90deg, ${cur.color}30, transparent)`}}/>
-                  <span style={{fontFamily:NUM,fontSize:8,fontWeight:700,color:'#3a70d0',letterSpacing:'0.12em',textTransform:'uppercase',whiteSpace:'nowrap'}}>
-                    switch to
-                  </span>
-                  <div style={{flex:1,height:'1px',background:`linear-gradient(270deg, ${cur.color}30, transparent)`}}/>
-                </div>
-              )}
-
-              {/* Status list */}
-              {allStatuses.filter(s => s.key !== status).map((s, i, arr) => (
-                <div key={s.key} onClick={() => status !== null ? pickStatus(s.key) : null}
-                  style={{
-                    display:'flex', alignItems:'center', justifyContent:'space-between',
-                    padding:'10px 18px',
-                    borderBottom: i < arr.length-1 ? `1px solid ${DIVIDER}` : 'none',
-                    cursor: status!==null ? 'pointer' : 'default',
-                    opacity: status===null ? 0.3 : 1,
-                    transition:'background 0.12s',
-                  }}
-                  onMouseEnter={e=>{ if(status!==null) e.currentTarget.style.background=`${s.color}10` }}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                  <div style={{display:'flex',alignItems:'center',gap:10}}>
-                    <div style={{
-                      width:8, height:8, borderRadius:'50%',
-                      background:s.color,
-                      boxShadow:`0 0 6px ${s.color}80`,
-                    }}/>
-                    <span style={{fontSize:13,fontWeight:600,color:'#d0e4ff',letterSpacing:'-0.01em'}}>{s.label}</span>
-                  </div>
-                  <span style={{fontFamily:NUM,fontSize:11,fontWeight:600,color: T[s.key] ? s.color + 'cc' : '#2a4898',letterSpacing:'-0.01em'}}>
-                    {fmt(T[s.key]||0)}
-                  </span>
-                </div>
-              ))}
-
-              {/* Add custom status */}
-              {showAdd ? (
-                <div style={{display:'flex',alignItems:'center',gap:6,padding:'10px 18px',borderTop:`1px solid ${DIVIDER}`}}>
-                  <input autoFocus value={newLabel} onChange={e=>setNewLabel(e.target.value)}
-                    onKeyDown={e=>{if(e.key==='Enter')addCustom();if(e.key==='Escape'){setShowAdd(false);setNewLabel('')}}}
-                    placeholder="Status name…"
-                    style={{flex:1,padding:'7px 10px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:12,fontFamily:BODY,outline:'none'}}/>
-                  <button onClick={addCustom}
-                    style={{padding:'7px 10px',background:'#4edea3',border:'none',color:'#07090f',cursor:'pointer',display:'flex',alignItems:'center'}}>
-                    <Check size={12}/>
-                  </button>
-                  <button onClick={()=>{setShowAdd(false);setNewLabel('')}}
-                    style={{padding:'7px 10px',background:'transparent',border:`1px solid rgba(60,120,255,0.25)`,color:'#60a5fa',cursor:'pointer',display:'flex',alignItems:'center'}}>
-                    <X size={12}/>
-                  </button>
-                </div>
-              ) : (
-                <div style={{display:'flex',justifyContent:'flex-end',padding:'8px 18px',borderTop:`1px solid ${DIVIDER}`}}>
-                  <button onClick={()=>setShowAdd(true)}
-                    style={{display:'flex',alignItems:'center',gap:5,padding:'5px 10px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:10,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
-                    onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
-                    onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
-                    <Plus size={10}/> Add status
-                  </button>
-                </div>
-              )}
-
-              {/* ── TODAY'S TASKS ── */}
-              <div style={{ borderTop:`1px solid rgba(60,120,255,0.15)` }}>
+              {/* ── RIGHT: Today's Tasks ── */}
+              <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
 
                 {/* Header */}
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 18px 8px' }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                    <div style={{ width:6, height:6, background:'#60a5fa', boxShadow:'0 0 8px #60a5fa', flexShrink:0 }}/>
-                    <span style={{ fontFamily:NUM, fontSize:9, fontWeight:800, color:'#5090d8', letterSpacing:'0.12em', textTransform:'uppercase' }}>
-                      Today's Tasks
+                <div style={{
+                  display:'flex', alignItems:'center', justifyContent:'space-between',
+                  padding:'10px 14px 8px',
+                  borderBottom:`1px solid ${DIVIDER}`,
+                  flexShrink: 0,
+                }}>
+                  <div style={{display:'flex',alignItems:'center',gap:7}}>
+                    <div style={{width:6,height:6,background:'#60a5fa',boxShadow:'0 0 8px #60a5fa',flexShrink:0}}/>
+                    <span style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase'}}>
+                      Tasks
                     </span>
                     {pending.length > 0 && (
-                      <span style={{
-                        fontFamily:NUM, fontSize:8, fontWeight:900,
-                        color:'#60a5fa',
-                        background:'rgba(96,165,250,0.15)',
-                        border:'1px solid rgba(96,165,250,0.3)',
-                        padding:'1px 6px',
-                        boxShadow:'0 0 8px rgba(96,165,250,0.2)',
-                      }}>
+                      <span style={{fontFamily:NUM,fontSize:8,fontWeight:900,color:'#60a5fa',background:'rgba(96,165,250,0.15)',border:'1px solid rgba(96,165,250,0.3)',padding:'1px 6px',boxShadow:'0 0 6px rgba(96,165,250,0.2)'}}>
                         {pending.length}
                       </span>
                     )}
@@ -347,12 +330,11 @@ export default function EngageWidget() {
                   <button
                     onClick={() => setShowTaskAdd(v => !v)}
                     style={{
-                      display:'flex', alignItems:'center', gap:4, padding:'4px 9px',
+                      display:'flex',alignItems:'center',gap:4,padding:'4px 9px',
                       background: showTaskAdd ? 'rgba(96,165,250,0.12)' : 'transparent',
                       border:`1px solid ${showTaskAdd ? 'rgba(96,165,250,0.4)' : 'rgba(60,100,200,0.2)'}`,
                       color: showTaskAdd ? '#60a5fa' : '#3a6090',
-                      fontSize:9, fontFamily:BODY, fontWeight:700,
-                      cursor:'pointer', transition:'all 0.15s', letterSpacing:'0.04em',
+                      fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',transition:'all 0.15s',letterSpacing:'0.04em',
                     }}
                     onMouseEnter={e=>{ e.currentTarget.style.borderColor='rgba(96,165,250,0.45)'; e.currentTarget.style.color='#60a5fa' }}
                     onMouseLeave={e=>{ if(!showTaskAdd){ e.currentTarget.style.borderColor='rgba(60,100,200,0.2)'; e.currentTarget.style.color='#3a6090' }}}>
@@ -360,95 +342,78 @@ export default function EngageWidget() {
                   </button>
                 </div>
 
-                {/* Quick-add input */}
+                {/* Quick-add */}
                 {showTaskAdd && (
-                  <div style={{ display:'flex', alignItems:'center', gap:6, padding:'0 18px 10px' }}>
+                  <div style={{display:'flex',alignItems:'center',gap:5,padding:'7px 10px',borderBottom:`1px solid ${DIVIDER}`,flexShrink:0}}>
                     <input
                       ref={taskInputRef}
                       value={newTask}
                       onChange={e => setNewTask(e.target.value)}
                       onKeyDown={e => { if(e.key==='Enter') addTask(); if(e.key==='Escape'){ setShowTaskAdd(false); setNewTask('') } }}
                       placeholder="Task for today…"
-                      style={{
-                        flex:1, padding:'7px 11px',
-                        background:'rgba(40,80,200,0.08)',
-                        border:`1px solid rgba(96,165,250,0.2)`,
-                        color:'#d0e4ff', fontSize:12, fontFamily:BODY, outline:'none',
-                        caretColor:'#60a5fa',
-                      }}
+                      style={{flex:1,padding:'6px 9px',background:'rgba(40,80,200,0.08)',border:`1px solid rgba(96,165,250,0.2)`,color:'#d0e4ff',fontSize:12,fontFamily:BODY,outline:'none',caretColor:'#60a5fa'}}
                     />
                     <button onClick={addTask}
-                      style={{ padding:'7px 10px', background:'#60a5fa', border:'none', color:'#07090f', cursor:'pointer', display:'flex', alignItems:'center', flexShrink:0, fontWeight:800 }}>
-                      <Check size={12}/>
+                      style={{padding:'6px 9px',background:'#60a5fa',border:'none',color:'#07090f',cursor:'pointer',display:'flex',alignItems:'center',flexShrink:0,fontWeight:800}}>
+                      <Check size={11}/>
                     </button>
                   </div>
                 )}
 
                 {/* Task list */}
-                <div style={{ paddingBottom: 10 }}>
+                <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
                   {todayTasks.length === 0 && (
-                    <p style={{ padding:'4px 18px 8px', fontSize:11, color:'#2a4898', fontStyle:'italic' }}>
-                      Nothing due today.
-                    </p>
+                    <p style={{padding:'10px 14px',fontSize:11,color:'#2a4898',fontStyle:'italic'}}>Nothing due today.</p>
                   )}
 
                   {pending.map(t => (
                     <div key={t.id}
-                      style={{ display:'flex', alignItems:'center', gap:9, padding:'6px 18px', transition:'background 0.12s' }}
+                      style={{display:'flex',alignItems:'center',gap:8,padding:'7px 12px',transition:'background 0.12s'}}
                       onMouseEnter={e => e.currentTarget.style.background='rgba(96,165,250,0.05)'}
                       onMouseLeave={e => e.currentTarget.style.background='transparent'}>
                       <button onClick={() => toggleTask(t.id)}
-                        style={{ background:'none', border:'none', padding:0, cursor:'pointer', flexShrink:0, color:'#2a4898', display:'flex', transition:'color 0.15s' }}
+                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#2a4898',display:'flex',transition:'color 0.15s'}}
                         onMouseEnter={e => e.currentTarget.style.color='#4edea3'}
                         onMouseLeave={e => e.currentTarget.style.color='#2a4898'}>
-                        <Circle size={14}/>
+                        <Circle size={13}/>
                       </button>
-                      <span style={{
-                        flex:1, fontSize:12, fontWeight:500,
-                        color:'#c8dcff',
-                        lineHeight:1.4, minWidth:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-                      }}>
+                      <span style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
                         {t.title}
                       </span>
                       <button onClick={() => removeTask(t.id)}
-                        style={{ background:'none', border:'none', padding:0, cursor:'pointer', flexShrink:0, color:'#1e3870', display:'flex', transition:'color 0.15s' }}
+                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#1e3870',display:'flex',transition:'color 0.15s'}}
                         onMouseEnter={e => e.currentTarget.style.color='#ff6b6b'}
                         onMouseLeave={e => e.currentTarget.style.color='#1e3870'}>
-                        <X size={11}/>
+                        <X size={10}/>
                       </button>
                     </div>
                   ))}
 
-                  {doneTasks.length > 0 && (
-                    <div style={{ margin:'4px 18px 0', height:'1px', background:'rgba(40,80,180,0.12)' }}/>
+                  {doneTasks.length > 0 && pending.length > 0 && (
+                    <div style={{margin:'3px 12px',height:'1px',background:'rgba(40,80,180,0.15)'}}/>
                   )}
 
                   {doneTasks.map(t => (
                     <div key={t.id}
-                      style={{ display:'flex', alignItems:'center', gap:9, padding:'5px 18px', opacity:0.4, transition:'opacity 0.15s' }}
-                      onMouseEnter={e => e.currentTarget.style.opacity='0.65'}
-                      onMouseLeave={e => e.currentTarget.style.opacity='0.4'}>
+                      style={{display:'flex',alignItems:'center',gap:8,padding:'6px 12px',opacity:0.38,transition:'opacity 0.15s'}}
+                      onMouseEnter={e => e.currentTarget.style.opacity='0.62'}
+                      onMouseLeave={e => e.currentTarget.style.opacity='0.38'}>
                       <button onClick={() => toggleTask(t.id)}
-                        style={{ background:'none', border:'none', padding:0, cursor:'pointer', flexShrink:0, color:'#4edea3', display:'flex' }}>
-                        <CheckCircle2 size={14}/>
+                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#4edea3',display:'flex'}}>
+                        <CheckCircle2 size={13}/>
                       </button>
-                      <span style={{
-                        flex:1, fontSize:12,
-                        color:'#4a70a8',
-                        textDecoration:'line-through',
-                        lineHeight:1.4, minWidth:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap',
-                      }}>
+                      <span style={{flex:1,fontSize:12,color:'#4a70a8',textDecoration:'line-through',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
                         {t.title}
                       </span>
                       <button onClick={() => removeTask(t.id)}
-                        style={{ background:'none', border:'none', padding:0, cursor:'pointer', flexShrink:0, color:'#1e3870', display:'flex' }}>
-                        <X size={11}/>
+                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#1e3870',display:'flex'}}>
+                        <X size={10}/>
                       </button>
                     </div>
                   ))}
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {/* ══ ACTIVITY PANEL ══ */}
@@ -458,9 +423,7 @@ export default function EngageWidget() {
                 Today's Activity
               </p>
               {shiftStart === null && status === null ? (
-                <p style={{fontSize:12,color:'#2a4898',lineHeight:1.6}}>
-                  Pick a status in Engage to start tracking.
-                </p>
+                <p style={{fontSize:12,color:'#2a4898',lineHeight:1.6}}>Pick a status in Engage to start tracking.</p>
               ) : (
                 <>
                   <div style={{marginBottom:18}}>
@@ -498,7 +461,6 @@ export default function EngageWidget() {
               )}
             </div>
           )}
-
         </div>
       )}
 
@@ -509,7 +471,7 @@ export default function EngageWidget() {
         }
         @keyframes status-pulse {
           0%, 100% { transform: scale(1); opacity: 1; }
-          50%       { transform: scale(1.35); opacity: 0.7; }
+          50%       { transform: scale(1.4); opacity: 0.65; }
         }
       `}</style>
     </div>
