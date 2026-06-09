@@ -18,6 +18,7 @@ import GrowthLab from './pages/GrowthLab'
 import StartupStudio from './pages/StartupStudio'
 import TimeReport from './pages/TimeReport'
 import MentalClarity from './pages/MentalClarity'
+import RoundTable from './pages/RoundTable'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -166,6 +167,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <MentalClarity />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/roundtable" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <RoundTable />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

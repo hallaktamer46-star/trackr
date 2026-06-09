@@ -7,7 +7,7 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail
+  FileText, Mail, Brain, Users
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -226,6 +226,8 @@ export default function Home() {
     { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
     { label:'Roadmap',       icon:Target,        action:()=>navigate('/roadmap') },
     { label:'Community',    icon:Newspaper,     action:()=>navigate('/blog') },
+    { label:'Mental Clarity', icon:Brain,       action:()=>navigate('/clarity') },
+    { label:'Round Table',  icon:Users,         action:()=>navigate('/roundtable') },
   ]
 
   const CV_LINKS = [
