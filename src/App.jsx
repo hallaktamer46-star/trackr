@@ -19,6 +19,7 @@ import StartupStudio from './pages/StartupStudio'
 import TimeReport from './pages/TimeReport'
 import MentalClarity from './pages/MentalClarity'
 import RoundTable from './pages/RoundTable'
+import RoadmapDetail from './pages/RoadmapDetail'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -176,6 +177,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <RoundTable />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/roadmap/:pathId" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <RoadmapDetail />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
