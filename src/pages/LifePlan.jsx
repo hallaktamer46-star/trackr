@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, X, ChevronLeft, ChevronRight, Layers } from 'lucide-react'
 
 const MONO = '"Geist Mono", "JetBrains Mono", monospace'
 const SANS = '"Geist", "Inter", system-ui, -apple-system, sans-serif'
@@ -393,7 +393,7 @@ export default function LifePlan() {
                 onMouseEnter={e => { e.currentTarget.style.borderColor='rgba(163,201,255,0.28)'; e.currentTarget.style.background='rgba(163,201,255,0.02)' }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(163,201,255,0.1)'; e.currentTarget.style.background='transparent' }}
               >
-                <div style={{ fontSize:28, marginBottom:12, opacity:.25 }}>◫</div>
+                <div style={{ marginBottom:12, opacity:.2, display:'flex', justifyContent:'center' }}><Layers size={28} color="#a3c9ff" strokeWidth={1} /></div>
                 <div style={{ fontSize:12, color:'rgba(163,201,255,0.35)', letterSpacing:'0.05em', fontFamily:SANS, marginBottom:4 }}>
                   Your day is a blank canvas.
                 </div>
