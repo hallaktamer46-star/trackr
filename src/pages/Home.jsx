@@ -7,7 +7,7 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail, Brain, Users, LayoutList, MessageSquare
+  FileText, Mail, Brain, Users, LayoutList
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
