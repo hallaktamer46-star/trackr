@@ -12,9 +12,9 @@ import { useApplications } from '../contexts/ApplicationContext'
 
 const MONO = 'Geist Mono, monospace'
 const SANS = 'Geist, Inter, sans-serif'
-const SURFACE = '#161b22'
-const BG = '#0d1117'
-const BORDER = 'rgba(48,54,61,0.9)'
+const SURFACE = 'rgba(13,18,32,0.97)'
+const BG = '#060b14'
+const BORDER = 'rgba(255,255,255,0.07)'
 
 const PRIORITY_COLOR = { high: '#ffb4ab', medium: '#ffb689', low: '#4edea3' }
 const PRIORITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' }
@@ -52,13 +52,19 @@ function SectionHead({ icon: Icon, label, color, action }) {
 
 /* ─── Card shell ─── */
 function Card({ children, accent, style }) {
+  const c = accent || '#60a5fa'
   return (
     <div style={{
-      background: SURFACE, border: `0.5px solid ${BORDER}`,
-      borderTop: `2px solid ${accent || 'transparent'}`,
+      background: `linear-gradient(145deg, ${c}0d 0%, rgba(6,11,20,0.97) 55%)`,
+      border: `1px solid ${c}22`,
+      borderTop: `2px solid ${c}`,
+      boxShadow: `0 0 40px ${c}06, inset 0 1px 0 ${c}12`,
       padding: 18, ...style,
+      position: 'relative', overflow: 'hidden',
     }}>
-      {children}
+      {/* subtle corner glow */}
+      <div style={{ position:'absolute', top:-40, right:-40, width:140, height:140, borderRadius:'50%', background:`radial-gradient(circle, ${c}0a, transparent)`, pointerEvents:'none' }}/>
+      <div style={{ position:'relative', zIndex:1 }}>{children}</div>
     </div>
   )
 }
@@ -390,10 +396,10 @@ export default function Calendar() {
             {/* Task list */}
             <div style={{ display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto' }}>
               {pendingTasks.length === 0 && !taskForm.open && (
-                <p style={{ fontFamily:MONO, fontSize:9, color:'#2a3040', padding:'8px 0' }}>No pending tasks — add one above.</p>
+                <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'8px 0' }}>No pending tasks — add one above.</p>
               )}
               {pendingTasks.map(t => (
-                <div key={t.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'rgba(255,255,255,0.015)', border:`0.5px solid ${BORDER}`, transition:'background 0.1s' }}
+                <div key={t.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'rgba(96,165,250,0.04)', border:`1px solid rgba(96,165,250,0.1)`, transition:'background 0.1s' }}
                   onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.04)'} onMouseLeave={e=>e.currentTarget.style.background='rgba(255,255,255,0.015)'}>
                   <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority], display:'flex', flexShrink:0, padding:0 }}>
                     <Circle size={14}/>
@@ -410,7 +416,7 @@ export default function Calendar() {
                       onMouseEnter={e=>e.currentTarget.style.color='#4edea3'} onMouseLeave={e=>e.currentTarget.style.color='#3a4455'}>
                       <CalendarIcon size={10}/>
                     </a>
-                    <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2a3040', display:'flex', padding:0, transition:'color 0.15s' }}
+                    <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
                       onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
                       <Trash2 size={11}/>
                     </button>
@@ -419,14 +425,14 @@ export default function Calendar() {
               ))}
               {doneTasks.length > 0 && (
                 <details style={{ marginTop:4 }}>
-                  <summary style={{ fontFamily:MONO, fontSize:8, color:'#2a3040', cursor:'pointer', padding:'4px 0', letterSpacing:'0.06em', textTransform:'uppercase' }}>
+                  <summary style={{ fontFamily:MONO, fontSize:8, color:'rgba(160,200,255,0.3)', cursor:'pointer', padding:'4px 0', letterSpacing:'0.06em', textTransform:'uppercase' }}>
                     {doneTasks.length} completed
                   </summary>
                   {doneTasks.map(t => (
                     <div key={t.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', opacity:0.4 }}>
                       <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#4edea3', display:'flex', flexShrink:0, padding:0 }}><Check size={14}/></button>
                       <p style={{ fontSize:11, color:'#5a6478', textDecoration:'line-through', flex:1 }}>{t.title}</p>
-                      <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2a3040', display:'flex', padding:0 }}><X size={10}/></button>
+                      <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0 }}><X size={10}/></button>
                     </div>
                   ))}
                 </details>
@@ -476,13 +482,13 @@ export default function Calendar() {
 
             <div style={{ display:'flex', flexDirection:'column', gap:10, maxHeight:320, overflowY:'auto' }}>
               {goals.length === 0 && !goalForm.open && (
-                <p style={{ fontFamily:MONO, fontSize:9, color:'#2a3040' }}>No goals yet — set your first target above.</p>
+                <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)' }}>No goals yet — set your first target above.</p>
               )}
               {goals.map(g => {
                 const pct = Math.min(100, g.target > 0 ? Math.round((g.progress / g.target) * 100) : 0)
                 const done = g.progress >= Number(g.target)
                 return (
-                  <div key={g.id} style={{ padding:'10px 12px', background:'rgba(255,255,255,0.015)', border:`0.5px solid ${BORDER}` }}>
+                  <div key={g.id} style={{ padding:'10px 12px', background:'rgba(96,165,250,0.04)', border:`1px solid rgba(96,165,250,0.1)` }}>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
                       <div>
                         <p style={{ fontSize:12, fontWeight:600, color: done ? '#4edea3' : '#c0c7d5' }}>{g.title}</p>
@@ -492,7 +498,7 @@ export default function Calendar() {
                       </div>
                       <div style={{ display:'flex', alignItems:'center', gap:4 }}>
                         <span style={{ fontFamily:MONO, fontSize:13, fontWeight:800, color: done ? '#4edea3' : '#8a919f' }}>{pct}%</span>
-                        <button onClick={() => deleteGoal(g.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2a3040', display:'flex', padding:0, transition:'color 0.15s' }}
+                        <button onClick={() => deleteGoal(g.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
                           onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
                           <Trash2 size={11}/>
                         </button>
@@ -520,8 +526,8 @@ export default function Calendar() {
             <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:280, overflowY:'auto' }}>
               {interviews.length === 0 ? (
                 <div style={{ textAlign:'center', padding:'24px 0' }}>
-                  <p style={{ fontFamily:MONO, fontSize:9, color:'#2a3040', marginBottom:6 }}>No interviews in progress.</p>
-                  <p style={{ fontFamily:MONO, fontSize:8, color:'#1e2a3a' }}>Applications with "Interview" status appear here automatically.</p>
+                  <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', marginBottom:6 }}>No interviews in progress.</p>
+                  <p style={{ fontFamily:MONO, fontSize:8, color:'rgba(160,200,255,0.2)' }}>Applications with "Interview" status appear here automatically.</p>
                 </div>
               ) : interviews.map(a => (
                 <div key={a.id} style={{ padding:'10px 12px', background:'rgba(255,182,137,0.05)', border:'0.5px solid rgba(255,182,137,0.15)', display:'flex', alignItems:'flex-start', gap:10 }}>
@@ -594,7 +600,7 @@ export default function Calendar() {
 
             <div style={{ display:'flex', flexDirection:'column', gap:6, maxHeight:280, overflowY:'auto' }}>
               {sessions.length === 0 && !sessForm.open && (
-                <p style={{ fontFamily:MONO, fontSize:9, color:'#2a3040' }}>No sessions scheduled — block time to focus.</p>
+                <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)' }}>No sessions scheduled — block time to focus.</p>
               )}
               {[...sessions].sort((a,b) => new Date(a.date)-new Date(b.date)).map(s => {
                 const st = SESSION_TYPES.find(x => x.key === s.type) || SESSION_TYPES[0]
@@ -616,7 +622,7 @@ export default function Calendar() {
                         onMouseEnter={e=>e.currentTarget.style.color=st.color} onMouseLeave={e=>e.currentTarget.style.color='#3a4455'}>
                         <CalendarIcon size={10}/>
                       </a>
-                      <button onClick={() => deleteSession(s.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2a3040', display:'flex', padding:0, transition:'color 0.15s' }}
+                      <button onClick={() => deleteSession(s.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
                         onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
                         <Trash2 size={11}/>
                       </button>
