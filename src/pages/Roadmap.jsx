@@ -105,22 +105,6 @@ function PathCard({ path, onClick, onDelete }) {
       onMouseLeave={() => { setHov(false); setDelHov(false) }}
       style={{ position: 'relative', cursor: 'pointer' }}
     >
-      {/* Delete button — top right corner, appears on hover */}
-      {hov && (
-        <button
-          onClick={e => { e.stopPropagation(); onDelete(path.id) }}
-          onMouseEnter={() => setDelHov(true)}
-          onMouseLeave={() => setDelHov(false)}
-          style={{
-            position: 'absolute', top: 12, right: 12, zIndex: 10,
-            width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            background: delHov ? 'rgba(248,113,113,0.18)' : 'rgba(248,113,113,0.08)',
-            border: `1px solid ${delHov ? 'rgba(248,113,113,0.5)' : 'rgba(248,113,113,0.2)'}`,
-            color: '#f87171', cursor: 'pointer', transition: 'all 0.15s',
-          }}
-        ><Trash2 size={11}/></button>
-      )}
-
       <div
         onClick={onClick}
         style={{
@@ -171,8 +155,23 @@ function PathCard({ path, onClick, onDelete }) {
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, opacity: hov ? 1 : 0.4, transition: 'opacity 0.2s', marginTop: 4 }}>
-            <ArrowUpRight size={16} color={c}/>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+            {hov && (
+              <button
+                onClick={e => { e.stopPropagation(); onDelete(path.id) }}
+                onMouseEnter={() => setDelHov(true)}
+                onMouseLeave={() => setDelHov(false)}
+                style={{
+                  width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: delHov ? 'rgba(248,113,113,0.18)' : 'rgba(248,113,113,0.08)',
+                  border: `1px solid ${delHov ? 'rgba(248,113,113,0.5)' : 'rgba(248,113,113,0.2)'}`,
+                  color: '#f87171', cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0,
+                }}
+              ><Trash2 size={11}/></button>
+            )}
+            <div style={{ opacity: hov ? 1 : 0.4, transition: 'opacity 0.2s', display: 'flex', alignItems: 'center' }}>
+              <ArrowUpRight size={16} color={c}/>
+            </div>
           </div>
         </div>
 
