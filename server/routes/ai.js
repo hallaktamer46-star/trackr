@@ -1685,7 +1685,7 @@ router.post('/roundtable/respond', async (req, res) => {
   try {
     const response = await ask(`${persona}
 
-Respond with exactly 3-4 bullet points. Use • as the bullet character. Each bullet is ONE sharp, specific, actionable insight — maximum 20 words per bullet. Zero filler words. No intro sentence before the bullets. No summary after the bullets. Just the raw bullets, each on its own line. Be brutally specific to their exact situation.
+Respond with exactly 4 bullet points. Use • as the bullet character. Each bullet MUST cover a completely different dimension — one about the immediate tactical move, one about the psychological or identity shift required, one about the hidden risk or what will go wrong if ignored, one about timing or sequencing (what to do first vs. later). Each bullet is 30-45 words: specific enough to act on today, distinct enough that it feels like a different person wrote it. No intro sentence. No summary. No filler. Just the 4 bullets, each on its own line. Be ruthlessly specific to their exact situation.
 
 Their situation:
 ${problem}`)
