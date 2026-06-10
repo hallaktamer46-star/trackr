@@ -240,7 +240,7 @@ export default function Home() {
     <div style={{ fontFamily:SANS, maxWidth:1280, margin:'0 auto', display:'flex', gap:20, alignItems:'flex-start', paddingTop:4 }}>
 
       {/* ── Left sidebar ── */}
-      <aside style={{ width:148, flexShrink:0, position:'sticky', top:72 }}>
+      <aside style={{ width:148, flexShrink:0 }}>
         <nav style={{ display:'flex', flexDirection:'column', gap:1, paddingTop:8 }}>
           {SIDEBAR_LINKS.map(({ label, icon:Icon, soon, action }) => (
             <button key={label} onClick={()=>{ if(soon)return; action?.() }}
