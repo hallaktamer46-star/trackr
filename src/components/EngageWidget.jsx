@@ -117,7 +117,7 @@ export default function EngageWidget() {
       hist.sort((a,b)=>new Date(b.date)-new Date(a.date))
       localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0,60)))
     } catch {}
-    setLog(finalLog); setStatus(null); setShiftStart(null); setLog([]); setTab('activity')
+    setLog(finalLog); setStatus(null); setShiftStart(null); setTab('activity')
   }
 
   function addCustom() {

@@ -32,7 +32,10 @@ function loadToday() {
     if (d.date!==new Date().toDateString()) return null
     const now=Date.now(), t={}
     for (const e of (d.log||[])) { const s=Math.floor(((e.end||now)-e.start)/1000); t[e.status]=(t[e.status]||0)+s }
-    return { statuses:t, total:d.shiftStart?Math.floor((now-d.shiftStart)/1000):0, shiftStart:d.shiftStart, live:d.status!==null, currentStatus:d.status }
+    let fallbackTotal = 0
+    for (const e of (d.log||[])) { if (e.end) fallbackTotal += Math.floor((e.end - e.start) / 1000) }
+    const total = d.shiftStart ? Math.floor((now - d.shiftStart) / 1000) : fallbackTotal
+    return { statuses:t, total, shiftStart:d.shiftStart, live:d.status!==null, currentStatus:d.status }
   } catch { return null }
 }
 function getLast7() {
