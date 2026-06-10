@@ -218,6 +218,8 @@ export default function Home() {
   const maxCount     = Math.max(...weeklyData.map(d=>d.count),1)
 
   const SIDEBAR_LINKS = [
+    { label:'Daily Debrief',icon:MessageSquare, action:()=>navigate('/debrief') },
+    { label:'Life Plan',    icon:LayoutList,    action:()=>navigate('/life') },
     { label:'Start a Blog', icon:PenSquare,    action:()=>setQuickPostOpen(true) },
     { label:'Jobs',         icon:Briefcase,    action:()=>navigate('/jobs') },
     { label:'Library',      icon:Library,       soon:true },
@@ -228,8 +230,6 @@ export default function Home() {
     { label:'Community',    icon:Newspaper,     action:()=>navigate('/blog') },
     { label:'Mental Clarity', icon:Brain,       action:()=>navigate('/clarity') },
     { label:'Round Table',  icon:Users,         action:()=>navigate('/roundtable') },
-    { label:'Life Plan',    icon:LayoutList,    action:()=>navigate('/life') },
-    { label:'Daily Debrief',icon:MessageSquare, action:()=>navigate('/debrief') },
   ]
 
   const CV_LINKS = [
