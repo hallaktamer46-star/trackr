@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, X, Newspaper, Brain, Layers } from 'lucide-react'
+import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, X, Newspaper, Brain, Layers, MessageSquare } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApplications } from '../../contexts/ApplicationContext'
 import { cn } from '../../lib/cn'
@@ -13,6 +13,7 @@ const nav = [
   { to: '/blog',     label: 'Community',       icon: Newspaper             },
   { to: '/clarity',  label: 'Mental Clarity',  icon: Brain                 },
   { to: '/life',     label: 'Life Plan',       icon: Layers                },
+  { to: '/debrief',  label: 'Daily Debrief',   icon: MessageSquare         },
 ]
 
 export default function Sidebar({ open, onClose }) {

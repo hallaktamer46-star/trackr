@@ -1723,4 +1723,31 @@ ${expertsText}`)
   }
 })
 
+// Daily Debrief — extract 5 insights from an end-of-day voice dump
+router.post('/debrief', async (req, res) => {
+  const { dump } = req.body
+  if (!dump?.trim()) return res.status(400).json({ error: 'dump is required' })
+  try {
+    const raw = await ask(`You are a brutally honest, deeply perceptive life coach. Someone just did an unfiltered end-of-day voice dump. Read it carefully and extract exactly 5 insights.
+
+Return ONLY a JSON object with this exact shape — no markdown, no code fences, no other text:
+{
+  "drained": "<what specifically drained their energy today — be direct and name it, not generic>",
+  "energized": "<what gave them life or felt genuinely good — specific, not generic>",
+  "avoiding": "<the one decision or conversation they are clearly avoiding — name it bluntly>",
+  "tomorrow": "<one specific, concrete action for tomorrow — not vague, not a list>",
+  "pattern": "<one sharp observation about a pattern in how they talk about their life — something they might not see themselves>"
+}
+
+Dump:
+${dump}`)
+    const s = raw.indexOf('{'), e = raw.lastIndexOf('}')
+    if (s === -1 || e === -1) throw new Error('No JSON in response')
+    res.json(JSON.parse(raw.slice(s, e + 1)))
+  } catch (err) {
+    console.error('Debrief error:', err)
+    res.status(500).json({ error: err.message })
+  }
+})
+
 export default router
