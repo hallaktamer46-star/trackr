@@ -403,7 +403,7 @@ export default function Roadmap() {
           </p>
         </div>
         <button onClick={() => setShowAddPath(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 18px', background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)', border: 'none', cursor: 'pointer', color: '#fff', fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', boxShadow: '0 4px 20px rgba(99,102,241,0.3)', transition: 'all 0.15s' }}
+          style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '10px 22px', background: 'linear-gradient(135deg, #1d4ed8, #7c3aed)', border: 'none', borderRadius: 999, cursor: 'pointer', color: '#fff', fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', boxShadow: '0 4px 20px rgba(99,102,241,0.35)', transition: 'all 0.18s' }}
           onMouseEnter={e => { e.currentTarget.style.filter='brightness(1.15)'; e.currentTarget.style.transform='translateY(-1px)' }}
           onMouseLeave={e => { e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
           <Plus size={11}/> Add Path
