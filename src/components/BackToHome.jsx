@@ -13,44 +13,37 @@ export default function BackToHome() {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 8,
-        padding: '4px 2px',
+        gap: 7,
+        padding: '3px 0',
         background: 'transparent',
         border: 'none',
         cursor: 'pointer',
-        transition: 'all 0.2s',
         marginBottom: 28,
+        opacity: hov ? 1 : 0.55,
+        transition: 'opacity 0.2s ease',
       }}
     >
-      {/* arrow — slides left on hover */}
       <svg
-        width="15" height="15" viewBox="0 0 16 16" fill="none"
+        width="14" height="14" viewBox="0 0 14 14" fill="none"
         style={{
-          transform: hov ? 'translateX(-4px)' : 'translateX(0)',
-          transition: 'transform 0.25s cubic-bezier(0.34,1.4,0.64,1)',
+          transform: hov ? 'translateX(-3px)' : 'none',
+          transition: 'transform 0.22s cubic-bezier(0.34,1.56,0.64,1)',
           flexShrink: 0,
         }}
       >
-        <path d="M10 3L5 8L10 13" stroke={hov ? '#93c5fd' : '#3a5878'} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-        <line x1="5" y1="8" x2="13" y2="8" stroke={hov ? '#93c5fd' : '#3a5878'} strokeWidth="1.6" strokeLinecap="round"/>
+        <path d="M9 2.5L4.5 7L9 11.5" stroke="#a8c8f8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
 
       <span style={{
-        fontFamily: "'Syne', 'Geist', sans-serif",
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif',
         fontSize: 13,
-        fontWeight: 700,
-        color: hov ? '#93c5fd' : '#3d5a7a',
-        letterSpacing: '0.04em',
-        transition: 'color 0.2s',
+        fontWeight: 500,
+        color: '#a8c8f8',
+        letterSpacing: '0.01em',
         lineHeight: 1,
-        textDecoration: hov ? 'underline' : 'none',
-        textDecorationColor: 'rgba(147,197,253,0.4)',
-        textUnderlineOffset: 4,
       }}>
         Home
       </span>
-
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700&display=swap');`}</style>
     </button>
   )
 }
