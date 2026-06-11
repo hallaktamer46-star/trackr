@@ -148,13 +148,22 @@ export default function Home() {
   const [quickPostOpen, setQuickPostOpen] = useState(false)
   const [eventModal, setEventModal] = useState(false)
   const [eventForm, setEventForm] = useState({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
-  const [events, setEvents] = useState(() => { try { return JSON.parse(localStorage.getItem('trackr_events')||'[]') } catch { return [] } })
-
-  useEffect(() => { localStorage.setItem('trackr_events', JSON.stringify(events)) }, [events])
-
   function saveEvent() {
     if (!eventForm.title.trim()) return
-    setEvents(prev => [...prev, { id: Date.now(), ...eventForm, createdAt: new Date().toISOString() }])
+    const impToPriority = n => n <= 2 ? 'low' : n === 3 ? 'medium' : 'high'
+    const task = {
+      id: Date.now().toString(),
+      title: eventForm.title,
+      due: eventForm.date,
+      priority: impToPriority(eventForm.importance),
+      note: eventForm.desc,
+      done: false,
+      createdAt: new Date().toISOString(),
+    }
+    try {
+      const existing = JSON.parse(localStorage.getItem('trackr_tasks') || '[]')
+      localStorage.setItem('trackr_tasks', JSON.stringify([...existing, task]))
+    } catch {}
     setEventModal(false)
     setEventForm({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
   }
@@ -312,7 +321,7 @@ export default function Home() {
             onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
             onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
             <CalendarDays size={13} color="#fff" strokeWidth={2.5}/>
-            <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Quick Add Event</span>
+            <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Add Event</span>
           </button>
           {canAddMore && (
             <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
@@ -543,14 +552,14 @@ export default function Home() {
       <ApplicationModal open={modalOpen} onClose={()=>setModalOpen(false)} onSave={handleSave} onDelete={deleteApplication} initial={editingApp??{status:'wishlist'}}/>
       {quickPostOpen && <QuickPostModal onClose={()=>setQuickPostOpen(false)} onPublished={()=>{}}/>}
 
-      {/* Quick Add Event Modal */}
+      {/* Add Event Modal */}
       {eventModal && (
         <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9000 }}
           onClick={() => setEventModal(false)}>
           <div style={{ background:'#0d1420', border:'0.5px solid rgba(163,201,255,0.15)', padding:28, width:440, maxWidth:'90vw', display:'flex', flexDirection:'column', gap:16 }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <h2 style={{ fontFamily:MONO, fontSize:14, fontWeight:800, color:'#e2e2e8', letterSpacing:'-0.02em', margin:0 }}>Quick Add Event</h2>
+              <h2 style={{ fontFamily:MONO, fontSize:14, fontWeight:800, color:'#e2e2e8', letterSpacing:'-0.02em', margin:0 }}>Add Event</h2>
               <button onClick={() => setEventModal(false)} style={{ background:'none', border:'none', color:'#5a6478', cursor:'pointer', display:'flex', padding:4 }}><X size={16}/></button>
             </div>
             <input value={eventForm.title} onChange={e => setEventForm(f=>({...f,title:e.target.value}))}
