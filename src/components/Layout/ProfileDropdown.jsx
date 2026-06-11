@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, UserCog, Crown, Check, X, Zap, Rocket, Sun, Moon } from 'lucide-react'
+import { LogOut, UserCog, Crown, Check, X, Zap, Rocket, Sun, Moon, CheckCircle2 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useApplications } from '../../contexts/ApplicationContext'
@@ -142,6 +142,14 @@ export default function ProfileDropdown() {
               <UserCog size={15} /> Edit profile
             </button>
           )}
+
+          {/* Completed tasks */}
+          <button
+            onClick={() => { setOpen(false); navigate('/completed-tasks') }}
+            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b border-slate-100 dark:border-slate-800"
+          >
+            <CheckCircle2 size={15} className="text-emerald-500" /> Completed tasks
+          </button>
 
           {/* Plans */}
           <button

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, Headphones, BookOpen, Podcast, Play, X, ChevronDown } from 'lucide-react'
+import { Search, Headphones, BookOpen, Podcast, Play, X } from 'lucide-react'
 
 const SANS = '"Geist", "Inter", system-ui, -apple-system, sans-serif'
 const MONO = '"Geist Mono", "JetBrains Mono", monospace'
@@ -113,10 +113,9 @@ function Cover({ item, h=200 }) {
 
 export default function Library() {
   const [query,  setQuery]  = useState('')
-  const [type,   setType]   = useState('all')
+  const [types,  setTypes]  = useState(['book','audiobook','podcast'])
   const [skill,  setSkill]  = useState('All')
   const [detail, setDetail] = useState(null)
-  const [typeOpen, setTypeOpen] = useState(false)
 
   useEffect(() => {
     const el = document.createElement('style')
@@ -137,100 +136,81 @@ export default function Library() {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
     return CATALOG.filter(item => {
-      if (type !== 'all' && item.type !== type) return false
+      if (types.length > 0 && !types.includes(item.type)) return false
       if (skill !== 'All' && item.skill !== skill) return false
       if (q && !`${item.title} ${item.author} ${item.skill}`.toLowerCase().includes(q)) return false
       return true
     })
-  }, [query, type, skill])
+  }, [query, types, skill])
 
-  const typeLabel = type === 'all' ? 'All types' : TYPE_META[type].label + 's'
   const skillColor = skill !== 'All' ? SKILL_COLORS[skill] : '#38bdf8'
   const activeSkillCount = skill !== 'All' ? CATALOG.filter(c => c.skill === skill).length : CATALOG.length
 
   return (
-    <div style={{ background:BG, minHeight:'100vh', fontFamily:SANS, margin:'-12px -24px', paddingBottom:100 }} onClick={() => setTypeOpen(false)}>
+    <div style={{ background:BG, minHeight:'100vh', fontFamily:SANS, margin:'-12px -24px', paddingBottom:100 }}>
       <style>{CSS}</style>
 
       {/* ── Search hero ──────────────────────────────────── */}
       <div style={{ padding:'52px 48px 40px', maxWidth:1200, margin:'0 auto' }}>
 
-        {/* Search bar */}
-        <div style={{ position:'relative', display:'flex', alignItems:'stretch', border:'1px solid rgba(163,201,255,0.14)', background:'rgba(255,255,255,0.025)', transition:'border-color .2s', maxWidth:720 }}
-          onFocusCapture={e => e.currentTarget.style.borderColor='rgba(56,189,248,0.4)'}
-          onBlurCapture={e => e.currentTarget.style.borderColor='rgba(163,201,255,0.14)'}
-        >
-          {/* Type selector */}
-          <div style={{ position:'relative' }}>
-            <button onClick={e => { e.stopPropagation(); setTypeOpen(v => !v) }}
-              style={{
-                height:'100%', padding:'0 18px', background:'rgba(255,255,255,0.04)',
-                borderRight:'1px solid rgba(163,201,255,0.1)', border:'none', borderRight:'1px solid rgba(163,201,255,0.1)',
-                color:'#a3c9ff', fontSize:13, fontWeight:500, fontFamily:SANS,
-                display:'flex', alignItems:'center', gap:7, cursor:'pointer',
-                whiteSpace:'nowrap', minWidth:126,
-              }}
-            >
-              {type !== 'all' && (() => { const Icon = TYPE_META[type].icon; return <Icon size={13} strokeWidth={2} /> })()}
-              {typeLabel}
-              <ChevronDown size={12} color="rgba(163,201,255,0.4)" style={{ marginLeft:'auto', transition:'transform .15s', transform: typeOpen ? 'rotate(180deg)' : 'none' }} />
-            </button>
-            {typeOpen && (
-              <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, background:'#0d1420', border:'1px solid rgba(163,201,255,0.12)', zIndex:30, minWidth:150, animation:'lib-in .15s ease' }}>
-                {[
-                  { key:'all', label:'All types', icon:null },
-                  { key:'book', label:'Books', icon:BookOpen },
-                  { key:'audiobook', label:'Audiobooks', icon:Headphones },
-                  { key:'podcast', label:'Podcasts', icon:Podcast },
-                ].map(t => {
-                  const Icon = t.icon
-                  return (
-                    <button key={t.key} onClick={e => { e.stopPropagation(); setType(t.key); setTypeOpen(false) }}
-                      style={{
-                        width:'100%', display:'flex', alignItems:'center', gap:9,
-                        background: type===t.key ? 'rgba(56,189,248,0.08)' : 'transparent',
-                        border:'none', color: type===t.key ? '#38bdf8' : '#a3c9ff',
-                        fontSize:13, fontWeight: type===t.key ? 600 : 400,
-                        padding:'11px 16px', cursor:'pointer', fontFamily:SANS, textAlign:'left',
-                        transition:'background .12s',
-                      }}
-                      onMouseEnter={e => { if(type!==t.key) e.currentTarget.style.background='rgba(163,201,255,0.04)' }}
-                      onMouseLeave={e => { if(type!==t.key) e.currentTarget.style.background='transparent' }}
-                    >
-                      {Icon ? <Icon size={13} strokeWidth={2} /> : <span style={{ width:13 }} />}
-                      {t.label}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
+        {/* Search + type toggles */}
+        <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{ flex:1, display:'flex', alignItems:'stretch', border:'1px solid rgba(163,201,255,0.14)', background:'rgba(255,255,255,0.025)', transition:'border-color .2s', maxWidth:600 }}
+            onFocusCapture={e => e.currentTarget.style.borderColor='rgba(56,189,248,0.4)'}
+            onBlurCapture={e => e.currentTarget.style.borderColor='rgba(163,201,255,0.14)'}
+          >
+            <div style={{ flex:1, position:'relative', display:'flex', alignItems:'center' }}>
+              <Search size={15} color="rgba(163,201,255,0.3)" style={{ position:'absolute', left:16, pointerEvents:'none' }} />
+              <input
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder="Search titles, authors, skills…"
+                style={{
+                  width:'100%', background:'transparent', border:'none', outline:'none',
+                  color:'#eef5ff', fontSize:15, fontFamily:SANS, fontWeight:400,
+                  padding:'16px 44px 16px 44px',
+                }}
+              />
+              {query && (
+                <button onClick={() => setQuery('')}
+                  style={{ position:'absolute', right:14, background:'transparent', border:'none', color:'rgba(163,201,255,0.4)', cursor:'pointer', display:'flex', padding:4 }}>
+                  <X size={14} />
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Text input */}
-          <div style={{ flex:1, position:'relative', display:'flex', alignItems:'center' }}>
-            <Search size={15} color="rgba(163,201,255,0.3)" style={{ position:'absolute', left:16, pointerEvents:'none' }} />
-            <input
-              type="text"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search titles, authors…"
-              style={{
-                width:'100%', background:'transparent', border:'none', outline:'none',
-                color:'#eef5ff', fontSize:15, fontFamily:SANS, fontWeight:400,
-                padding:'16px 44px 16px 44px',
-              }}
-            />
-            {query && (
-              <button onClick={() => setQuery('')}
-                style={{ position:'absolute', right:14, background:'transparent', border:'none', color:'rgba(163,201,255,0.4)', cursor:'pointer', display:'flex', padding:4 }}>
-                <X size={14} />
+          {[
+            { key:'book',      label:'Books',      icon:BookOpen,   color:'#4ade80' },
+            { key:'audiobook', label:'Audiobooks', icon:Headphones, color:'#60a5fa' },
+            { key:'podcast',   label:'Podcasts',   icon:Podcast,    color:'#c084fc' },
+          ].map(({ key, label, icon:Icon, color }) => {
+            const active = types.includes(key)
+            return (
+              <button key={key}
+                onClick={() => setTypes(prev => prev.includes(key) ? prev.filter(t => t !== key) : [...prev, key])}
+                style={{
+                  display:'flex', alignItems:'center', gap:7,
+                  padding:'0 18px', height:52, flexShrink:0,
+                  background: active ? `${color}18` : 'rgba(255,255,255,0.025)',
+                  border: `1px solid ${active ? color + '55' : 'rgba(163,201,255,0.1)'}`,
+                  color: active ? color : 'rgba(163,201,255,0.38)',
+                  fontSize:13, fontFamily:SANS, fontWeight: active ? 600 : 400,
+                  cursor:'pointer', transition:'all .15s', whiteSpace:'nowrap',
+                }}
+                onMouseEnter={e => { if(!active){ e.currentTarget.style.background=`${color}0d`; e.currentTarget.style.color=`${color}99` }}}
+                onMouseLeave={e => { if(!active){ e.currentTarget.style.background='rgba(255,255,255,0.025)'; e.currentTarget.style.color='rgba(163,201,255,0.38)' }}}
+              >
+                <Icon size={13} strokeWidth={2} />
+                {label}
               </button>
-            )}
-          </div>
+            )
+          })}
         </div>
 
         {/* Active filters */}
-        {(skill !== 'All' || type !== 'all' || query) && (
+        {(skill !== 'All' || types.length < 3 || query) && (
           <div style={{ display:'flex', alignItems:'center', gap:8, marginTop:12, animation:'lib-in .2s ease' }}>
             <span style={{ fontSize:11, color:'rgba(163,201,255,0.35)', fontFamily:MONO }}>Showing</span>
             {skill !== 'All' && (
@@ -238,11 +218,13 @@ export default function Library() {
                 {skill}
               </span>
             )}
-            {type !== 'all' && (
-              <span style={{ fontSize:11, color:'#38bdf8', fontFamily:MONO }}>· {typeLabel}</span>
+            {types.length > 0 && types.length < 3 && (
+              <span style={{ fontSize:11, color:'#38bdf8', fontFamily:MONO }}>
+                · {types.map(t => TYPE_META[t]?.label + 's').join(', ')}
+              </span>
             )}
             <span style={{ fontSize:11, color:'rgba(163,201,255,0.3)', fontFamily:MONO }}>— {results.length} result{results.length!==1?'s':''}</span>
-            <button onClick={() => { setSkill('All'); setType('all'); setQuery('') }}
+            <button onClick={() => { setSkill('All'); setTypes(['book','audiobook','podcast']); setQuery('') }}
               style={{ background:'transparent', border:'none', color:'rgba(163,201,255,0.35)', cursor:'pointer', fontSize:11, fontFamily:MONO, display:'flex', alignItems:'center', gap:3 }}
               onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
               onMouseLeave={e => e.currentTarget.style.color='rgba(163,201,255,0.35)'}

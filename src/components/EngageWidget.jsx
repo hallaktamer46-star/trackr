@@ -88,9 +88,8 @@ export default function EngageWidget() {
   const curSecs   = log.length && !log[log.length-1]?.end ? Math.floor((Date.now()-log[log.length-1].start)/1000) : 0
   const shiftSecs = shiftStart ? Math.floor((Date.now()-shiftStart)/1000) : 0
 
-  const todayTasks = tasks.filter(t => t.due === todayStr)
-  const pending    = todayTasks.filter(t => !t.done)
-  const doneTasks  = todayTasks.filter(t => t.done)
+  const pending   = tasks.filter(t => !t.done && t.due <= todayStr)
+  const doneTasks = tasks.filter(t => t.done)
 
   function pickStatus(key) {
     const now = Date.now()
@@ -132,7 +131,11 @@ export default function EngageWidget() {
   }
 
   function toggleTask(id) {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t))
+    setTasks(prev => prev.map(t => t.id === id ? {
+      ...t,
+      done: !t.done,
+      completedAt: t.done ? null : new Date().toISOString()
+    } : t))
   }
 
   function removeTask(id) {
@@ -362,8 +365,8 @@ export default function EngageWidget() {
 
                 {/* Task list */}
                 <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
-                  {todayTasks.length === 0 && (
-                    <p style={{padding:'10px 14px',fontSize:11,color:'#2a4898',fontStyle:'italic'}}>Nothing due today.</p>
+                  {pending.length === 0 && doneTasks.length === 0 && (
+                    <p style={{padding:'10px 14px',fontSize:11,color:'#2a4898',fontStyle:'italic'}}>No tasks yet — add one above.</p>
                   )}
 
                   {pending.map(t => (

@@ -23,6 +23,7 @@ import RoadmapDetail from './pages/RoadmapDetail'
 import LifePlan from './pages/LifePlan'
 import DailyDebrief from './pages/DailyDebrief'
 import Library from './pages/Library'
+import CompletedTasks from './pages/CompletedTasks'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -216,6 +217,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <LifePlan />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/completed-tasks" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <CompletedTasks />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Plus, Bell, AlertTriangle, ChevronRight, Sparkles,
@@ -7,7 +7,7 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail, Brain, Users, LayoutList, Flame
+  FileText, Mail, Brain, Users, LayoutList, Flame, X
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -24,6 +24,7 @@ import QuickPostModal from '../components/QuickPostModal'
 
 const MONO = 'Geist Mono, monospace'
 const SANS = 'Geist, Inter, sans-serif'
+const IMP_COLORS = { 1:'#4edea3', 2:'#a3c9ff', 3:'#fbbf24', 4:'#ffb689', 5:'#ffb4ab' }
 
 const STATUS_CONFIG = {
   wishlist:  { label: 'Wishlist',  color: '#8a919f' },
@@ -145,6 +146,18 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingApp, setEditingApp] = useState(null)
   const [quickPostOpen, setQuickPostOpen] = useState(false)
+  const [eventModal, setEventModal] = useState(false)
+  const [eventForm, setEventForm] = useState({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
+  const [events, setEvents] = useState(() => { try { return JSON.parse(localStorage.getItem('trackr_events')||'[]') } catch { return [] } })
+
+  useEffect(() => { localStorage.setItem('trackr_events', JSON.stringify(events)) }, [events])
+
+  function saveEvent() {
+    if (!eventForm.title.trim()) return
+    setEvents(prev => [...prev, { id: Date.now(), ...eventForm, createdAt: new Date().toISOString() }])
+    setEventModal(false)
+    setEventForm({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
+  }
 
   const firstName = user?.user_metadata?.first_name || null
   const greeting = useMemo(() => {
@@ -294,6 +307,13 @@ export default function Home() {
           </h1>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <button onClick={() => setEventModal(true)}
+            style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
+            onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
+            onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
+            <CalendarDays size={13} color="#fff" strokeWidth={2.5}/>
+            <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Quick Add Event</span>
+          </button>
           {canAddMore && (
             <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
               style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
@@ -522,6 +542,49 @@ export default function Home() {
 
       <ApplicationModal open={modalOpen} onClose={()=>setModalOpen(false)} onSave={handleSave} onDelete={deleteApplication} initial={editingApp??{status:'wishlist'}}/>
       {quickPostOpen && <QuickPostModal onClose={()=>setQuickPostOpen(false)} onPublished={()=>{}}/>}
+
+      {/* Quick Add Event Modal */}
+      {eventModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9000 }}
+          onClick={() => setEventModal(false)}>
+          <div style={{ background:'#0d1420', border:'0.5px solid rgba(163,201,255,0.15)', padding:28, width:440, maxWidth:'90vw', display:'flex', flexDirection:'column', gap:16 }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <h2 style={{ fontFamily:MONO, fontSize:14, fontWeight:800, color:'#e2e2e8', letterSpacing:'-0.02em', margin:0 }}>Quick Add Event</h2>
+              <button onClick={() => setEventModal(false)} style={{ background:'none', border:'none', color:'#5a6478', cursor:'pointer', display:'flex', padding:4 }}><X size={16}/></button>
+            </div>
+            <input value={eventForm.title} onChange={e => setEventForm(f=>({...f,title:e.target.value}))}
+              onKeyDown={e => e.key==='Enter' && saveEvent()}
+              placeholder="Event title…"
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#e2e2e8', fontSize:14, fontFamily:SANS, outline:'none' }}/>
+            <input type="date" value={eventForm.date} onChange={e => setEventForm(f=>({...f,date:e.target.value}))}
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#8a919f', fontSize:13, fontFamily:MONO, outline:'none', colorScheme:'dark' }}/>
+            <textarea value={eventForm.desc} onChange={e => setEventForm(f=>({...f,desc:e.target.value}))}
+              placeholder="Description (optional)…" rows={3}
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#c0c7d5', fontSize:13, fontFamily:SANS, outline:'none', resize:'none' }}/>
+            <div>
+              <p style={{ fontFamily:MONO, fontSize:9, color:'#404753', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:8 }}>Importance</p>
+              <div style={{ display:'flex', gap:6 }}>
+                {[1,2,3,4,5].map(n => (
+                  <button key={n} onClick={() => setEventForm(f=>({...f,importance:n}))}
+                    style={{
+                      flex:1, padding:'9px 0', border:`0.5px solid ${eventForm.importance===n ? IMP_COLORS[n]+'80' : 'rgba(163,201,255,0.1)'}`,
+                      background: eventForm.importance===n ? `${IMP_COLORS[n]}18` : 'rgba(255,255,255,0.02)',
+                      color: eventForm.importance===n ? IMP_COLORS[n] : 'rgba(163,201,255,0.3)',
+                      fontFamily:MONO, fontSize:13, fontWeight:700, cursor:'pointer', transition:'all .12s',
+                    }}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button onClick={saveEvent}
+              style={{ padding:'12px 0', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', color:'#fff', fontFamily:MONO, fontSize:11, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer' }}>
+              Save Event
+            </button>
+          </div>
+        </div>
+      )}
 
       <style>{`@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}`}</style>
       </div>

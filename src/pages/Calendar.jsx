@@ -4,7 +4,7 @@ import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
   ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
   Clock, Flag, Star, Circle, PlayCircle, Coffee, BookOpen,
-  BarChart3, Edit3, CalendarIcon
+  BarChart3, Edit3, CalendarIcon, MoreVertical, ChevronDown
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
   isToday, addMonths, subMonths, parseISO, isFuture, isPast, startOfDay } from 'date-fns'
@@ -231,6 +231,8 @@ export default function Calendar() {
 
   /* task form */
   const [taskForm, setTaskForm] = useState({ open: false, title: '', due: format(new Date(),'yyyy-MM-dd'), priority: 'medium', note: '' })
+  const [editingTaskId, setEditingTaskId] = useState(null)
+  const [expandedTaskId, setExpandedTaskId] = useState(null)
   /* goal form */
   const [goalForm, setGoalForm] = useState({ open: false, title: '', target: '', unit: 'applications', period: 'week' })
   const [motivation, setMotivation] = useState({ goalId: null, text: '' })
@@ -258,10 +260,15 @@ export default function Calendar() {
   /* ── Helpers ── */
   const addTask = () => {
     if (!taskForm.title.trim()) return
-    setTasks(t => [...t, { id: Date.now().toString(), ...taskForm, done: false, createdAt: new Date().toISOString() }])
+    if (editingTaskId) {
+      setTasks(t => t.map(x => x.id === editingTaskId ? { ...x, title: taskForm.title, due: taskForm.due, priority: taskForm.priority, note: taskForm.note } : x))
+      setEditingTaskId(null)
+    } else {
+      setTasks(t => [...t, { id: Date.now().toString(), ...taskForm, done: false, createdAt: new Date().toISOString() }])
+    }
     setTaskForm(f => ({ ...f, open: false, title: '', note: '' }))
   }
-  const toggleTask = id => setTasks(t => t.map(x => x.id === id ? { ...x, done: !x.done } : x))
+  const toggleTask = id => setTasks(t => t.map(x => x.id === id ? { ...x, done: !x.done, completedAt: x.done ? null : new Date().toISOString() } : x))
   const deleteTask = id => setTasks(t => t.filter(x => x.id !== id))
 
   const addGoal = () => {
@@ -407,57 +414,98 @@ export default function Calendar() {
               }
             />
 
-            {/* Add task form */}
+            {/* Add / Edit task form */}
             {taskForm.open && (
               <div style={{ background: BG, border: `0.5px solid ${BORDER}`, padding: 12, marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <input value={taskForm.title} onChange={e => setTaskForm(f=>({...f,title:e.target.value}))} placeholder="Task title…"
                   onKeyDown={e => e.key==='Enter' && addTask()}
                   style={{ width:'100%', boxSizing:'border-box', padding:'7px 10px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#e2e2e8', fontSize:12, fontFamily:SANS, outline:'none' }}/>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6 }}>
-                  <input type="date" value={taskForm.due} onChange={e => setTaskForm(f=>({...f,due:e.target.value}))}
-                    style={{ padding:'6px 8px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#8a919f', fontSize:11, fontFamily:MONO, outline:'none', colorScheme:'dark' }}/>
-                  <select value={taskForm.priority} onChange={e => setTaskForm(f=>({...f,priority:e.target.value}))}
-                    style={{ padding:'6px 8px', background:SURFACE, border:`0.5px solid ${BORDER}`, color:'#8a919f', fontSize:11, fontFamily:MONO, outline:'none', cursor:'pointer' }}>
-                    <option value="high">🔴 High</option>
-                    <option value="medium">🟡 Medium</option>
-                    <option value="low">🟢 Low</option>
-                  </select>
+                <input type="date" value={taskForm.due} onChange={e => setTaskForm(f=>({...f,due:e.target.value}))}
+                  style={{ padding:'6px 8px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#8a919f', fontSize:11, fontFamily:MONO, outline:'none', colorScheme:'dark', width:'100%', boxSizing:'border-box' }}/>
+                <div style={{ display:'flex', gap:4 }}>
+                  {['high','medium','low'].map(p => (
+                    <button key={p} onClick={() => setTaskForm(f=>({...f,priority:p}))}
+                      style={{
+                        flex:1, padding:'6px 4px',
+                        background: taskForm.priority===p ? `${PRIORITY_COLOR[p]}18` : 'rgba(255,255,255,0.02)',
+                        border: `0.5px solid ${taskForm.priority===p ? PRIORITY_COLOR[p]+'60' : BORDER}`,
+                        color: taskForm.priority===p ? PRIORITY_COLOR[p] : '#5a6478',
+                        fontFamily:MONO, fontSize:9, fontWeight:700, cursor:'pointer', transition:'all .12s',
+                        textTransform:'uppercase', letterSpacing:'0.06em',
+                      }}>
+                      {PRIORITY_LABEL[p]}
+                    </button>
+                  ))}
                 </div>
+                <textarea value={taskForm.note} onChange={e => setTaskForm(f=>({...f,note:e.target.value}))}
+                  placeholder="Note (optional)…" rows={2}
+                  style={{ width:'100%', boxSizing:'border-box', padding:'7px 10px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#8a919f', fontSize:11, fontFamily:SANS, outline:'none', resize:'none' }}/>
                 <div style={{ display:'flex', gap:6 }}>
-                  <button onClick={addTask} style={{ flex:1, padding:'7px 0', background:'rgba(163,201,255,0.1)', border:'0.5px solid rgba(163,201,255,0.3)', color:'#a3c9ff', fontFamily:MONO, fontSize:10, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer' }}>Add Task</button>
-                  <button onClick={() => setTaskForm(f=>({...f,open:false}))} style={{ padding:'7px 10px', background:'rgba(255,255,255,0.02)', border:`0.5px solid ${BORDER}`, color:'#5a6478', cursor:'pointer' }}><X size={12}/></button>
+                  <button onClick={addTask} style={{ flex:1, padding:'7px 0', background:'rgba(163,201,255,0.1)', border:'0.5px solid rgba(163,201,255,0.3)', color:'#a3c9ff', fontFamily:MONO, fontSize:10, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer' }}>
+                    {editingTaskId ? 'Update Task' : 'Add Task'}
+                  </button>
+                  <button onClick={() => { setTaskForm(f=>({...f,open:false})); setEditingTaskId(null) }} style={{ padding:'7px 10px', background:'rgba(255,255,255,0.02)', border:`0.5px solid ${BORDER}`, color:'#5a6478', cursor:'pointer' }}><X size={12}/></button>
                 </div>
               </div>
             )}
 
             {/* Task list */}
-            <div style={{ display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto' }}>
+            <div style={{ display:'flex', flexDirection:'column', maxHeight:340, overflowY:'auto', background:'rgba(0,0,0,0.35)', border:`0.5px solid ${BORDER}` }}>
               {pendingTasks.length === 0 && !taskForm.open && (
-                <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'8px 0' }}>No pending tasks — add one above.</p>
+                <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'12px 10px' }}>No pending tasks — add one above.</p>
               )}
               {pendingTasks.map(t => (
-                <div key={t.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'rgba(96,165,250,0.04)', border:`1px solid rgba(96,165,250,0.1)`, transition:'background 0.1s' }}
-                  onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.04)'} onMouseLeave={e=>e.currentTarget.style.background='rgba(255,255,255,0.015)'}>
-                  <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority], display:'flex', flexShrink:0, padding:0 }}>
-                    <Circle size={14}/>
-                  </button>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ fontSize:12, color:'#c0c7d5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{t.title}</p>
-                    <p style={{ fontFamily:MONO, fontSize:8, color: isPast(startOfDay(parseISO(t.due))) && !isToday(parseISO(t.due)) ? '#ffb4ab' : '#3a4455', marginTop:1 }}>
-                      {isToday(parseISO(t.due)) ? 'Today' : format(parseISO(t.due), 'MMM d')}
-                    </p>
-                  </div>
-                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                    <a href={gcalUrl(t.title, t.due)} target="_blank" rel="noopener noreferrer"
-                      style={{ color:'#3a4455', display:'flex', transition:'color 0.15s' }}
-                      onMouseEnter={e=>e.currentTarget.style.color='#4edea3'} onMouseLeave={e=>e.currentTarget.style.color='#3a4455'}>
-                      <CalendarIcon size={10}/>
-                    </a>
-                    <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
-                      onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
-                      <Trash2 size={11}/>
+                <div key={t.id}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', transition:'background 0.1s', borderBottom:`0.5px solid rgba(163,201,255,0.05)` }}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.04)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                    <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority], display:'flex', flexShrink:0, padding:0 }}>
+                      <Circle size={14}/>
                     </button>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p style={{ fontSize:12, color:'#c0c7d5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{t.title}</p>
+                      <p style={{ fontFamily:MONO, fontSize:8, color: isPast(startOfDay(parseISO(t.due))) && !isToday(parseISO(t.due)) ? '#ffb4ab' : '#3a4455', marginTop:1 }}>
+                        {isToday(parseISO(t.due)) ? 'Today' : format(parseISO(t.due), 'MMM d')}
+                      </p>
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                      <button onClick={() => { setExpandedTaskId(id => id === t.id ? null : t.id) }}
+                        style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
+                        onMouseEnter={e=>e.currentTarget.style.color='#a3c9ff'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
+                        <MoreVertical size={11}/>
+                      </button>
+                      <button onClick={() => {
+                        setEditingTaskId(t.id)
+                        setTaskForm({ open:true, title:t.title, due:t.due, priority:t.priority||'medium', note:t.note||'' })
+                      }} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
+                        onMouseEnter={e=>e.currentTarget.style.color='#a3c9ff'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
+                        <Edit3 size={11}/>
+                      </button>
+                      <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
+                        onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
+                        <Trash2 size={11}/>
+                      </button>
+                    </div>
                   </div>
+                  {expandedTaskId === t.id && (
+                    <div style={{ padding:'8px 10px 10px 32px', background:'rgba(0,0,0,0.4)', borderBottom:`0.5px solid rgba(163,201,255,0.08)` }}>
+                      <div style={{ display:'flex', gap:16 }}>
+                        <div>
+                          <p style={{ fontFamily:MONO, fontSize:8, color:'#3a4455', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3 }}>Priority</p>
+                          <p style={{ fontSize:11, color: PRIORITY_COLOR[t.priority||'medium'], fontWeight:600 }}>{PRIORITY_LABEL[t.priority||'medium']}</p>
+                        </div>
+                        <div>
+                          <p style={{ fontFamily:MONO, fontSize:8, color:'#3a4455', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3 }}>Due</p>
+                          <p style={{ fontFamily:MONO, fontSize:11, color:'#8a919f' }}>{format(parseISO(t.due), 'MMM d, yyyy')}</p>
+                        </div>
+                        {t.note && (
+                          <div style={{ flex:1 }}>
+                            <p style={{ fontFamily:MONO, fontSize:8, color:'#3a4455', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3 }}>Note</p>
+                            <p style={{ fontSize:11, color:'#8a919f', lineHeight:1.4 }}>{t.note}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
               {doneTasks.length > 0 && (
