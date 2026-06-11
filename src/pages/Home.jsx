@@ -265,7 +265,15 @@ export default function Home() {
 
       {/* ── Left sidebar ── */}
       <aside style={{ width:148, flexShrink:0 }}>
-        <nav style={{ display:'flex', flexDirection:'column', gap:1, paddingTop:8 }}>
+        {/* Drop a thought */}
+        <button onClick={() => setQuickPostOpen(true)}
+          style={{ display:'flex', alignItems:'center', gap:7, width:'100%', padding:'8px 10px', margin:'8px 0 4px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.12)', borderRadius:6, cursor:'pointer', transition:'all 0.15s', textAlign:'left' }}
+          onMouseEnter={e=>{ e.currentTarget.style.background='rgba(163,201,255,0.08)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.22)' }}
+          onMouseLeave={e=>{ e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.12)' }}>
+          <PenSquare size={12} style={{ color:'#a3c9ff', flexShrink:0 }}/>
+          <span style={{ fontFamily:SANS, fontSize:11, color:'#4a5568', fontWeight:400, whiteSpace:'nowrap' }}>Drop a thought…</span>
+        </button>
+        <nav style={{ display:'flex', flexDirection:'column', gap:1 }}>
           {SIDEBAR_LINKS.map(({ label, icon:Icon, soon, action }) => (
             <button key={label} onClick={()=>{ if(soon)return; action?.() }}
               style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'transparent', border:'0.5px solid transparent', cursor:soon?'default':'pointer', textAlign:'left', transition:'all 0.15s', opacity:soon?0.35:1 }}
@@ -302,17 +310,6 @@ export default function Home() {
 
       {/* ── Main dashboard ── */}
       <div style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', gap:12 }}>
-
-      {/* ══ Drop a thought bar ══ */}
-      <button onClick={() => setQuickPostOpen(true)}
-        style={{ display:'flex', alignItems:'center', gap:12, width:'100%', padding:'13px 18px', background:'rgba(163,201,255,0.03)', border:'1px solid rgba(163,201,255,0.09)', borderRadius:999, cursor:'pointer', transition:'all 0.15s', textAlign:'left' }}
-        onMouseEnter={e=>{ e.currentTarget.style.background='rgba(163,201,255,0.06)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.18)' }}
-        onMouseLeave={e=>{ e.currentTarget.style.background='rgba(163,201,255,0.03)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.09)' }}>
-        <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#a3c9ff22,#4edea322)', border:'1px solid rgba(163,201,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <PenSquare size={14} style={{ color:'#a3c9ff' }}/>
-        </div>
-        <span style={{ fontFamily:SANS, fontSize:14, color:'#3a4455', fontWeight:400, letterSpacing:'-0.01em' }}>Drop a thought…</span>
-      </button>
 
       {/* ══ Header row ══ */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
