@@ -123,14 +123,14 @@ export default function Library() {
     el.textContent = CSS
     document.head.appendChild(el)
 
-    // Paint every ancestor the same bg so there's no contrast leak on the sides
-    const targets = [document.documentElement, document.body, document.body.firstElementChild]
-    const prev = targets.map(t => t?.style?.background ?? '')
-    targets.forEach(t => t && (t.style.background = BG))
+    // Force every ancestor to match — override Tailwind bg classes with !important
+    const bgOverride = document.createElement('style')
+    bgOverride.textContent = `html,body,#root,#root>div,#root>div>div { background: ${BG} !important; }`
+    document.head.appendChild(bgOverride)
 
     return () => {
       document.head.removeChild(el)
-      targets.forEach((t, i) => t && (t.style.background = prev[i]))
+      document.head.removeChild(bgOverride)
     }
   }, [])
 
