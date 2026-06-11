@@ -7,7 +7,7 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail, Brain, Users, LayoutList
+  FileText, Mail, Brain, Users, LayoutList, Flame
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -218,14 +218,14 @@ export default function Home() {
   const maxCount     = Math.max(...weeklyData.map(d=>d.count),1)
 
   const SIDEBAR_LINKS = [
-    { label:'Daily Debrief',icon:MessageSquare, action:()=>navigate('/debrief') },
-    { label:'Life Plan',    icon:LayoutList,    action:()=>navigate('/life') },
     { label:'Start a Blog', icon:PenSquare,    action:()=>setQuickPostOpen(true) },
     { label:'Jobs',         icon:Briefcase,    action:()=>navigate('/jobs') },
+    { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
+    { label:'Life Plan',    icon:LayoutList,    action:()=>navigate('/life') },
+    { label:'Daily Debrief',icon:Flame,         action:()=>navigate('/debrief') },
     { label:'Library',      icon:Library,       soon:true },
     { label:'Market',       icon:BarChart3,      soon:true },
     { label:'Skills',       icon:GraduationCap,  soon:true },
-    { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
     { label:'Roadmap',       icon:Target,        action:()=>navigate('/roadmap') },
     { label:'Community',    icon:Newspaper,     action:()=>navigate('/blog') },
     { label:'Mental Clarity', icon:Brain,       action:()=>navigate('/clarity') },
