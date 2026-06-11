@@ -163,6 +163,7 @@ export default function Home() {
     try {
       const existing = JSON.parse(localStorage.getItem('trackr_tasks') || '[]')
       localStorage.setItem('trackr_tasks', JSON.stringify([...existing, task]))
+      window.dispatchEvent(new CustomEvent('trackr-tasks-updated'))
     } catch {}
     setEventModal(false)
     setEventForm({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })

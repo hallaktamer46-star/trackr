@@ -71,6 +71,12 @@ export default function EngageWidget() {
   useEffect(() => { saveTasks(tasks) }, [tasks])
 
   useEffect(() => {
+    const handler = () => setTasks(loadTasks())
+    window.addEventListener('trackr-tasks-updated', handler)
+    return () => window.removeEventListener('trackr-tasks-updated', handler)
+  }, [])
+
+  useEffect(() => {
     if (status !== null) timer.current = setInterval(() => setTick(t => t+1), 1000)
     else clearInterval(timer.current)
     return () => clearInterval(timer.current)
