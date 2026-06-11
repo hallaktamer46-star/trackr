@@ -5,15 +5,6 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase'
 const MONO = 'Geist Mono, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
-const FEATURES = [
-  { label: 'Kanban Pipeline',   color: '#4edea3' },
-  { label: 'AI Coaching',       color: '#a3c9ff' },
-  { label: 'Interview Prep',    color: '#ffb689' },
-  { label: 'Smart Follow-ups',  color: '#ffb4ab' },
-  { label: 'Salary Intel',      color: '#c4b5fd' },
-  { label: 'CV Builder',        color: '#4edea3' },
-]
-
 const STATS = [
   ['Free',  'Forever plan'],
   ['AI',    'Powered tools'],
@@ -61,20 +52,12 @@ export default function Auth() {
       <div className="auth-hero" style={{ flex: '0 0 56%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '44px 56px', position: 'relative', zIndex: 1 }}>
 
         {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, background: 'linear-gradient(135deg, #4edea3 0%, #a3c9ff 100%)', borderRadius: 7, display: 'grid', placeItems: 'center', boxShadow: '0 0 20px rgba(78,222,163,0.25)' }}>
-            <div style={{ width: 13, height: 13, border: '2px solid rgba(5,8,16,0.7)', borderRadius: 3 }} />
-          </div>
-          <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 800, letterSpacing: '0.14em', color: '#ffffff' }}>TRACKR</span>
+        <div>
+          <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 48, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1 }}>T</span>
         </div>
 
         {/* Main copy */}
         <div style={{ maxWidth: 540 }}>
-          {/* Badge */}
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '5px 14px', borderRadius: 100, marginBottom: 36 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4edea3', boxShadow: '0 0 10px #4edea3' }} />
-            <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#4edea3', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Now in public beta</span>
-          </div>
 
           {/* Headline */}
           <h1 style={{ fontSize: 'clamp(52px, 5.5vw, 78px)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', color: '#ffffff', marginBottom: 6, fontFamily: SANS }}>
@@ -88,15 +71,6 @@ export default function Auth() {
             The precision platform for job seekers who treat their career like a mission. Track, strategize, and land — with tools built for real outcomes.
           </p>
 
-          {/* Feature chips */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 52 }}>
-            {FEATURES.map(f => (
-              <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 13px', background: 'rgba(255,255,255,0.025)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 6, transition: 'border-color 0.2s' }}>
-                <div style={{ width: 5, height: 5, borderRadius: '50%', background: f.color, boxShadow: `0 0 6px ${f.color}88` }} />
-                <span style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(192,199,213,0.5)', letterSpacing: '0.05em' }}>{f.label}</span>
-              </div>
-            ))}
-          </div>
 
           {/* Stats */}
           <div style={{ display: 'flex', gap: 36 }}>
