@@ -122,7 +122,16 @@ export default function Library() {
     const el = document.createElement('style')
     el.textContent = CSS
     document.head.appendChild(el)
-    return () => document.head.removeChild(el)
+
+    // Paint every ancestor the same bg so there's no contrast leak on the sides
+    const targets = [document.documentElement, document.body, document.body.firstElementChild]
+    const prev = targets.map(t => t?.style?.background ?? '')
+    targets.forEach(t => t && (t.style.background = BG))
+
+    return () => {
+      document.head.removeChild(el)
+      targets.forEach((t, i) => t && (t.style.background = prev[i]))
+    }
   }, [])
 
   const results = useMemo(() => {
