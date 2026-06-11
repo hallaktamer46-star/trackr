@@ -392,28 +392,6 @@ export default function EngageWidget() {
                     </div>
                   ))}
 
-                  {doneTasks.length > 0 && pending.length > 0 && (
-                    <div style={{margin:'3px 12px',height:'1px',background:'rgba(40,80,180,0.15)'}}/>
-                  )}
-
-                  {doneTasks.map(t => (
-                    <div key={t.id}
-                      style={{display:'flex',alignItems:'center',gap:8,padding:'6px 12px',opacity:0.38,transition:'opacity 0.15s'}}
-                      onMouseEnter={e => e.currentTarget.style.opacity='0.62'}
-                      onMouseLeave={e => e.currentTarget.style.opacity='0.38'}>
-                      <button onClick={() => toggleTask(t.id)}
-                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#4edea3',display:'flex'}}>
-                        <CheckCircle2 size={13}/>
-                      </button>
-                      <span style={{flex:1,fontSize:12,color:'#4a70a8',textDecoration:'line-through',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
-                        {t.title}
-                      </span>
-                      <button onClick={() => removeTask(t.id)}
-                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#1e3870',display:'flex'}}>
-                        <X size={10}/>
-                      </button>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
