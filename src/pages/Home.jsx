@@ -241,7 +241,6 @@ export default function Home() {
   const maxCount     = Math.max(...weeklyData.map(d=>d.count),1)
 
   const SIDEBAR_LINKS = [
-    { label:'Start a Blog', icon:PenSquare,    action:()=>setQuickPostOpen(true) },
     { label:'Jobs',         icon:Briefcase,    action:()=>navigate('/jobs') },
     { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
     { label:'Life Plan',    icon:LayoutList,    action:()=>navigate('/life') },
@@ -303,6 +302,17 @@ export default function Home() {
 
       {/* ── Main dashboard ── */}
       <div style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', gap:12 }}>
+
+      {/* ══ Drop a thought bar ══ */}
+      <button onClick={() => setQuickPostOpen(true)}
+        style={{ display:'flex', alignItems:'center', gap:12, width:'100%', padding:'13px 18px', background:'rgba(163,201,255,0.03)', border:'1px solid rgba(163,201,255,0.09)', borderRadius:999, cursor:'pointer', transition:'all 0.15s', textAlign:'left' }}
+        onMouseEnter={e=>{ e.currentTarget.style.background='rgba(163,201,255,0.06)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.18)' }}
+        onMouseLeave={e=>{ e.currentTarget.style.background='rgba(163,201,255,0.03)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.09)' }}>
+        <div style={{ width:32, height:32, borderRadius:'50%', background:'linear-gradient(135deg,#a3c9ff22,#4edea322)', border:'1px solid rgba(163,201,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          <PenSquare size={14} style={{ color:'#a3c9ff' }}/>
+        </div>
+        <span style={{ fontFamily:SANS, fontSize:14, color:'#3a4455', fontWeight:400, letterSpacing:'-0.01em' }}>Drop a thought…</span>
+      </button>
 
       {/* ══ Header row ══ */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
