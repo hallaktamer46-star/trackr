@@ -49,6 +49,9 @@ export default function EngageWidget() {
   const [newTask, setNewTask]         = useState('')
   const taskInputRef = useRef(null)
 
+  const [editingTask, setEditingTask] = useState(null)
+  const [editForm, setEditForm]       = useState({ title:'', date:'', desc:'', importance:3 })
+
   const navigate  = useNavigate()
   const timer     = useRef(null)
   const widgetRef = useRef(null)
@@ -148,6 +151,27 @@ export default function EngageWidget() {
 
   function removeTask(id) {
     setTasks(prev => prev.filter(t => t.id !== id))
+  }
+
+  const IMP_COLORS = { 1:'#4edea3', 2:'#a3c9ff', 3:'#fbbf24', 4:'#ffb689', 5:'#ffb4ab' }
+  const priorityToImp = p => p === 'low' ? 1 : p === 'high' ? 5 : 3
+  const impToPriority = n => n <= 2 ? 'low' : n === 3 ? 'medium' : 'high'
+
+  function openEdit(t) {
+    setEditForm({ title: t.title, date: t.due, desc: t.note || '', importance: priorityToImp(t.priority) })
+    setEditingTask(t)
+  }
+
+  function saveEdit() {
+    if (!editForm.title.trim()) return
+    setTasks(prev => prev.map(t => t.id === editingTask.id ? {
+      ...t,
+      title: editForm.title,
+      due: editForm.date,
+      note: editForm.desc,
+      priority: impToPriority(editForm.importance),
+    } : t))
+    setEditingTask(null)
   }
 
   const openTab = t => setTab(p => p === t ? null : t)
@@ -390,7 +414,10 @@ export default function EngageWidget() {
                         onMouseLeave={e => e.currentTarget.style.color='#2a4898'}>
                         <Circle size={13}/>
                       </button>
-                      <span style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                      <span onClick={() => openEdit(t)}
+                        style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',cursor:'pointer',transition:'color 0.15s'}}
+                        onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
+                        onMouseLeave={e => e.currentTarget.style.color='#c8dcff'}>
                         {t.title}
                       </span>
                       <button onClick={() => removeTask(t.id)}
@@ -465,6 +492,60 @@ export default function EngageWidget() {
           50%       { transform: scale(1.4); opacity: 0.65; }
         }
       `}</style>
+
+      {/* ── Task edit modal ── */}
+      {editingTask && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:99999, padding:20 }}
+          onClick={() => setEditingTask(null)}>
+          <div style={{ width:'100%', maxWidth:380, background:'#0a0e1c', border:'0.5px solid rgba(163,201,255,0.15)', padding:'36px 32px', display:'flex', flexDirection:'column', gap:16, animation:'slideUp 0.18s cubic-bezier(0.22,1,0.36,1)' }}
+            onClick={e => e.stopPropagation()}>
+
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <h2 style={{ fontFamily:NUM, fontSize:13, fontWeight:800, color:'#e2e2e8', letterSpacing:'-0.01em', margin:0 }}>Edit Task</h2>
+              <button onClick={() => setEditingTask(null)} style={{ background:'none', border:'none', color:'rgba(163,201,255,0.35)', cursor:'pointer', fontSize:18, lineHeight:1, padding:4, transition:'color .15s' }}
+                onMouseEnter={e => e.currentTarget.style.color='rgba(163,201,255,0.7)'}
+                onMouseLeave={e => e.currentTarget.style.color='rgba(163,201,255,0.35)'}>×</button>
+            </div>
+
+            <input value={editForm.title} onChange={e => setEditForm(f=>({...f,title:e.target.value}))}
+              onKeyDown={e => e.key==='Enter' && saveEdit()}
+              placeholder="Task title…"
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.14)', color:'#e2e2e8', fontSize:14, fontFamily:BODY, outline:'none', width:'100%', boxSizing:'border-box' }}/>
+
+            <input type="date" value={editForm.date} onChange={e => setEditForm(f=>({...f,date:e.target.value}))}
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.14)', color:'#8a919f', fontSize:13, fontFamily:NUM, outline:'none', colorScheme:'dark', width:'100%', boxSizing:'border-box' }}/>
+
+            <textarea value={editForm.desc} onChange={e => setEditForm(f=>({...f,desc:e.target.value}))}
+              placeholder="Description (optional)…" rows={3}
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.14)', color:'#c0c7d5', fontSize:13, fontFamily:BODY, outline:'none', resize:'none', width:'100%', boxSizing:'border-box' }}/>
+
+            <div>
+              <p style={{ fontFamily:NUM, fontSize:9, color:'rgba(163,201,255,0.3)', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8 }}>Importance</p>
+              <div style={{ display:'flex', gap:6 }}>
+                {[1,2,3,4,5].map(n => (
+                  <button key={n} onClick={() => setEditForm(f=>({...f,importance:n}))}
+                    style={{
+                      flex:1, padding:'9px 0',
+                      border:`0.5px solid ${editForm.importance===n ? IMP_COLORS[n]+'80' : 'rgba(163,201,255,0.1)'}`,
+                      background: editForm.importance===n ? `${IMP_COLORS[n]}18` : 'rgba(255,255,255,0.02)',
+                      color: editForm.importance===n ? IMP_COLORS[n] : 'rgba(163,201,255,0.3)',
+                      fontFamily:NUM, fontSize:13, fontWeight:700, cursor:'pointer', transition:'all .12s',
+                    }}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={saveEdit}
+              style={{ padding:'12px 0', background:'linear-gradient(135deg,rgba(96,165,250,0.18),rgba(163,201,255,0.1))', border:'0.5px solid rgba(96,165,250,0.35)', color:'#60a5fa', fontFamily:NUM, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', transition:'all .15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background='rgba(96,165,250,0.22)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.55)' }}
+              onMouseLeave={e => { e.currentTarget.style.background='linear-gradient(135deg,rgba(96,165,250,0.18),rgba(163,201,255,0.1))'; e.currentTarget.style.borderColor='rgba(96,165,250,0.35)' }}>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
