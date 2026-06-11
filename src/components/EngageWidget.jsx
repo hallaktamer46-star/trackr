@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Power, Play, Plus, X, Check, Circle, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
+import { useNavigate } from 'react-router-dom'
 
 const NUM  = 'Geist Mono, monospace'
 const BODY = 'Geist, Inter, -apple-system, sans-serif'
@@ -48,6 +49,7 @@ export default function EngageWidget() {
   const [newTask, setNewTask]         = useState('')
   const taskInputRef = useRef(null)
 
+  const navigate  = useNavigate()
   const timer     = useRef(null)
   const widgetRef = useRef(null)
 
@@ -320,10 +322,12 @@ export default function EngageWidget() {
                   flexShrink: 0,
                 }}>
                   <div style={{display:'flex',alignItems:'center',gap:7}}>
-                    <div style={{width:6,height:6,background:'#60a5fa',boxShadow:'0 0 8px #60a5fa',flexShrink:0}}/>
-                    <span style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase'}}>
+                    <button onClick={() => navigate('/calendar')}
+                      style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase',background:'none',border:'none',cursor:'pointer',padding:0,textDecoration:'none',transition:'color 0.15s'}}
+                      onMouseEnter={e=>{ e.currentTarget.style.color='#60a5fa' }}
+                      onMouseLeave={e=>{ e.currentTarget.style.color='#5090d8' }}>
                       Tasks
-                    </span>
+                    </button>
                     {pending.length > 0 && (
                       <span style={{fontFamily:NUM,fontSize:8,fontWeight:900,color:'#60a5fa',background:'rgba(96,165,250,0.15)',border:'1px solid rgba(96,165,250,0.3)',padding:'1px 6px',boxShadow:'0 0 6px rgba(96,165,250,0.2)'}}>
                         {pending.length}
