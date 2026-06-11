@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import BackToHome from '../components/BackToHome'
 import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
@@ -18,6 +18,29 @@ const BORDER = 'rgba(255,255,255,0.07)'
 
 const PRIORITY_COLOR = { high: '#ffb4ab', medium: '#ffb689', low: '#4edea3' }
 const PRIORITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' }
+
+const GOAL_QUOTES = [
+  'One more step closer.',
+  'Keep the streak alive.',
+  'Progress is progress, no matter how small.',
+  "You're building momentum.",
+  'That one counts.',
+  'Every rep adds up.',
+  'Consistency is the key.',
+  'You showed up. That matters.',
+  'Small wins stack into big results.',
+  'Forward, always forward.',
+  'Done beats perfect.',
+  "That's how it gets done.",
+  'Another brick in the wall.',
+  "You're in motion — stay there.",
+  "The scoreboard doesn't lie.",
+  'One step at a time gets you there.',
+  "That's the work.",
+  'Keep going.',
+  "Proof you're serious.",
+  'It adds up faster than you think.',
+]
 
 const SESSION_TYPES = [
   { key: 'research',  label: 'Research',   icon: BookOpen,  color: '#a3c9ff' },
@@ -210,6 +233,8 @@ export default function Calendar() {
   const [taskForm, setTaskForm] = useState({ open: false, title: '', due: format(new Date(),'yyyy-MM-dd'), priority: 'medium', note: '' })
   /* goal form */
   const [goalForm, setGoalForm] = useState({ open: false, title: '', target: '', unit: 'applications', period: 'week' })
+  const [motivation, setMotivation] = useState({ goalId: null, text: '' })
+  const motivationTimer = useRef(null)
   /* session form */
   const [sessForm, setSessForm] = useState({ open: false, type: 'research', label: '', date: format(new Date(),'yyyy-MM-dd'), duration: 60, note: '' })
 
@@ -244,7 +269,19 @@ export default function Calendar() {
     setGoals(g => [...g, { id: Date.now().toString(), ...goalForm, progress: 0, createdAt: new Date().toISOString() }])
     setGoalForm(f => ({ ...f, open: false, title: '', target: '' }))
   }
-  const nudgeGoal = (id, dir) => setGoals(g => g.map(x => x.id === id ? { ...x, progress: Math.max(0, Math.min(Number(x.target), x.progress + dir)) } : x))
+  const nudgeGoal = (id, dir) => {
+    setGoals(g => g.map(x => x.id === id ? { ...x, progress: Math.max(0, Math.min(Number(x.target), x.progress + dir)) } : x))
+    if (dir > 0) {
+      const q = GOAL_QUOTES[Math.floor(Math.random() * GOAL_QUOTES.length)]
+      setMotivation({ goalId: id, text: q })
+      if (motivationTimer.current) clearTimeout(motivationTimer.current)
+      motivationTimer.current = setTimeout(() => setMotivation({ goalId: null, text: '' }), 3000)
+    }
+  }
+  const setPctGoal = (id, pct, target) => {
+    const clamped = Math.min(100, Math.max(0, Number(pct)))
+    setGoals(g => g.map(x => x.id === id ? { ...x, progress: Math.round((clamped / 100) * Number(target)) } : x))
+  }
   const deleteGoal = id => setGoals(g => g.filter(x => x.id !== id))
 
   const addSession = () => {
@@ -497,7 +534,13 @@ export default function Calendar() {
                         </p>
                       </div>
                       <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                        <span style={{ fontFamily:MONO, fontSize:13, fontWeight:800, color: done ? '#4edea3' : '#8a919f' }}>{pct}%</span>
+                        <input
+                          type="number" min="0" max="100"
+                          value={pct}
+                          onChange={e => setPctGoal(g.id, e.target.value, g.target)}
+                          style={{ fontFamily:MONO, fontSize:13, fontWeight:800, color: done ? '#4edea3' : '#8a919f', background:'transparent', border:'none', borderBottom:`0.5px solid ${done ? 'rgba(78,222,163,0.3)' : 'rgba(255,255,255,0.08)'}`, width:34, textAlign:'right', outline:'none', padding:'0 0 1px 0', MozAppearance:'textfield' }}
+                        />
+                        <span style={{ fontFamily:MONO, fontSize:13, fontWeight:800, color: done ? '#4edea3' : '#8a919f' }}>%</span>
                         <button onClick={() => deleteGoal(g.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
                           onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='#2a3040'}>
                           <Trash2 size={11}/>
@@ -514,6 +557,11 @@ export default function Calendar() {
                       <button onClick={() => nudgeGoal(g.id,  1)} style={{ padding:'3px 8px', background:'rgba(78,222,163,0.07)', border:'0.5px solid rgba(78,222,163,0.2)', color:'#4edea3', fontFamily:MONO, fontSize:9, fontWeight:700, cursor:'pointer' }}>+1</button>
                       <button onClick={() => nudgeGoal(g.id,  5)} style={{ padding:'3px 8px', background:'rgba(78,222,163,0.07)', border:'0.5px solid rgba(78,222,163,0.2)', color:'#4edea3', fontFamily:MONO, fontSize:9, fontWeight:700, cursor:'pointer' }}>+5</button>
                     </div>
+                    {motivation.goalId === g.id && (
+                      <p style={{ fontFamily:MONO, fontSize:9, color:'#4edea3', opacity:0.75, marginTop:5, letterSpacing:'0.04em', fontStyle:'italic', lineHeight:1.4 }}>
+                        ↑ {motivation.text}
+                      </p>
+                    )}
                   </div>
                 )
               })}

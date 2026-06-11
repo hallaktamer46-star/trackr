@@ -1,16 +1,33 @@
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
+const MONO = 'Geist Mono, monospace'
+const SANS = 'Geist, Inter, sans-serif'
+
+const FEATURES = [
+  { label: 'Kanban Pipeline',   color: '#4edea3' },
+  { label: 'AI Coaching',       color: '#a3c9ff' },
+  { label: 'Interview Prep',    color: '#ffb689' },
+  { label: 'Smart Follow-ups',  color: '#ffb4ab' },
+  { label: 'Salary Intel',      color: '#c4b5fd' },
+  { label: 'CV Builder',        color: '#4edea3' },
+]
+
+const STATS = [
+  ['Free',  'Forever plan'],
+  ['AI',    'Powered tools'],
+  ['100%',  'Data control'],
+]
+
 export default function Auth() {
   const { signIn, signUp } = useAuth()
-  const [mode, setMode]       = useState('signin')
-  const [email, setEmail]     = useState('')
+  const [mode,     setMode]     = useState('signin')
+  const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState(null)
-  const [success, setSuccess] = useState(null)
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState(null)
+  const [success,  setSuccess]  = useState(null)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -30,159 +47,263 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen w-full grid md:grid-cols-2 bg-white dark:bg-slate-950">
+    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', background: '#050810', fontFamily: SANS, overflow: 'hidden', position: 'relative' }}>
 
-      {/* Left – brand panel */}
-      <div className="hidden md:flex flex-col justify-between p-10 bg-slate-900 border-r border-slate-800 relative overflow-hidden">
+      {/* ── Animated background ── */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+        <div className="auth-grid" />
+        <div className="auth-orb auth-orb-1" />
+        <div className="auth-orb auth-orb-2" />
+        <div className="auth-orb auth-orb-3" />
+      </div>
+
+      {/* ── Left hero panel ── */}
+      <div className="auth-hero" style={{ flex: '0 0 56%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '44px 56px', position: 'relative', zIndex: 1 }}>
+
         {/* Logo */}
-        <div className="flex items-center gap-3 z-10">
-          <div className="w-8 h-8 bg-sky-500 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.5)] grid place-items-center">
-            <div className="w-4 h-4 border-2 border-white rounded-sm" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ width: 30, height: 30, background: 'linear-gradient(135deg, #4edea3 0%, #a3c9ff 100%)', borderRadius: 7, display: 'grid', placeItems: 'center', boxShadow: '0 0 20px rgba(78,222,163,0.25)' }}>
+            <div style={{ width: 13, height: 13, border: '2px solid rgba(5,8,16,0.7)', borderRadius: 3 }} />
           </div>
-          <span className="font-extrabold text-xl tracking-tighter font-mono text-white">TRACKR</span>
+          <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 800, letterSpacing: '0.14em', color: '#ffffff' }}>TRACKR</span>
         </div>
 
-        {/* Tagline + stats */}
-        <div className="z-10 space-y-6">
-          <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-400 font-bold">
-            v1.0.0 / Q1 RELEASE
-          </p>
-          <h1 className="text-5xl font-extrabold tracking-tighter leading-[1.05] text-white">
-            Your job search,<br />
-            <span className="text-slate-500">finally engineered.</span>
+        {/* Main copy */}
+        <div style={{ maxWidth: 540 }}>
+          {/* Badge */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '5px 14px', borderRadius: 100, marginBottom: 36 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4edea3', boxShadow: '0 0 10px #4edea3' }} />
+            <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#4edea3', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Now in public beta</span>
+          </div>
+
+          {/* Headline */}
+          <h1 style={{ fontSize: 'clamp(52px, 5.5vw, 78px)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', color: '#ffffff', marginBottom: 6, fontFamily: SANS }}>
+            Built for those
           </h1>
-          <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
-            A pipeline for your applications. Precision tooling for follow-ups, interviews and
-            offers. No spreadsheets. No chaos.
+          <h1 style={{ fontSize: 'clamp(52px, 5.5vw, 78px)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', marginBottom: 28, fontFamily: SANS }}>
+            <span style={{ color: 'transparent', WebkitTextStroke: '1.5px rgba(255,255,255,0.2)' }}>who close.</span>
+          </h1>
+
+          <p style={{ fontSize: 15, color: 'rgba(192,199,213,0.6)', lineHeight: 1.75, maxWidth: 420, marginBottom: 44, fontFamily: SANS }}>
+            The precision platform for job seekers who treat their career like a mission. Track, strategize, and land — with tools built for real outcomes.
           </p>
 
-          <div className="grid grid-cols-3 gap-px bg-slate-800 max-w-md">
-            {[['Kanban', 'Pipeline'], ['AI', 'Coaching'], ['Email', 'Reminders']].map(([n, l]) => (
-              <div key={l} className="bg-slate-900 p-4">
-                <p className="text-2xl font-extrabold font-mono text-white">{n}</p>
-                <p className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">{l}</p>
+          {/* Feature chips */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 52 }}>
+            {FEATURES.map(f => (
+              <div key={f.label} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 13px', background: 'rgba(255,255,255,0.025)', border: '0.5px solid rgba(255,255,255,0.06)', borderRadius: 6, transition: 'border-color 0.2s' }}>
+                <div style={{ width: 5, height: 5, borderRadius: '50%', background: f.color, boxShadow: `0 0 6px ${f.color}88` }} />
+                <span style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(192,199,213,0.5)', letterSpacing: '0.05em' }}>{f.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: 'flex', gap: 36 }}>
+            {STATS.map(([n, l]) => (
+              <div key={l}>
+                <p style={{ fontFamily: MONO, fontSize: 24, fontWeight: 800, color: '#ffffff', lineHeight: 1, letterSpacing: '-0.02em' }}>{n}</p>
+                <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(160,200,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 5 }}>{l}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-[10px] font-mono text-slate-600 z-10">
-          © {new Date().getFullYear()} Trackr · Free up to 10 apps · Pro $15/mo
+        <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(80,95,120,0.5)', letterSpacing: '0.05em' }}>
+          © 2026 Trackr · Free up to 10 apps · Pro $15/mo
         </p>
-
-        {/* Glow */}
-        <div className="pointer-events-none absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-sky-500/10 blur-3xl" />
       </div>
 
-      {/* Right – form */}
-      <div className="flex items-center justify-center p-8 bg-white dark:bg-slate-950">
-        <div className="w-full max-w-sm">
+      {/* ── Vertical divider ── */}
+      <div style={{ width: '0.5px', background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0.05) 80%, transparent 100%)', flexShrink: 0 }} />
+
+      {/* ── Right form panel ── */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px', position: 'relative', zIndex: 1 }}>
+
+        {/* Subtle glow behind card */}
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 380, height: 380, background: 'radial-gradient(circle, rgba(78,222,163,0.04) 0%, transparent 65%)', pointerEvents: 'none' }} />
+
+        <div style={{ width: '100%', maxWidth: 372, position: 'relative' }}>
 
           {!isSupabaseConfigured && (
-            <div className="mb-6 bg-sky-50 dark:bg-sky-950 border border-sky-200 dark:border-sky-800 rounded-xl p-3.5 text-xs text-sky-800 dark:text-sky-300">
-              <strong>Demo mode:</strong> data stored locally in your browser.
+            <div style={{ marginBottom: 16, background: 'rgba(78,222,163,0.05)', border: '0.5px solid rgba(78,222,163,0.12)', padding: '9px 14px', borderRadius: 8 }}>
+              <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(78,222,163,0.65)', letterSpacing: '0.04em' }}>
+                <strong>Demo mode</strong> — data stored locally in your browser.
+              </p>
             </div>
           )}
 
-          <p className="text-[10px] uppercase tracking-[0.2em] font-mono text-sky-500 font-bold mb-3">
-            {mode === 'signin' ? 'Authenticate' : 'Create Account'}
-          </p>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 mb-2">
-            {mode === 'signin' ? 'Welcome back' : 'Start your pipeline'}
-          </h2>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mb-8">
-            {mode === 'signin'
-              ? 'Sign in to your Trackr workspace.'
-              : 'Track applications with precision.'}
-          </p>
+          {/* Card */}
+          <div style={{ background: 'rgba(255,255,255,0.018)', border: '0.5px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '36px 32px', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Field label="Email">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="auth-input"
-              />
-            </Field>
-            <Field label="Password">
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                minLength={6}
-                className="auth-input"
-              />
-            </Field>
+            <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#4edea3', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>
+              {mode === 'signin' ? '// authenticate' : '// create account'}
+            </p>
+            <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff', marginBottom: 5, fontFamily: SANS }}>
+              {mode === 'signin' ? 'Welcome back.' : 'Start your pipeline.'}
+            </h2>
+            <p style={{ fontSize: 13, color: 'rgba(150,162,185,0.55)', marginBottom: 28, lineHeight: 1.5, fontFamily: SANS }}>
+              {mode === 'signin' ? 'Sign in to your Trackr workspace.' : 'Track applications with precision.'}
+            </p>
 
-            {error   && <p className="text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{error}</p>}
-            {success && <p className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">{success}</p>}
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div>
+                <label style={{ display: 'block', fontFamily: MONO, fontSize: 9, fontWeight: 700, color: 'rgba(160,200,255,0.35)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 7 }}>Email</label>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" className="auth-field" />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontFamily: MONO, fontSize: 9, fontWeight: 700, color: 'rgba(160,200,255,0.35)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 7 }}>Password</label>
+                <input type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" minLength={6} className="auth-field" />
+              </div>
 
+              {error   && <p style={{ fontFamily: MONO, fontSize: 10, color: '#ffb4ab', background: 'rgba(255,180,171,0.07)', border: '0.5px solid rgba(255,180,171,0.18)', padding: '8px 12px', borderRadius: 6, letterSpacing: '0.02em' }}>{error}</p>}
+              {success && <p style={{ fontFamily: MONO, fontSize: 10, color: '#4edea3', background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '8px 12px', borderRadius: 6, letterSpacing: '0.02em' }}>{success}</p>}
+
+              <button type="submit" disabled={loading} className="auth-submit" style={{ marginTop: 4 }}>
+                {loading
+                  ? <><span className="auth-spinner" /> Processing…</>
+                  : <>{mode === 'signin' ? 'Sign in' : 'Create account'} →</>
+                }
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
+              <div style={{ flex: 1, height: '0.5px', background: 'rgba(255,255,255,0.05)' }} />
+              <span style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(150,162,185,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>or</span>
+              <div style={{ flex: 1, height: '0.5px', background: 'rgba(255,255,255,0.05)' }} />
+            </div>
+
+            {/* Google */}
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-11 bg-slate-900 dark:bg-sky-500 hover:bg-slate-800 dark:hover:bg-sky-600 disabled:opacity-60 text-white font-mono uppercase tracking-widest text-[11px] rounded-xl transition-colors flex items-center justify-center gap-2 mt-2"
+              type="button"
+              onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })}
+              className="auth-google"
             >
-              {loading
-                ? <><Loader2 size={14} className="animate-spin" /> Please wait…</>
-                : <>{mode === 'signin' ? 'Sign in' : 'Create account'} →</>
-              }
+              <svg width="15" height="15" viewBox="0 0 48 48">
+                <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.3z"/>
+                <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.1 1.4-4.8 2.3-8 2.3-6.2 0-11.4-4.2-13.3-9.8H2.6v6.2C6.6 42.7 14.8 48 24 48z"/>
+                <path fill="#FBBC05" d="M10.7 28.7A14.7 14.7 0 0 1 10 24c0-1.6.3-3.2.7-4.7v-6.2H2.6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.9l8.1-6.2z"/>
+                <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.9 2.1 30.4 0 24 0 14.8 0 6.6 5.3 2.6 13.1l8.1 6.2C12.6 13.7 17.8 9.5 24 9.5z"/>
+              </svg>
+              Continue with Google
             </button>
-          </form>
 
-          <div className="mt-6 flex items-center gap-3">
-            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
-            <span className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-600 font-mono">or</span>
-            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
+            <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(150,162,185,0.4)', textAlign: 'center', marginTop: 22, letterSpacing: '0.02em' }}>
+              {mode === 'signin' ? 'No account? ' : 'Already have one? '}
+              <button
+                onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setSuccess(null) }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4edea3', fontFamily: MONO, fontSize: 10, fontWeight: 700, padding: 0 }}
+              >
+                {mode === 'signin' ? 'Create account →' : 'Sign in →'}
+              </button>
+            </p>
           </div>
-
-          <button
-            type="button"
-            onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })}
-            className="mt-4 w-full h-11 flex items-center justify-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200"
-          >
-            <svg width="18" height="18" viewBox="0 0 48 48">
-              <path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-4.9 7.2v6h7.9c4.6-4.3 7.3-10.6 7.3-17.3z"/>
-              <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.9-6c-2.1 1.4-4.8 2.3-8 2.3-6.2 0-11.4-4.2-13.3-9.8H2.6v6.2C6.6 42.7 14.8 48 24 48z"/>
-              <path fill="#FBBC05" d="M10.7 28.7A14.7 14.7 0 0 1 10 24c0-1.6.3-3.2.7-4.7v-6.2H2.6A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.6 10.9l8.1-6.2z"/>
-              <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.9 2.1 30.4 0 24 0 14.8 0 6.6 5.3 2.6 13.1l8.1 6.2C12.6 13.7 17.8 9.5 24 9.5z"/>
-            </svg>
-            Continue with Google
-          </button>
-
-          <p className="text-xs text-slate-400 dark:text-slate-500 mt-6 text-center">
-            {mode === 'signin' ? 'No account yet?' : 'Already have an account?'}{' '}
-            <button
-              onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setSuccess(null) }}
-              className="text-sky-500 font-medium hover:underline"
-            >
-              {mode === 'signin' ? 'Create one' : 'Sign in'}
-            </button>
-          </p>
         </div>
       </div>
 
       <style>{`
-        .auth-input{width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;font-size:14px;color:#0f172a;background:#f8fafc;outline:none;transition:all 0.15s;}
-        .auth-input:focus{border-color:#38bdf8;background:white;box-shadow:0 0 0 3px rgba(56,189,248,0.1);}
-        .auth-input::placeholder{color:#94a3b8;}
-        .dark .auth-input{background:#1e293b;color:#f1f5f9;border-color:#334155;}
-        .dark .auth-input:focus{background:#1e293b;border-color:#38bdf8;box-shadow:0 0 0 3px rgba(56,189,248,0.15);}
-        .dark .auth-input::placeholder{color:#475569;}
-      `}</style>
-    </div>
-  )
-}
+        @keyframes orbFloat1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,-30px) scale(1.05)} }
+        @keyframes orbFloat2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-30px,40px) scale(1.08)} }
+        @keyframes orbFloat3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,20px) scale(0.95)} }
+        @keyframes authSpin  { to { transform: rotate(360deg) } }
 
-function Field({ label, children }) {
-  return (
-    <div className="space-y-1.5">
-      <label className="block text-[10px] uppercase tracking-widest text-slate-400 font-mono font-semibold">{label}</label>
-      {children}
+        .auth-grid {
+          position: absolute; inset: 0;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+          background-size: 64px 64px;
+        }
+        .auth-orb {
+          position: absolute; border-radius: 50%; pointer-events: none;
+        }
+        .auth-orb-1 {
+          top: -15%; left: 15%; width: 700px; height: 700px;
+          background: radial-gradient(circle, rgba(78,222,163,0.07) 0%, transparent 65%);
+          animation: orbFloat1 9s ease-in-out infinite;
+        }
+        .auth-orb-2 {
+          bottom: -20%; right: 5%; width: 600px; height: 600px;
+          background: radial-gradient(circle, rgba(163,201,255,0.05) 0%, transparent 65%);
+          animation: orbFloat2 12s ease-in-out infinite;
+        }
+        .auth-orb-3 {
+          top: 40%; left: 40%; width: 400px; height: 400px;
+          background: radial-gradient(circle, rgba(196,181,253,0.04) 0%, transparent 65%);
+          animation: orbFloat3 15s ease-in-out infinite;
+        }
+
+        .auth-field {
+          width: 100%; box-sizing: border-box;
+          padding: 10px 14px;
+          background: rgba(255,255,255,0.025);
+          border: 0.5px solid rgba(255,255,255,0.07);
+          border-radius: 8px;
+          font-size: 13px;
+          font-family: 'Geist', Inter, sans-serif;
+          color: #e2e2e8;
+          outline: none;
+          transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+        }
+        .auth-field:focus {
+          border-color: rgba(78,222,163,0.35);
+          background: rgba(78,222,163,0.025);
+          box-shadow: 0 0 0 3px rgba(78,222,163,0.05);
+        }
+        .auth-field::placeholder { color: rgba(150,162,185,0.22); }
+
+        .auth-submit {
+          width: 100%; padding: 11px 0;
+          background: linear-gradient(135deg, rgba(78,222,163,0.14), rgba(163,201,255,0.09));
+          border: 0.5px solid rgba(78,222,163,0.28);
+          border-radius: 8px;
+          color: #4edea3;
+          font-family: 'Geist Mono', monospace;
+          font-size: 11px; font-weight: 700;
+          letter-spacing: 0.09em; text-transform: uppercase;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+          transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+        }
+        .auth-submit:hover:not(:disabled) {
+          background: linear-gradient(135deg, rgba(78,222,163,0.22), rgba(163,201,255,0.15));
+          border-color: rgba(78,222,163,0.45);
+          box-shadow: 0 0 24px rgba(78,222,163,0.12);
+          transform: translateY(-1px);
+        }
+        .auth-submit:active:not(:disabled) { transform: translateY(0); }
+        .auth-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .auth-spinner {
+          display: inline-block; width: 11px; height: 11px;
+          border: 1.5px solid rgba(78,222,163,0.25);
+          border-top-color: #4edea3;
+          border-radius: 50%;
+          animation: authSpin 0.65s linear infinite;
+        }
+
+        .auth-google {
+          width: 100%; padding: 10px;
+          background: rgba(255,255,255,0.02);
+          border: 0.5px solid rgba(255,255,255,0.06);
+          border-radius: 8px;
+          color: rgba(192,199,213,0.6);
+          font-family: 'Geist', Inter, sans-serif;
+          font-size: 13px; font-weight: 500;
+          cursor: pointer;
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          transition: background 0.15s, border-color 0.15s;
+        }
+        .auth-google:hover {
+          background: rgba(255,255,255,0.045);
+          border-color: rgba(255,255,255,0.11);
+        }
+
+        @media (max-width: 768px) {
+          .auth-hero { display: none !important; }
+        }
+      `}</style>
     </div>
   )
 }
