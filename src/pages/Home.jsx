@@ -223,7 +223,7 @@ export default function Home() {
     { label:'Calendar',     icon:CalendarDays,  action:()=>navigate('/calendar') },
     { label:'Life Plan',    icon:LayoutList,    action:()=>navigate('/life') },
     { label:'Daily Debrief',icon:Flame,         action:()=>navigate('/debrief') },
-    { label:'Library',      icon:Library,       soon:true },
+    { label:'Library',      icon:Library,       action:()=>navigate('/library') },
     { label:'Market',       icon:BarChart3,      soon:true },
     { label:'Skills',       icon:GraduationCap,  soon:true },
     { label:'Roadmap',       icon:Target,        action:()=>navigate('/roadmap') },

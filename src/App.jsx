@@ -22,6 +22,7 @@ import RoundTable from './pages/RoundTable'
 import RoadmapDetail from './pages/RoadmapDetail'
 import LifePlan from './pages/LifePlan'
 import DailyDebrief from './pages/DailyDebrief'
+import Library from './pages/Library'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -188,6 +189,15 @@ function AppRoutes() {
           <ApplicationProvider>
             <Layout>
               <RoadmapDetail />
+            </Layout>
+          </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/library" element={
+        <ProtectedRoute>
+          <ApplicationProvider>
+            <Layout>
+              <Library />
             </Layout>
           </ApplicationProvider>
         </ProtectedRoute>
