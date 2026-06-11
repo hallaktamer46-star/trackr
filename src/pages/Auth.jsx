@@ -4,12 +4,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 const MONO = 'Geist Mono, monospace'
 const SANS = 'Geist, Inter, sans-serif'
-
-const STATS = [
-  ['Free',  'Forever plan'],
-  ['AI',    'Powered tools'],
-  ['100%',  'Data control'],
-]
+const SERIF = "Georgia, 'Times New Roman', serif"
 
 export default function Auth() {
   const { signIn, signUp } = useAuth()
@@ -19,6 +14,7 @@ export default function Auth() {
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState(null)
   const [success,  setSuccess]  = useState(null)
+  const [showForm, setShowForm] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -38,7 +34,7 @@ export default function Auth() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', width: '100%', display: 'flex', background: '#050810', fontFamily: SANS, overflow: 'hidden', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', width: '100%', background: '#050810', fontFamily: SANS, overflow: 'hidden', position: 'relative' }}>
 
       {/* ── Animated background ── */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
@@ -48,75 +44,91 @@ export default function Auth() {
         <div className="auth-orb auth-orb-3" />
       </div>
 
-      {/* ── Left hero panel ── */}
-      <div className="auth-hero" style={{ flex: '0 0 56%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '44px 56px', position: 'relative', zIndex: 1 }}>
+      {/* ── Top bar ── */}
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '30px 52px' }}>
 
-        {/* Logo */}
-        <div>
-          <span style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 48, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1 }}>T</span>
+        {/* Logo: T + trackr */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 11 }}>
+          <span style={{ fontFamily: SERIF, fontSize: 46, fontWeight: 700, color: '#ffffff', lineHeight: 1, letterSpacing: '-0.02em' }}>T</span>
+          <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.32em', textTransform: 'uppercase', paddingBottom: 3 }}>TRACKR</span>
         </div>
 
-        {/* Main copy */}
-        <div style={{ maxWidth: 540 }}>
-
-          {/* Headline */}
-          <h1 style={{ fontSize: 'clamp(52px, 5.5vw, 78px)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', color: '#ffffff', marginBottom: 6, fontFamily: SANS }}>
-            Built for those
-          </h1>
-          <h1 style={{ fontSize: 'clamp(52px, 5.5vw, 78px)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.04em', marginBottom: 28, fontFamily: SANS }}>
-            <span style={{ color: 'transparent', WebkitTextStroke: '1.5px rgba(255,255,255,0.2)' }}>who close.</span>
-          </h1>
-
-          <p style={{ fontSize: 15, color: 'rgba(192,199,213,0.6)', lineHeight: 1.75, maxWidth: 420, marginBottom: 44, fontFamily: SANS }}>
-            The precision platform for job seekers who treat their career like a mission. Track, strategize, and land — with tools built for real outcomes.
-          </p>
-
-
-          {/* Stats */}
-          <div style={{ display: 'flex', gap: 36 }}>
-            {STATS.map(([n, l]) => (
-              <div key={l}>
-                <p style={{ fontFamily: MONO, fontSize: 24, fontWeight: 800, color: '#ffffff', lineHeight: 1, letterSpacing: '-0.02em' }}>{n}</p>
-                <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(160,200,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 5 }}>{l}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(80,95,120,0.5)', letterSpacing: '0.05em' }}>
-          © 2026 Trackr · Free up to 10 apps · Pro $15/mo
-        </p>
+        {/* Sign in trigger */}
+        <button
+          onClick={() => setShowForm(true)}
+          style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: 'rgba(163,201,255,0.6)', letterSpacing: '0.12em', textTransform: 'uppercase', background: 'rgba(163,201,255,0.04)', border: '0.5px solid rgba(163,201,255,0.12)', padding: '9px 24px', cursor: 'pointer', transition: 'all .18s' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(163,201,255,0.09)'; e.currentTarget.style.color = '#a3c9ff'; e.currentTarget.style.borderColor = 'rgba(163,201,255,0.28)' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(163,201,255,0.04)'; e.currentTarget.style.color = 'rgba(163,201,255,0.6)'; e.currentTarget.style.borderColor = 'rgba(163,201,255,0.12)' }}
+        >
+          Sign in →
+        </button>
       </div>
 
-      {/* ── Vertical divider ── */}
-      <div style={{ width: '0.5px', background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0.05) 80%, transparent 100%)', flexShrink: 0 }} />
+      {/* ── Centered hero ── */}
+      <div style={{ position: 'relative', zIndex: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 116px)', padding: '0 32px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 780 }}>
 
-      {/* ── Right form panel ── */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 32px', position: 'relative', zIndex: 1 }}>
+          <h1 style={{ fontSize: 'clamp(54px, 6.5vw, 92px)', fontWeight: 900, lineHeight: 1.02, letterSpacing: '-0.04em', color: '#ffffff', marginBottom: 0, fontFamily: SANS }}>
+            Take the next step.
+          </h1>
+          <h1 style={{ fontSize: 'clamp(54px, 6.5vw, 92px)', fontWeight: 900, lineHeight: 1.02, letterSpacing: '-0.04em', marginBottom: 32, fontFamily: SANS }}>
+            <span style={{ color: 'transparent', WebkitTextStroke: '1.5px rgba(255,255,255,0.22)' }}>Keep taking them.</span>
+          </h1>
 
-        {/* Subtle glow behind card */}
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 380, height: 380, background: 'radial-gradient(circle, rgba(78,222,163,0.04) 0%, transparent 65%)', pointerEvents: 'none' }} />
+          <p style={{ fontSize: 17, color: 'rgba(192,199,213,0.52)', lineHeight: 1.85, maxWidth: 500, margin: '0 auto 52px', fontFamily: SANS, fontWeight: 400 }}>
+            Job searching is momentum. Trackr keeps it going — every application tracked, every follow-up timed, every offer earned.
+          </p>
 
-        <div style={{ width: '100%', maxWidth: 372, position: 'relative' }}>
+          <button
+            onClick={() => { setMode('signup'); setShowForm(true) }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '15px 38px', background: 'linear-gradient(135deg, #4edea3 0%, #a3c9ff 100%)', border: 'none', cursor: 'pointer', fontFamily: MONO, fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#050810', transition: 'all .2s', boxShadow: '0 8px 40px rgba(78,222,163,0.2)' }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 48px rgba(78,222,163,0.32)' }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 40px rgba(78,222,163,0.2)' }}
+          >
+            Start tracking free →
+          </button>
 
-          {!isSupabaseConfigured && (
-            <div style={{ marginBottom: 16, background: 'rgba(78,222,163,0.05)', border: '0.5px solid rgba(78,222,163,0.12)', padding: '9px 14px', borderRadius: 8 }}>
-              <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(78,222,163,0.65)', letterSpacing: '0.04em' }}>
-                <strong>Demo mode</strong> — data stored locally in your browser.
-              </p>
-            </div>
-          )}
+          <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(80,95,120,0.4)', letterSpacing: '0.05em', marginTop: 20 }}>
+            No card required · Free up to 10 applications
+          </p>
 
-          {/* Card */}
-          <div style={{ background: 'rgba(255,255,255,0.018)', border: '0.5px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '36px 32px', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)' }}>
+        </div>
+      </div>
+
+      {/* ── Auth form overlay ── */}
+      {showForm && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(5,8,16,0.82)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200, padding: '20px' }}
+          onClick={() => setShowForm(false)}
+        >
+          <div
+            style={{ width: '100%', maxWidth: 380, background: 'rgba(10,14,28,0.95)', border: '0.5px solid rgba(255,255,255,0.08)', padding: '40px 36px', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', position: 'relative', animation: 'authFadeIn .22s ease' }}
+            onClick={e => e.stopPropagation()}
+          >
+
+            {/* Close */}
+            <button
+              onClick={() => setShowForm(false)}
+              style={{ position: 'absolute', top: 16, right: 18, background: 'none', border: 'none', color: 'rgba(163,201,255,0.3)', cursor: 'pointer', fontSize: 18, fontFamily: MONO, lineHeight: 1, padding: 4, transition: 'color .15s' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'rgba(163,201,255,0.7)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(163,201,255,0.3)'}
+            >×</button>
+
+            {!isSupabaseConfigured && (
+              <div style={{ marginBottom: 18, background: 'rgba(78,222,163,0.05)', border: '0.5px solid rgba(78,222,163,0.12)', padding: '8px 12px' }}>
+                <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(78,222,163,0.65)', letterSpacing: '0.04em' }}>
+                  <strong>Demo mode</strong> — data stored locally.
+                </p>
+              </div>
+            )}
 
             <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#4edea3', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 10 }}>
               {mode === 'signin' ? '// authenticate' : '// create account'}
             </p>
-            <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff', marginBottom: 5, fontFamily: SANS }}>
+            <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff', marginBottom: 4, fontFamily: SANS }}>
               {mode === 'signin' ? 'Welcome back.' : 'Start your pipeline.'}
             </h2>
-            <p style={{ fontSize: 13, color: 'rgba(150,162,185,0.55)', marginBottom: 28, lineHeight: 1.5, fontFamily: SANS }}>
+            <p style={{ fontSize: 13, color: 'rgba(150,162,185,0.45)', marginBottom: 28, lineHeight: 1.5, fontFamily: SANS }}>
               {mode === 'signin' ? 'Sign in to your Trackr workspace.' : 'Track applications with precision.'}
             </p>
 
@@ -130,8 +142,8 @@ export default function Auth() {
                 <input type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" minLength={6} className="auth-field" />
               </div>
 
-              {error   && <p style={{ fontFamily: MONO, fontSize: 10, color: '#ffb4ab', background: 'rgba(255,180,171,0.07)', border: '0.5px solid rgba(255,180,171,0.18)', padding: '8px 12px', borderRadius: 6, letterSpacing: '0.02em' }}>{error}</p>}
-              {success && <p style={{ fontFamily: MONO, fontSize: 10, color: '#4edea3', background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '8px 12px', borderRadius: 6, letterSpacing: '0.02em' }}>{success}</p>}
+              {error   && <p style={{ fontFamily: MONO, fontSize: 10, color: '#ffb4ab', background: 'rgba(255,180,171,0.07)', border: '0.5px solid rgba(255,180,171,0.18)', padding: '8px 12px', letterSpacing: '0.02em' }}>{error}</p>}
+              {success && <p style={{ fontFamily: MONO, fontSize: 10, color: '#4edea3', background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '8px 12px', letterSpacing: '0.02em' }}>{success}</p>}
 
               <button type="submit" disabled={loading} className="auth-submit" style={{ marginTop: 4 }}>
                 {loading
@@ -141,14 +153,12 @@ export default function Auth() {
               </button>
             </form>
 
-            {/* Divider */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
               <div style={{ flex: 1, height: '0.5px', background: 'rgba(255,255,255,0.05)' }} />
               <span style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(150,162,185,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>or</span>
               <div style={{ flex: 1, height: '0.5px', background: 'rgba(255,255,255,0.05)' }} />
             </div>
 
-            {/* Google */}
             <button
               type="button"
               onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })}
@@ -163,7 +173,7 @@ export default function Auth() {
               Continue with Google
             </button>
 
-            <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(150,162,185,0.4)', textAlign: 'center', marginTop: 22, letterSpacing: '0.02em' }}>
+            <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(150,162,185,0.35)', textAlign: 'center', marginTop: 22, letterSpacing: '0.02em' }}>
               {mode === 'signin' ? 'No account? ' : 'Already have one? '}
               <button
                 onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError(null); setSuccess(null) }}
@@ -174,36 +184,35 @@ export default function Auth() {
             </p>
           </div>
         </div>
-      </div>
+      )}
 
       <style>{`
         @keyframes orbFloat1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,-30px) scale(1.05)} }
         @keyframes orbFloat2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-30px,40px) scale(1.08)} }
         @keyframes orbFloat3 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(20px,20px) scale(0.95)} }
         @keyframes authSpin  { to { transform: rotate(360deg) } }
+        @keyframes authFadeIn { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
 
         .auth-grid {
           position: absolute; inset: 0;
           background-image:
-            linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-          background-size: 64px 64px;
+            linear-gradient(rgba(255,255,255,0.016) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.016) 1px, transparent 1px);
+          background-size: 72px 72px;
         }
-        .auth-orb {
-          position: absolute; border-radius: 50%; pointer-events: none;
-        }
+        .auth-orb { position: absolute; border-radius: 50%; pointer-events: none; }
         .auth-orb-1 {
-          top: -15%; left: 15%; width: 700px; height: 700px;
+          top: -15%; left: 10%; width: 760px; height: 760px;
           background: radial-gradient(circle, rgba(78,222,163,0.07) 0%, transparent 65%);
           animation: orbFloat1 9s ease-in-out infinite;
         }
         .auth-orb-2 {
-          bottom: -20%; right: 5%; width: 600px; height: 600px;
+          bottom: -20%; right: 5%; width: 640px; height: 640px;
           background: radial-gradient(circle, rgba(163,201,255,0.05) 0%, transparent 65%);
           animation: orbFloat2 12s ease-in-out infinite;
         }
         .auth-orb-3 {
-          top: 40%; left: 40%; width: 400px; height: 400px;
+          top: 35%; left: 45%; width: 480px; height: 480px;
           background: radial-gradient(circle, rgba(196,181,253,0.04) 0%, transparent 65%);
           animation: orbFloat3 15s ease-in-out infinite;
         }
@@ -272,10 +281,6 @@ export default function Auth() {
         .auth-google:hover {
           background: rgba(255,255,255,0.045);
           border-color: rgba(255,255,255,0.11);
-        }
-
-        @media (max-width: 768px) {
-          .auth-hero { display: none !important; }
         }
       `}</style>
     </div>
