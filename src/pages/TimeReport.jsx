@@ -126,7 +126,7 @@ export default function TimeReport() {
 
       {/* ── TOP STRIP ───────────────────────────────────────── */}
       <div style={{borderBottom:'1px solid rgba(0,212,255,0.1)',padding:'14px 32px',display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center'}}>
-        <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.22em',color:'rgba(0,212,255,0.4)',textTransform:'uppercase'}}>ENGAGE · TRACKER</span>
+        <div/>
 
         {/* Center — LIVE */}
         <div style={{display:'flex',justifyContent:'center'}}>
