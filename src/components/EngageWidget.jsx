@@ -69,9 +69,16 @@ export default function EngageWidget() {
   useEffect(() => {
     const s = load()
     if (!s) return
+    // If shiftStart is from a previous calendar day and session is not active → stale data, ignore it
+    if (s.shiftStart && !s.status) {
+      const shiftDay = new Date(s.shiftStart).toDateString()
+      if (shiftDay !== today) {
+        setCustom(s.custom || [])  // keep custom statuses
+        return
+      }
+    }
     const sd = s.sessionDate || s.date
     const hasActiveSession = s.status !== null && s.shiftStart
-    // Load if: active session (any day, crosses midnight fine) OR closed session from today
     if (hasActiveSession || sd === today) {
       setStatus(s.status ?? null); setLog(s.log || [])
       setCustom(s.custom || []); setShiftStart(s.shiftStart || null)

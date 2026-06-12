@@ -41,7 +41,11 @@ function loadToday() {
     const today=new Date().toDateString()
     const sessionDate = d.sessionDate || d.date
     const hasActiveSession = d.status !== null && d.shiftStart
-    // Only show if active session OR today's closed session
+    // If shiftStart is from a previous day and session is inactive → stale data, ignore
+    if (d.shiftStart && !d.status) {
+      const shiftDay = new Date(d.shiftStart).toDateString()
+      if (shiftDay !== today) return null
+    }
     if (!hasActiveSession && sessionDate !== today) return null
     const now=Date.now(), t={}
     for (const e of (d.log||[])) { const s=Math.floor(((e.end||now)-e.start)/1000); t[e.status]=(t[e.status]||0)+s }
