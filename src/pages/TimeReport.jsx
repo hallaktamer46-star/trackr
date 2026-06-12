@@ -131,7 +131,7 @@ export default function TimeReport() {
         {/* Center — LIVE */}
         <div style={{display:'flex',justifyContent:'center'}}>
           {todayData?.live ? (
-            <div style={{display:'flex',alignItems:'center',gap:8,padding:'5px 14px',border:'1px solid rgba(0,255,179,0.25)',background:'rgba(0,255,179,0.06)'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
               <div style={{width:6,height:6,borderRadius:'50%',background:'#00ffb3',boxShadow:'0 0 10px #00ffb3',animation:'pulse 1.5s ease-in-out infinite',flexShrink:0}}/>
               <span style={{fontFamily:MONO,fontSize:9,fontWeight:700,color:'#00ffb3',letterSpacing:'0.2em'}}>LIVE</span>
             </div>
