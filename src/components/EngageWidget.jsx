@@ -42,6 +42,7 @@ export default function EngageWidget() {
   const [showAdd, setShowAdd]       = useState(false)
   const [newLabel, setNewLabel]     = useState('')
   const [shiftStart, setShiftStart] = useState(null)
+  const [clockedOutAt, setClockedOutAt] = useState(null)
   const [, setTick]                 = useState(0)
 
   const [tasks, setTasks]             = useState(loadTasks)
@@ -65,12 +66,24 @@ export default function EngageWidget() {
   useEffect(() => {
     const s = load()
     if (s?.date === today) {
+      // If clocked out, check if 2h have passed — if so, start fresh
+      if (s.clockedOutAt && Date.now() >= s.clockedOutAt + 2 * 60 * 60 * 1000) return
       setStatus(s.status ?? null); setLog(s.log || [])
       setCustom(s.custom || []); setShiftStart(s.shiftStart || null)
+      if (s.clockedOutAt) setClockedOutAt(s.clockedOutAt)
     }
   }, [])
 
-  useEffect(() => { save({ status, log, custom, shiftStart, date: today }) }, [status, log, custom, shiftStart])
+  useEffect(() => { save({ status, log, custom, shiftStart, clockedOutAt, date: today }) }, [status, log, custom, shiftStart, clockedOutAt])
+
+  // Auto-reset 2 hours after clock-out
+  useEffect(() => {
+    if (!clockedOutAt) return
+    const ms = (clockedOutAt + 2 * 60 * 60 * 1000) - Date.now()
+    if (ms <= 0) { setLog([]); setCustom([]); setClockedOutAt(null); setTab(null); return }
+    const t = setTimeout(() => { setLog([]); setCustom([]); setClockedOutAt(null); setTab(null) }, ms)
+    return () => clearTimeout(t)
+  }, [clockedOutAt])
   useEffect(() => { saveTasks(tasks) }, [tasks])
 
   useEffect(() => {
@@ -97,7 +110,12 @@ export default function EngageWidget() {
   }
   const T         = totals()
   const curSecs   = log.length && !log[log.length-1]?.end ? Math.floor((Date.now()-log[log.length-1].start)/1000) : 0
-  const shiftSecs = shiftStart ? Math.floor((Date.now()-shiftStart)/1000) : 0
+  // After clock-out, compute final total from closed log entries
+  const shiftSecs = shiftStart
+    ? Math.floor((Date.now()-shiftStart)/1000)
+    : clockedOutAt
+      ? log.reduce((acc,e) => acc + (e.end && e.start ? Math.floor((e.end-e.start)/1000) : 0), 0)
+      : 0
 
   const pending   = tasks.filter(t => !t.done && t.due <= todayStr)
   const doneTasks = tasks.filter(t => t.done)
@@ -115,19 +133,21 @@ export default function EngageWidget() {
 
   function endShift() {
     const now = Date.now()
+    const clockOutDay = today  // capture day at clock-out time, not when timer fires
     const finalLog = log.map((e,i) => i===log.length-1 && !e.end ? {...e,end:now} : e)
     const finalTotals = {}
     for (const e of finalLog) { const s=Math.floor((e.end-e.start)/1000); finalTotals[e.status]=(finalTotals[e.status]||0)+s }
     const totalSecs = shiftStart ? Math.floor((now-shiftStart)/1000) : 0
     try {
       const hist = JSON.parse(localStorage.getItem('trackr_history')||'[]')
-      const idx  = hist.findIndex(h=>h.date===today)
-      const record = { date:today, total:totalSecs, statuses:finalTotals, shiftStart, shiftEnd:now }
+      const idx  = hist.findIndex(h=>h.date===clockOutDay)
+      const record = { date:clockOutDay, total:totalSecs, statuses:finalTotals, shiftStart, shiftEnd:now }
       if (idx>=0) hist[idx]=record; else hist.push(record)
       hist.sort((a,b)=>new Date(b.date)-new Date(a.date))
       localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0,60)))
     } catch {}
-    setLog(finalLog); setStatus(null); setShiftStart(null); setTab('activity')
+    // Keep log visible for 2 hours, then auto-reset
+    setLog(finalLog); setStatus(null); setShiftStart(null); setClockedOutAt(now); setTab('activity')
   }
 
   function addCustom() {
@@ -181,11 +201,13 @@ export default function EngageWidget() {
   const DIVIDER = 'rgba(40,80,180,0.12)'
 
   return (
-    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width: tab ? 620 : 340, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column', transition:'width 0.2s cubic-bezier(0.22,1,0.36,1)' }}>
+    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width: tab ? 620 : 340, height: tab ? '100vh' : 'auto', zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column', transition:'width 0.2s cubic-bezier(0.22,1,0.36,1)', background: tab ? BG : 'transparent' }}>
 
       {/* ── TAB BAR ── */}
       <div style={{
         display:'flex',
+        order: 2,
+        flexShrink: 0,
         background: BG,
         borderTop: `1px solid ${BORDER}`,
         borderLeft: `1px solid ${BORDER}`,
@@ -221,11 +243,11 @@ export default function EngageWidget() {
       {/* ── PANEL ── */}
       {tab && (
         <div style={{
+          flex: 1,
+          order: 1,
           background: BG,
-          borderBottom: `1px solid ${BORDER}`,
           borderLeft: `1px solid ${BORDER}`,
-          backdropFilter: 'blur(24px)',
-          boxShadow: '-4px 0px 40px rgba(0,0,0,0.7)',
+          overflowY: 'auto',
           animation: 'slideUp 0.18s cubic-bezier(0.22,1,0.36,1)',
         }}>
 
@@ -440,7 +462,7 @@ export default function EngageWidget() {
               <p style={{fontSize:10,fontWeight:800,color:'#60a5fa',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:16}}>
                 Today's Activity
               </p>
-              {shiftStart === null && status === null ? (
+              {shiftStart === null && status === null && !clockedOutAt ? (
                 <p style={{fontSize:12,color:'#2a4898',lineHeight:1.6}}>Pick a status in Engage to start tracking.</p>
               ) : (
                 <>
