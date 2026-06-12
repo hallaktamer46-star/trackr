@@ -64,7 +64,7 @@ export default function TimeReport() {
   useEffect(() => {
     const style = document.createElement('style')
     style.id = 'timereport-bg'
-    style.textContent = 'html,body,#root,#root *{background:#020408!important}'
+    style.textContent = 'html,body{background:#020408!important}.min-h-screen{background:#020408!important}'
     document.head.appendChild(style)
     return () => document.getElementById('timereport-bg')?.remove()
   }, [])
@@ -122,7 +122,7 @@ export default function TimeReport() {
   }
 
   return (
-    <div style={{fontFamily:DISPLAY,background:'#020408',minHeight:'100vh',margin:'-24px',padding:'0 0 80px'}}>
+    <div style={{fontFamily:DISPLAY,background:'#020408',minHeight:'100vh',position:'relative',left:'50%',transform:'translateX(-50%)',width:'100vw',marginTop:'-24px',marginBottom:'-24px',padding:'0 0 80px'}}>
 
       {/* ── TOP STRIP ───────────────────────────────────────── */}
       <div style={{borderBottom:'1px solid rgba(0,212,255,0.1)',padding:'14px 32px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
