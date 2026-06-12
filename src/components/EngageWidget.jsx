@@ -42,7 +42,7 @@ export default function EngageWidget() {
   const [showAdd, setShowAdd]       = useState(false)
   const [newLabel, setNewLabel]     = useState('')
   const [shiftStart, setShiftStart] = useState(null)
-  const [clockedOutAt, setClockedOutAt] = useState(null)
+  const [sessionDate, setSessionDate] = useState(null)
   const [, setTick]                 = useState(0)
 
   const [tasks, setTasks]             = useState(loadTasks)
@@ -68,25 +68,18 @@ export default function EngageWidget() {
 
   useEffect(() => {
     const s = load()
-    if (s?.date === today) {
-      // If clocked out, check if 2h have passed — if so, start fresh
-      if (s.clockedOutAt && Date.now() >= s.clockedOutAt + 2 * 60 * 60 * 1000) return
+    if (!s) return
+    const sd = s.sessionDate || s.date
+    const hasActiveSession = s.status !== null && s.shiftStart
+    // Load if: active session (any day, crosses midnight fine) OR closed session from today
+    if (hasActiveSession || sd === today) {
       setStatus(s.status ?? null); setLog(s.log || [])
       setCustom(s.custom || []); setShiftStart(s.shiftStart || null)
-      if (s.clockedOutAt) setClockedOutAt(s.clockedOutAt)
+      setSessionDate(s.sessionDate || s.date || today)
     }
   }, [])
 
-  useEffect(() => { save({ status, log, custom, shiftStart, clockedOutAt, date: today }) }, [status, log, custom, shiftStart, clockedOutAt])
-
-  // Auto-reset 2 hours after clock-out
-  useEffect(() => {
-    if (!clockedOutAt) return
-    const ms = (clockedOutAt + 2 * 60 * 60 * 1000) - Date.now()
-    if (ms <= 0) { setLog([]); setCustom([]); setClockedOutAt(null); setTab(null); return }
-    const t = setTimeout(() => { setLog([]); setCustom([]); setClockedOutAt(null); setTab(null) }, ms)
-    return () => clearTimeout(t)
-  }, [clockedOutAt])
+  useEffect(() => { save({ status, log, custom, shiftStart, sessionDate, date: today }) }, [status, log, custom, shiftStart, sessionDate])
   useEffect(() => { saveTasks(tasks) }, [tasks])
 
   useEffect(() => {
@@ -113,19 +106,16 @@ export default function EngageWidget() {
   }
   const T         = totals()
   const curSecs   = log.length && !log[log.length-1]?.end ? Math.floor((Date.now()-log[log.length-1].start)/1000) : 0
-  // After clock-out, compute final total from closed log entries
   const shiftSecs = shiftStart
     ? Math.floor((Date.now()-shiftStart)/1000)
-    : clockedOutAt
-      ? log.reduce((acc,e) => acc + (e.end && e.start ? Math.floor((e.end-e.start)/1000) : 0), 0)
-      : 0
+    : log.reduce((acc,e) => acc + (e.end && e.start ? Math.floor((e.end-e.start)/1000) : 0), 0)
 
   const pending   = tasks.filter(t => !t.done && t.due <= todayStr)
   const doneTasks = tasks.filter(t => t.done)
 
   function pickStatus(key) {
     const now = Date.now()
-    if (shiftStart === null) setShiftStart(now)
+    if (shiftStart === null) { setShiftStart(now); setSessionDate(today) }
     setLog(l => {
       const c = [...l]
       if (c.length && !c[c.length-1].end) c[c.length-1] = {...c[c.length-1], end: now}
@@ -136,26 +126,31 @@ export default function EngageWidget() {
 
   function endShift() {
     const now = Date.now()
-    const clockOutDay = today  // capture day at clock-out time, not when timer fires
+    const recordDate = sessionDate || today  // always attribute to the day clock-in happened
     const finalLog = log.map((e,i) => i===log.length-1 && !e.end ? {...e,end:now} : e)
     const finalTotals = {}
     for (const e of finalLog) { const s=Math.floor((e.end-e.start)/1000); finalTotals[e.status]=(finalTotals[e.status]||0)+s }
     const totalSecs = shiftStart ? Math.floor((now-shiftStart)/1000) : 0
     try {
       const hist = JSON.parse(localStorage.getItem('trackr_history')||'[]')
-      const idx  = hist.findIndex(h=>h.date===clockOutDay)
-      const record = { date:clockOutDay, total:totalSecs, statuses:finalTotals, shiftStart, shiftEnd:now }
+      const idx  = hist.findIndex(h=>h.date===recordDate)
+      const record = { date:recordDate, total:totalSecs, statuses:finalTotals, shiftStart, shiftEnd:now }
       if (idx>=0) hist[idx]=record; else hist.push(record)
       hist.sort((a,b)=>new Date(b.date)-new Date(a.date))
       localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0,60)))
     } catch {}
-    // Keep log visible for 2 hours, then auto-reset
-    setLog(finalLog); setStatus(null); setShiftStart(null); setClockedOutAt(now); setTab('activity')
+    setLog(finalLog); setStatus(null); setShiftStart(null); setTab('activity')
   }
 
   function addCustom() {
     const lbl = newLabel.trim(); if (!lbl) return
     setCustom(c=>[...c,lbl]); setNewLabel(''); setShowAdd(false)
+  }
+
+  function removeCustom(idx) {
+    setCustom(c => c.filter((_,i) => i !== idx))
+    // If currently on this custom status, reset to null
+    if (status === 'c'+idx) setStatus(null)
   }
 
   function addTask() {
@@ -347,9 +342,19 @@ export default function EngageWidget() {
                         <div style={{width:7,height:7,borderRadius:'50%',background:s.color,boxShadow:`0 0 5px ${s.color}80`}}/>
                         <span style={{fontSize:12,fontWeight:600,color:'#d0e4ff'}}>{s.label}</span>
                       </div>
-                      <span style={{fontFamily:NUM,fontSize:10,fontWeight:600,color: T[s.key] ? s.color+'cc' : '#2a4898'}}>
-                        {fmt(T[s.key]||0)}
-                      </span>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                        <span style={{fontFamily:NUM,fontSize:10,fontWeight:600,color: T[s.key] ? s.color+'cc' : '#2a4898'}}>
+                          {fmt(T[s.key]||0)}
+                        </span>
+                        {s.key.startsWith('c') && (
+                          <button onClick={e=>{ e.stopPropagation(); removeCustom(parseInt(s.key.slice(1))) }}
+                            style={{background:'none',border:'none',padding:0,cursor:'pointer',color:'#2a4070',display:'flex',lineHeight:1,transition:'color 0.15s'}}
+                            onMouseEnter={e=>e.currentTarget.style.color='#ff6b6b'}
+                            onMouseLeave={e=>e.currentTarget.style.color='#2a4070'}>
+                            <X size={10}/>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -487,7 +492,7 @@ export default function EngageWidget() {
               <p style={{fontSize:10,fontWeight:800,color:'#60a5fa',letterSpacing:'0.1em',textTransform:'uppercase',marginBottom:16}}>
                 Today's Activity
               </p>
-              {shiftStart === null && status === null && !clockedOutAt ? (
+              {log.length === 0 && status === null ? (
                 <p style={{fontSize:12,color:'#2a4898',lineHeight:1.6}}>Pick a status in Engage to start tracking.</p>
               ) : (
                 <>

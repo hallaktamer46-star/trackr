@@ -26,10 +26,23 @@ function fmtSecsShort(s) {
 function loadHistory() {
   try { return JSON.parse(localStorage.getItem('trackr_history')||'[]') } catch { return [] }
 }
+function loadCustomStatuses() {
+  try {
+    const d = JSON.parse(localStorage.getItem('trackr_engage_v2')||'{}')
+    const custom = d.custom || []
+    const map = {}
+    custom.forEach((label, i) => { map['c'+i] = { label, color:'#60a5fa', dim:'rgba(96,165,250,0.12)' } })
+    return map
+  } catch { return {} }
+}
 function loadToday() {
   try {
     const d=JSON.parse(localStorage.getItem('trackr_engage_v2')||'{}')
-    if (d.date!==new Date().toDateString()) return null
+    const today=new Date().toDateString()
+    const sessionDate = d.sessionDate || d.date
+    const hasActiveSession = d.status !== null && d.shiftStart
+    // Only show if active session OR today's closed session
+    if (!hasActiveSession && sessionDate !== today) return null
     const now=Date.now(), t={}
     for (const e of (d.log||[])) { const s=Math.floor(((e.end||now)-e.start)/1000); t[e.status]=(t[e.status]||0)+s }
     let fallbackTotal = 0
@@ -68,9 +81,11 @@ export default function TimeReport() {
     document.head.appendChild(style)
     return () => document.getElementById('timereport-bg')?.remove()
   }, [])
-  const history   = useMemo(()=>loadHistory(),[])
-  const today     = new Date().toDateString()
-  const todayData = useMemo(()=>loadToday(),[tick])
+  const history      = useMemo(()=>loadHistory(),[])
+  const customSt     = useMemo(()=>loadCustomStatuses(),[tick])
+  const S_ALL        = useMemo(()=>({...S,...customSt}),[customSt])
+  const today        = new Date().toDateString()
+  const todayData    = useMemo(()=>loadToday(),[tick])
 
   useEffect(()=>{
     const t=setInterval(()=>setTick(x=>x+1),1000)
@@ -97,14 +112,14 @@ export default function TimeReport() {
 
   const TD   = todayData?.statuses||{}
   const TTOT = todayData?.total||0
-  const keys = Object.keys(S)
+  const keys = Object.keys(S_ALL)
 
-  const topStatus = TTOT>0 ? keys.reduce((a,b)=>(TD[a]||0)>(TD[b]||0)?a:b) : null
+  const topStatus = TTOT>0 ? Object.keys(TD).reduce((a,b)=>(TD[a]||0)>(TD[b]||0)?a:b, null) : null
 
   // ── shared pieces ────────────────────────────────────────────
 
   const Row = ({k, secs, total}) => {
-    const def = S[k]||{label:k,color:'#00d4ff',dim:'rgba(0,212,255,0.1)'}
+    const def = S_ALL[k]||{label:k,color:'#00d4ff',dim:'rgba(0,212,255,0.1)'}
     const pct = total>0 ? Math.min(100,(secs/total)*100) : 0
     return (
       <div style={{display:'flex',alignItems:'center',gap:0,marginBottom:2}}>
