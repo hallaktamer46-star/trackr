@@ -201,13 +201,11 @@ export default function EngageWidget() {
   const DIVIDER = 'rgba(40,80,180,0.12)'
 
   return (
-    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width: tab ? 620 : 340, height: tab ? '100vh' : 'auto', zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column', transition:'width 0.2s cubic-bezier(0.22,1,0.36,1)', background: tab ? BG : 'transparent' }}>
+    <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width: tab ? 620 : 340, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column', transition:'width 0.2s cubic-bezier(0.22,1,0.36,1)' }}>
 
       {/* ── TAB BAR ── */}
       <div style={{
         display:'flex',
-        order: 2,
-        flexShrink: 0,
         background: BG,
         borderTop: `1px solid ${BORDER}`,
         borderLeft: `1px solid ${BORDER}`,
@@ -243,11 +241,11 @@ export default function EngageWidget() {
       {/* ── PANEL ── */}
       {tab && (
         <div style={{
-          flex: 1,
-          order: 1,
           background: BG,
+          borderBottom: `1px solid ${BORDER}`,
           borderLeft: `1px solid ${BORDER}`,
-          overflowY: 'auto',
+          backdropFilter: 'blur(24px)',
+          boxShadow: '-4px 0px 40px rgba(0,0,0,0.7)',
           animation: 'slideUp 0.18s cubic-bezier(0.22,1,0.36,1)',
         }}>
 
