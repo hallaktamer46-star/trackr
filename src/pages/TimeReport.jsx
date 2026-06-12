@@ -60,6 +60,14 @@ const TT = ({ active, payload, label }) => {
 export default function TimeReport() {
   const [tab, setTab]   = useState('today')
   const [tick, setTick] = useState(0)
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.id = 'timereport-bg'
+    style.textContent = 'html,body,#root,#root>div,#root>div>div{background:#020408!important}'
+    document.head.appendChild(style)
+    return () => document.getElementById('timereport-bg')?.remove()
+  }, [])
   const history   = useMemo(()=>loadHistory(),[])
   const today     = new Date().toDateString()
   const todayData = useMemo(()=>loadToday(),[tick])
