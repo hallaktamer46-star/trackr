@@ -125,17 +125,26 @@ export default function TimeReport() {
     <div style={{fontFamily:DISPLAY,background:'#020408',minHeight:'100vh',position:'relative',left:'50%',transform:'translateX(-50%)',width:'100vw',marginTop:'-24px',marginBottom:'-24px',padding:'0 0 80px'}}>
 
       {/* ── TOP STRIP ───────────────────────────────────────── */}
-      <div style={{borderBottom:'1px solid rgba(0,212,255,0.1)',padding:'14px 32px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+      <div style={{borderBottom:'1px solid rgba(0,212,255,0.1)',padding:'14px 32px',display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center'}}>
         <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.22em',color:'rgba(0,212,255,0.4)',textTransform:'uppercase'}}>ENGAGE · TRACKER</span>
-        <div style={{display:'flex',alignItems:'center',gap:20}}>
-          {todayData?.live && (
-            <div style={{display:'flex',alignItems:'center',gap:7,padding:'4px 10px',border:'1px solid rgba(0,255,179,0.25)',background:'rgba(0,255,179,0.07)'}}>
-              <div style={{width:6,height:6,borderRadius:'50%',background:'#00ffb3',boxShadow:'0 0 8px #00ffb3',animation:'pulse 1.5s ease-in-out infinite',flexShrink:0}}/>
-              <span style={{fontFamily:MONO,fontSize:9,fontWeight:700,color:'#00ffb3',letterSpacing:'0.18em'}}>LIVE</span>
+
+        {/* Center — LIVE */}
+        <div style={{display:'flex',justifyContent:'center'}}>
+          {todayData?.live ? (
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:'5px 14px',border:'1px solid rgba(0,255,179,0.25)',background:'rgba(0,255,179,0.06)'}}>
+              <div style={{width:6,height:6,borderRadius:'50%',background:'#00ffb3',boxShadow:'0 0 10px #00ffb3',animation:'pulse 1.5s ease-in-out infinite',flexShrink:0}}/>
+              <span style={{fontFamily:MONO,fontSize:9,fontWeight:700,color:'#00ffb3',letterSpacing:'0.2em'}}>LIVE</span>
             </div>
-          )}
-          <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.16em',color:'rgba(0,212,255,0.35)',textTransform:'uppercase'}}>
-            {new Date().toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})}
+          ) : <div/>}
+        </div>
+
+        {/* Right — date */}
+        <div style={{display:'flex',justifyContent:'flex-end',flexDirection:'column',alignItems:'flex-end',gap:2}}>
+          <span style={{fontFamily:MONO,fontSize:11,fontWeight:700,color:'rgba(0,212,255,0.7)',letterSpacing:'0.08em',textTransform:'uppercase'}}>
+            {new Date().toLocaleDateString('en',{weekday:'long'})}
+          </span>
+          <span style={{fontFamily:MONO,fontSize:8,color:'rgba(0,212,255,0.3)',letterSpacing:'0.14em',textTransform:'uppercase'}}>
+            {new Date().toLocaleDateString('en',{month:'long',day:'numeric',year:'numeric'})}
           </span>
         </div>
       </div>
