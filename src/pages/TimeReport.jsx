@@ -64,7 +64,7 @@ export default function TimeReport() {
   useEffect(() => {
     const style = document.createElement('style')
     style.id = 'timereport-bg'
-    style.textContent = 'html,body,#root,#root>div,#root>div>div{background:#020408!important}'
+    style.textContent = 'html,body,#root,#root *{background:#020408!important}'
     document.head.appendChild(style)
     return () => document.getElementById('timereport-bg')?.remove()
   }, [])

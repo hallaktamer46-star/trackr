@@ -53,6 +53,9 @@ export default function EngageWidget() {
   const [editingTask, setEditingTask] = useState(null)
   const [editForm, setEditForm]       = useState({ title:'', date:'', desc:'', importance:3 })
 
+  const [lastCompleted, setLastCompleted] = useState(null)
+  const undoTimer = useRef(null)
+
   const navigate  = useNavigate()
   const timer     = useRef(null)
   const widgetRef = useRef(null)
@@ -162,11 +165,23 @@ export default function EngageWidget() {
   }
 
   function toggleTask(id) {
-    setTasks(prev => prev.map(t => t.id === id ? {
-      ...t,
-      done: !t.done,
-      completedAt: t.done ? null : new Date().toISOString()
-    } : t))
+    setTasks(prev => prev.map(t => {
+      if (t.id !== id) return t
+      const completing = !t.done
+      if (completing) {
+        clearTimeout(undoTimer.current)
+        setLastCompleted(t)
+        undoTimer.current = setTimeout(() => setLastCompleted(null), 5000)
+      }
+      return { ...t, done: completing, completedAt: completing ? new Date().toISOString() : null }
+    }))
+  }
+
+  function undoComplete() {
+    if (!lastCompleted) return
+    clearTimeout(undoTimer.current)
+    setTasks(prev => prev.map(t => t.id === lastCompleted.id ? { ...t, done: false, completedAt: null } : t))
+    setLastCompleted(null)
   }
 
   function removeTask(id) {
@@ -419,6 +434,18 @@ export default function EngageWidget() {
 
                 {/* Task list */}
                 <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
+                  {/* Undo toast */}
+                  {lastCompleted && (
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 12px',background:'rgba(78,222,163,0.07)',borderBottom:'1px solid rgba(78,222,163,0.15)'}}>
+                      <span style={{fontSize:11,color:'#4edea3',fontFamily:NUM,letterSpacing:'0.02em',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:160}}>✓ {lastCompleted.title}</span>
+                      <button onClick={undoComplete}
+                        style={{flexShrink:0,fontSize:10,fontFamily:NUM,fontWeight:700,color:'#4edea3',background:'rgba(78,222,163,0.12)',border:'1px solid rgba(78,222,163,0.3)',padding:'3px 9px',cursor:'pointer',letterSpacing:'0.06em',transition:'all 0.15s'}}
+                        onMouseEnter={e=>{e.currentTarget.style.background='rgba(78,222,163,0.22)'}}
+                        onMouseLeave={e=>{e.currentTarget.style.background='rgba(78,222,163,0.12)'}}>
+                        UNDO
+                      </button>
+                    </div>
+                  )}
                   {pending.length === 0 && doneTasks.length === 0 && (
                     <p style={{padding:'10px 14px',fontSize:11,color:'#2a4898',fontStyle:'italic'}}>No tasks yet — add one above.</p>
                   )}
