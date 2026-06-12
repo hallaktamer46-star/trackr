@@ -127,11 +127,11 @@ export default function TimeReport() {
       {/* ── TOP STRIP ───────────────────────────────────────── */}
       <div style={{borderBottom:'1px solid rgba(0,212,255,0.1)',padding:'14px 32px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
         <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.22em',color:'rgba(0,212,255,0.4)',textTransform:'uppercase'}}>ENGAGE · TRACKER</span>
-        <div style={{display:'flex',alignItems:'center',gap:16}}>
+        <div style={{display:'flex',alignItems:'center',gap:20}}>
           {todayData?.live && (
-            <div style={{display:'flex',alignItems:'center',gap:6}}>
-              <div style={{width:5,height:5,background:'#00ffb3',boxShadow:'0 0 8px #00ffb3',animation:'pulse 1.5s ease-in-out infinite'}}/>
-              <span style={{fontFamily:MONO,fontSize:8,color:'#00ffb3',letterSpacing:'0.14em'}}>LIVE</span>
+            <div style={{display:'flex',alignItems:'center',gap:7,padding:'4px 10px',border:'1px solid rgba(0,255,179,0.25)',background:'rgba(0,255,179,0.07)'}}>
+              <div style={{width:6,height:6,borderRadius:'50%',background:'#00ffb3',boxShadow:'0 0 8px #00ffb3',animation:'pulse 1.5s ease-in-out infinite',flexShrink:0}}/>
+              <span style={{fontFamily:MONO,fontSize:9,fontWeight:700,color:'#00ffb3',letterSpacing:'0.18em'}}>LIVE</span>
             </div>
           )}
           <span style={{fontFamily:MONO,fontSize:9,letterSpacing:'0.16em',color:'rgba(0,212,255,0.35)',textTransform:'uppercase'}}>
