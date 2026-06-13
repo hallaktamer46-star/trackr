@@ -1,12 +1,9 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Sparkles, Rocket, Building2, Telescope, Map } from 'lucide-react'
 import ProfileDropdown from './ProfileDropdown'
-import { cn } from '../../lib/cn'
 
-// Custom pulse / activity icon — bespoke, not from any icon library
-function ActivityIcon({ size = 17, style }) {
+function ActivityIcon({ size = 15 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={style}>
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <polyline
         points="1,10 5,10 7,4 10,16 13,8 15,11 19,11"
         stroke="currentColor"
@@ -19,94 +16,120 @@ function ActivityIcon({ size = 17, style }) {
 }
 
 const nav = [
-  { to: '/',        label: 'Home',          icon: Home,      end: true },
-  { to: '/growth',  label: 'Growth Lab',    icon: Telescope           },
-  { to: '/roadmap', label: 'Roadmap',       icon: Map                 },
-  { to: '/ai/cv',   label: 'Job Toolkit',   icon: Sparkles            },
-  { to: '/startup', label: 'Startup Studio',icon: Rocket              },
-  { to: '/pitch',   label: 'Pitch Lab',     icon: Building2           },
+  { to: '/',        label: 'Home',           end: true },
+  { to: '/growth',  label: 'Growth Lab'               },
+  { to: '/roadmap', label: 'Roadmap'                  },
+  { to: '/ai/cv',   label: 'Job Toolkit'              },
+  { to: '/startup', label: 'Startup Studio'           },
+  { to: '/pitch',   label: 'Pitch Lab'                },
 ]
+
+const SANS = 'Geist, Inter, -apple-system, sans-serif'
+const MONO = '"Geist Mono", monospace'
 
 export default function Header() {
   const navigate = useNavigate()
 
   return (
-    <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sticky top-0 z-30 flex items-center">
-      <div className="w-full max-w-screen-xl mx-auto px-4 flex items-center justify-between gap-4">
+    <header style={{
+      height: 52,
+      background: '#070a0f',
+      borderBottom: '1px solid rgba(48,54,61,0.7)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 30,
+      display: 'flex',
+      alignItems: 'center',
+    }}>
+      <div style={{
+        width: '100%',
+        maxWidth: 1200,
+        margin: '0 auto',
+        padding: '0 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 16,
+      }}>
 
         {/* Logo */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="34" height="34" rx="9" fill="#0c1220"/>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexShrink: 0 }}>
+          <svg width="26" height="26" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="34" height="34" fill="#0c1a2e"/>
             <polyline
               points="4,17 8,17 10.5,10 14,24 17,12 20,20 23,20 26,17 30,17"
-              stroke="#38bdf8"
-              strokeWidth="2"
+              stroke="#00d4ff"
+              strokeWidth="2.2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
-          <span className="hidden sm:block text-slate-900 dark:text-white" style={{ fontFamily: 'Inter, -apple-system, sans-serif', fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>
+          <span style={{
+            fontFamily: SANS,
+            fontSize: 15,
+            fontWeight: 700,
+            color: '#e2e2e8',
+            letterSpacing: '-0.02em',
+          }}>
             Trackr
           </span>
         </div>
 
-        {/* Nav links */}
-        <nav className="flex items-end gap-1 h-14">
-          {nav.map(({ to, label, icon: Icon, end }) => (
+        {/* Nav */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+          {nav.map(({ to, label, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
-              className={({ isActive }) => cn(
-                'flex flex-col items-center justify-end gap-1 px-4 pb-2 h-full text-xs font-medium transition-colors border-b-2',
-                isActive
-                  ? 'border-sky-500 text-sky-600 dark:text-sky-400'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-              )}
+              style={({ isActive }) => ({
+                fontFamily: SANS,
+                fontSize: 13,
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? '#e2e2e8' : 'rgba(96,140,200,0.7)',
+                textDecoration: 'none',
+                padding: '6px 14px',
+                letterSpacing: '-0.01em',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.15s',
+                borderBottom: isActive ? '1px solid rgba(0,212,255,0.5)' : '1px solid transparent',
+              })}
+              onMouseEnter={e => { if (e.currentTarget.style.fontWeight !== '600') e.currentTarget.style.color = '#c0cfe8' }}
+              onMouseLeave={e => { if (e.currentTarget.style.fontWeight !== '600') e.currentTarget.style.color = 'rgba(96,140,200,0.7)' }}
             >
-              {({ isActive }) => (
-                <>
-                  <Icon size={20} className={isActive ? 'opacity-100' : 'opacity-60'} />
-                  <span>{label}</span>
-                </>
-              )}
+              {label}
             </NavLink>
           ))}
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
           <button
             onClick={() => navigate('/time-report')}
             title="Time Report"
             style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '5px 10px',
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: '5px 12px',
               background: 'transparent',
               border: 'none',
-              borderRadius: 6,
               cursor: 'pointer',
-              color: 'rgba(148,163,184,0.7)',
-              transition: 'color 0.15s, background 0.15s',
-              fontFamily: '"Geist Mono", monospace',
+              color: 'rgba(96,140,200,0.6)',
+              fontFamily: MONO,
               fontSize: 9,
               fontWeight: 700,
-              letterSpacing: '0.12em',
+              letterSpacing: '0.1em',
               textTransform: 'uppercase',
+              transition: 'color 0.15s',
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = '#38bdf8'
-              e.currentTarget.style.background = 'rgba(56,189,248,0.07)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = 'rgba(148,163,184,0.7)'
-              e.currentTarget.style.background = 'transparent'
-            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(96,140,200,0.6)'}
           >
-            <ActivityIcon size={15}/>
-            <span style={{ letterSpacing: '0.1em' }}>Report</span>
+            <ActivityIcon size={14} />
+            <span>Report</span>
           </button>
+
+          <div style={{ width: 1, height: 18, background: 'rgba(48,54,61,0.9)', margin: '0 4px' }} />
+
           <ProfileDropdown />
         </div>
 
