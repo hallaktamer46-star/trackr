@@ -3,6 +3,7 @@ import { Power, Play, Plus, X, Check, Circle, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import SetShiftModal from './SetShiftModal'
+import TaskModal from './TaskModal'
 
 const NUM  = 'Geist Mono, monospace'
 const BODY = 'Geist, Inter, -apple-system, sans-serif'
@@ -47,12 +48,7 @@ export default function EngageWidget() {
   const [, setTick]                 = useState(0)
 
   const [tasks, setTasks]             = useState(loadTasks)
-  const [showTaskAdd, setShowTaskAdd] = useState(false)
-  const [newTask, setNewTask]         = useState('')
-  const taskInputRef = useRef(null)
-
   const [editingTask, setEditingTask] = useState(null)
-  const [editForm, setEditForm]       = useState({ title:'', date:'', desc:'', importance:3 })
 
   const [lastCompleted, setLastCompleted] = useState(null)
   const undoTimer = useRef(null)
@@ -160,9 +156,7 @@ export default function EngageWidget() {
     return () => clearInterval(timer.current)
   }, [status])
 
-  useEffect(() => { if (showTaskAdd) taskInputRef.current?.focus() }, [showTaskAdd])
-
-  const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, color:'#60a5fa' }))]
+const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, color:'#60a5fa' }))]
   const cur = allStatuses.find(s => s.key === status)
 
   const totals = () => {
@@ -280,12 +274,6 @@ export default function EngageWidget() {
     if (status === 'c'+idx) setStatus(null)
   }
 
-  function addTask() {
-    const title = newTask.trim(); if (!title) return
-    setTasks(prev => [...prev, { id: Date.now(), title, done: false, due: todayStr }])
-    setNewTask(''); setShowTaskAdd(false)
-  }
-
   function toggleTask(id) {
     setTasks(prev => prev.map(t => {
       if (t.id !== id) return t
@@ -310,24 +298,17 @@ export default function EngageWidget() {
     setTasks(prev => prev.filter(t => t.id !== id))
   }
 
-  const IMP_COLORS = { 1:'#4edea3', 2:'#a3c9ff', 3:'#fbbf24', 4:'#ffb689', 5:'#ffb4ab' }
-  const priorityToImp = p => p === 'low' ? 1 : p === 'high' ? 5 : 3
-  const impToPriority = n => n <= 2 ? 'low' : n === 3 ? 'medium' : 'high'
-
   function openEdit(t) {
-    setEditForm({ title: t.title, date: t.due, desc: t.note || '', importance: priorityToImp(t.priority) })
     setEditingTask(t)
   }
 
-  function saveEdit() {
-    if (!editForm.title.trim()) return
-    setTasks(prev => prev.map(t => t.id === editingTask.id ? {
-      ...t,
-      title: editForm.title,
-      due: editForm.date,
-      note: editForm.desc,
-      priority: impToPriority(editForm.importance),
-    } : t))
+  function handleTaskSave({ id, title, due, note, priority }) {
+    if (!id) {
+      setTasks(prev => [...prev, { id: Date.now(), title, due, note, priority, done: false }])
+      window.dispatchEvent(new Event('trackr-tasks-updated'))
+    } else {
+      setTasks(prev => prev.map(t => t.id === id ? { ...t, title, due, note, priority } : t))
+    }
     setEditingTask(null)
   }
 
@@ -536,7 +517,7 @@ export default function EngageWidget() {
                       style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:shiftGoal?'rgba(96,165,250,0.08)':'transparent',border:`1px solid ${shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)'}`,color:shiftGoal?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s',whiteSpace:'nowrap'}}
                       onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
                       onMouseLeave={e=>{e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)';e.currentTarget.style.color=shiftGoal?'#60a5fa':'#3a6090'}}>
-                      ⏱ {shiftGoalLabel || 'Set shift'}
+                      <Plus size={9}/> {shiftGoalLabel || 'Add shift'}
                     </button>
                     <button onClick={()=>setShowAdd(true)}
                       style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
@@ -572,37 +553,19 @@ export default function EngageWidget() {
                     )}
                   </div>
                   <button
-                    onClick={() => setShowTaskAdd(v => !v)}
+                    onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
                     style={{
                       display:'flex',alignItems:'center',gap:4,padding:'4px 9px',
-                      background: showTaskAdd ? 'rgba(96,165,250,0.12)' : 'transparent',
-                      border:`1px solid ${showTaskAdd ? 'rgba(96,165,250,0.4)' : 'rgba(60,100,200,0.2)'}`,
-                      color: showTaskAdd ? '#60a5fa' : '#3a6090',
+                      background:'transparent',
+                      border:'1px solid rgba(60,100,200,0.2)',
+                      color:'#3a6090',
                       fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',transition:'all 0.15s',letterSpacing:'0.04em',
                     }}
                     onMouseEnter={e=>{ e.currentTarget.style.borderColor='rgba(96,165,250,0.45)'; e.currentTarget.style.color='#60a5fa' }}
-                    onMouseLeave={e=>{ if(!showTaskAdd){ e.currentTarget.style.borderColor='rgba(60,100,200,0.2)'; e.currentTarget.style.color='#3a6090' }}}>
+                    onMouseLeave={e=>{ e.currentTarget.style.borderColor='rgba(60,100,200,0.2)'; e.currentTarget.style.color='#3a6090' }}>
                     <Plus size={9}/> Add
                   </button>
                 </div>
-
-                {/* Quick-add */}
-                {showTaskAdd && (
-                  <div style={{display:'flex',alignItems:'center',gap:5,padding:'7px 10px',borderBottom:`1px solid ${DIVIDER}`,flexShrink:0}}>
-                    <input
-                      ref={taskInputRef}
-                      value={newTask}
-                      onChange={e => setNewTask(e.target.value)}
-                      onKeyDown={e => { if(e.key==='Enter') addTask(); if(e.key==='Escape'){ setShowTaskAdd(false); setNewTask('') } }}
-                      placeholder="Task for today…"
-                      style={{flex:1,padding:'6px 9px',background:'rgba(40,80,200,0.08)',border:`1px solid rgba(96,165,250,0.2)`,color:'#d0e4ff',fontSize:12,fontFamily:BODY,outline:'none',caretColor:'#60a5fa'}}
-                    />
-                    <button onClick={addTask}
-                      style={{padding:'6px 9px',background:'#60a5fa',border:'none',color:'#07090f',cursor:'pointer',display:'flex',alignItems:'center',flexShrink:0,fontWeight:800}}>
-                      <Check size={11}/>
-                    </button>
-                  </div>
-                )}
 
                 {/* Task list */}
                 <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
@@ -712,59 +675,13 @@ export default function EngageWidget() {
         }
       `}</style>
 
-      {/* ── Task edit modal ── */}
-      {editingTask && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:99999, padding:20 }}
-          onClick={() => setEditingTask(null)}>
-          <div style={{ width:'100%', maxWidth:380, background:'#0a0e1c', border:'0.5px solid rgba(163,201,255,0.15)', padding:'36px 32px', display:'flex', flexDirection:'column', gap:16, animation:'slideUp 0.18s cubic-bezier(0.22,1,0.36,1)' }}
-            onClick={e => e.stopPropagation()}>
-
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <h2 style={{ fontFamily:NUM, fontSize:13, fontWeight:800, color:'#e2e2e8', letterSpacing:'-0.01em', margin:0 }}>Edit Task</h2>
-              <button onClick={() => setEditingTask(null)} style={{ background:'none', border:'none', color:'rgba(163,201,255,0.35)', cursor:'pointer', fontSize:18, lineHeight:1, padding:4, transition:'color .15s' }}
-                onMouseEnter={e => e.currentTarget.style.color='rgba(163,201,255,0.7)'}
-                onMouseLeave={e => e.currentTarget.style.color='rgba(163,201,255,0.35)'}>×</button>
-            </div>
-
-            <input value={editForm.title} onChange={e => setEditForm(f=>({...f,title:e.target.value}))}
-              onKeyDown={e => e.key==='Enter' && saveEdit()}
-              placeholder="Task title…"
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.14)', color:'#e2e2e8', fontSize:14, fontFamily:BODY, outline:'none', width:'100%', boxSizing:'border-box' }}/>
-
-            <input type="date" value={editForm.date} onChange={e => setEditForm(f=>({...f,date:e.target.value}))}
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.14)', color:'#8a919f', fontSize:13, fontFamily:NUM, outline:'none', colorScheme:'dark', width:'100%', boxSizing:'border-box' }}/>
-
-            <textarea value={editForm.desc} onChange={e => setEditForm(f=>({...f,desc:e.target.value}))}
-              placeholder="Description (optional)…" rows={3}
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.14)', color:'#c0c7d5', fontSize:13, fontFamily:BODY, outline:'none', resize:'none', width:'100%', boxSizing:'border-box' }}/>
-
-            <div>
-              <p style={{ fontFamily:NUM, fontSize:9, color:'rgba(163,201,255,0.3)', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8 }}>Importance</p>
-              <div style={{ display:'flex', gap:6 }}>
-                {[1,2,3,4,5].map(n => (
-                  <button key={n} onClick={() => setEditForm(f=>({...f,importance:n}))}
-                    style={{
-                      flex:1, padding:'9px 0',
-                      border:`0.5px solid ${editForm.importance===n ? IMP_COLORS[n]+'80' : 'rgba(163,201,255,0.1)'}`,
-                      background: editForm.importance===n ? `${IMP_COLORS[n]}18` : 'rgba(255,255,255,0.02)',
-                      color: editForm.importance===n ? IMP_COLORS[n] : 'rgba(163,201,255,0.3)',
-                      fontFamily:NUM, fontSize:13, fontWeight:700, cursor:'pointer', transition:'all .12s',
-                    }}>
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button onClick={saveEdit}
-              style={{ padding:'12px 0', background:'linear-gradient(135deg,rgba(96,165,250,0.18),rgba(163,201,255,0.1))', border:'0.5px solid rgba(96,165,250,0.35)', color:'#60a5fa', fontFamily:NUM, fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', transition:'all .15s' }}
-              onMouseEnter={e => { e.currentTarget.style.background='rgba(96,165,250,0.22)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.55)' }}
-              onMouseLeave={e => { e.currentTarget.style.background='linear-gradient(135deg,rgba(96,165,250,0.18),rgba(163,201,255,0.1))'; e.currentTarget.style.borderColor='rgba(96,165,250,0.35)' }}>
-              Save Changes
-            </button>
-          </div>
-        </div>
-      )}
+      {/* ── Task modal (add / edit) ── */}
+      <TaskModal
+        open={!!editingTask}
+        task={editingTask}
+        onClose={() => setEditingTask(null)}
+        onSave={handleTaskSave}
+      />
 
       {/* ── Set Shift full-screen modal ── */}
       <SetShiftModal

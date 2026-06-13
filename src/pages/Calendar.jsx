@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import BackToHome from '../components/BackToHome'
+import TaskModal from '../components/TaskModal'
 import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
   ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
@@ -229,9 +230,8 @@ export default function Calendar() {
   const [sessions, setSessions] = useLocalStorage('trackr_sessions', [])
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
 
-  /* task form */
-  const [taskForm, setTaskForm] = useState({ open: false, title: '', due: format(new Date(),'yyyy-MM-dd'), priority: 'medium', note: '' })
-  const [editingTaskId, setEditingTaskId] = useState(null)
+  /* task modal */
+  const [calTaskModal, setCalTaskModal] = useState({ open: false, task: null })
   const [expandedTaskId, setExpandedTaskId] = useState(null)
   /* goal form */
   const [goalForm, setGoalForm] = useState({ open: false, title: '', target: '', unit: 'applications', period: 'week' })
@@ -258,15 +258,13 @@ export default function Calendar() {
   ].filter(Boolean), [tasks, sessions, applications])
 
   /* ── Helpers ── */
-  const addTask = () => {
-    if (!taskForm.title.trim()) return
-    if (editingTaskId) {
-      setTasks(t => t.map(x => x.id === editingTaskId ? { ...x, title: taskForm.title, due: taskForm.due, priority: taskForm.priority, note: taskForm.note } : x))
-      setEditingTaskId(null)
+  const handleCalTaskSave = ({ id, title, due, note, priority }) => {
+    if (!id) {
+      setTasks(t => [...t, { id: Date.now().toString(), title, due, priority, note, done: false, createdAt: new Date().toISOString() }])
     } else {
-      setTasks(t => [...t, { id: Date.now().toString(), ...taskForm, done: false, createdAt: new Date().toISOString() }])
+      setTasks(t => t.map(x => x.id === id ? { ...x, title, due, priority, note } : x))
     }
-    setTaskForm(f => ({ ...f, open: false, title: '', note: '' }))
+    setCalTaskModal({ open: false, task: null })
   }
   const toggleTask = id => setTasks(t => t.map(x => x.id === id ? { ...x, done: !x.done, completedAt: x.done ? null : new Date().toISOString() } : x))
   const deleteTask = id => setTasks(t => t.filter(x => x.id !== id))
@@ -407,51 +405,16 @@ export default function Calendar() {
           <Card accent="#a3c9ff" style={{ gridColumn: '1', display: 'flex', flexDirection: 'column', gap: 0 }}>
             <SectionHead icon={CheckSquare} label="Tasks" color="#a3c9ff"
               action={
-                <button onClick={() => setTaskForm(f => ({ ...f, open: !f.open }))}
+                <button onClick={() => setCalTaskModal({ open: true, task: null })}
                   style={{ display: 'flex', alignItems: 'center', gap: 4, fontFamily: MONO, fontSize: 9, fontWeight: 700, color: '#a3c9ff', background: 'rgba(163,201,255,0.08)', border: '0.5px solid rgba(163,201,255,0.2)', padding: '4px 10px', cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   <Plus size={10} /> Add
                 </button>
               }
             />
 
-            {/* Add / Edit task form */}
-            {taskForm.open && (
-              <div style={{ background: BG, border: `0.5px solid ${BORDER}`, padding: 12, marginBottom: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <input value={taskForm.title} onChange={e => setTaskForm(f=>({...f,title:e.target.value}))} placeholder="Task title…"
-                  onKeyDown={e => e.key==='Enter' && addTask()}
-                  style={{ width:'100%', boxSizing:'border-box', padding:'7px 10px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#e2e2e8', fontSize:12, fontFamily:SANS, outline:'none' }}/>
-                <input type="date" value={taskForm.due} onChange={e => setTaskForm(f=>({...f,due:e.target.value}))}
-                  style={{ padding:'6px 8px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#8a919f', fontSize:11, fontFamily:MONO, outline:'none', colorScheme:'dark', width:'100%', boxSizing:'border-box' }}/>
-                <div style={{ display:'flex', gap:4 }}>
-                  {['high','medium','low'].map(p => (
-                    <button key={p} onClick={() => setTaskForm(f=>({...f,priority:p}))}
-                      style={{
-                        flex:1, padding:'6px 4px',
-                        background: taskForm.priority===p ? `${PRIORITY_COLOR[p]}18` : 'rgba(255,255,255,0.02)',
-                        border: `0.5px solid ${taskForm.priority===p ? PRIORITY_COLOR[p]+'60' : BORDER}`,
-                        color: taskForm.priority===p ? PRIORITY_COLOR[p] : '#5a6478',
-                        fontFamily:MONO, fontSize:9, fontWeight:700, cursor:'pointer', transition:'all .12s',
-                        textTransform:'uppercase', letterSpacing:'0.06em',
-                      }}>
-                      {PRIORITY_LABEL[p]}
-                    </button>
-                  ))}
-                </div>
-                <textarea value={taskForm.note} onChange={e => setTaskForm(f=>({...f,note:e.target.value}))}
-                  placeholder="Note (optional)…" rows={2}
-                  style={{ width:'100%', boxSizing:'border-box', padding:'7px 10px', background:'rgba(255,255,255,0.025)', border:`0.5px solid ${BORDER}`, color:'#8a919f', fontSize:11, fontFamily:SANS, outline:'none', resize:'none' }}/>
-                <div style={{ display:'flex', gap:6 }}>
-                  <button onClick={addTask} style={{ flex:1, padding:'7px 0', background:'rgba(163,201,255,0.1)', border:'0.5px solid rgba(163,201,255,0.3)', color:'#a3c9ff', fontFamily:MONO, fontSize:10, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer' }}>
-                    {editingTaskId ? 'Update Task' : 'Add Task'}
-                  </button>
-                  <button onClick={() => { setTaskForm(f=>({...f,open:false})); setEditingTaskId(null) }} style={{ padding:'7px 10px', background:'rgba(255,255,255,0.02)', border:`0.5px solid ${BORDER}`, color:'#5a6478', cursor:'pointer' }}><X size={12}/></button>
-                </div>
-              </div>
-            )}
-
             {/* Task list */}
             <div style={{ display:'flex', flexDirection:'column', maxHeight:340, overflowY:'auto', background:'rgba(0,0,0,0.35)', border:`0.5px solid ${BORDER}` }}>
-              {pendingTasks.length === 0 && !taskForm.open && (
+              {pendingTasks.length === 0 && (
                 <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'12px 10px' }}>No pending tasks — add one above.</p>
               )}
               {pendingTasks.map(t => (
@@ -473,10 +436,8 @@ export default function Calendar() {
                         onMouseEnter={e=>e.currentTarget.style.color='#a3c9ff'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
                         <MoreVertical size={11}/>
                       </button>
-                      <button onClick={() => {
-                        setEditingTaskId(t.id)
-                        setTaskForm({ open:true, title:t.title, due:t.due, priority:t.priority||'medium', note:t.note||'' })
-                      }} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
+                      <button onClick={() => setCalTaskModal({ open: true, task: t })}
+                        style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
                         onMouseEnter={e=>e.currentTarget.style.color='#a3c9ff'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
                         <Edit3 size={11}/>
                       </button>
@@ -731,6 +692,13 @@ export default function Calendar() {
 
         </div>{/* end 4-section grid */}
       </div>{/* end main grid */}
+
+      <TaskModal
+        open={calTaskModal.open}
+        task={calTaskModal.task}
+        onClose={() => setCalTaskModal({ open: false, task: null })}
+        onSave={handleCalTaskSave}
+      />
     </div>
   )
 }
