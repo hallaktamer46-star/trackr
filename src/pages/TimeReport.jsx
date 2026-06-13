@@ -86,7 +86,6 @@ const Row = ({ k, secs, total, S_ALL, index = 0 }) => {
   return (
     <div style={{
       position:'relative', height:48, marginBottom:3, overflow:'hidden',
-      border:`1px solid ${def.color}18`,
       animation:`fadeUp 0.4s ${index * 0.06}s ease both`,
     }}>
       {/* background fill */}
@@ -127,13 +126,11 @@ const Row = ({ k, secs, total, S_ALL, index = 0 }) => {
 // Card component for stat numbers
 const StatCard = ({ label, value, color, sub, index = 0 }) => (
   <div style={{
-    background:`linear-gradient(135deg, ${color}08 0%, rgba(0,0,0,0) 70%)`,
-    border:`1px solid ${color}20`,
-    borderTop:`2px solid ${color}`,
+    background:`linear-gradient(135deg, ${color}09 0%, rgba(0,0,0,0) 70%)`,
+    borderTop:`2px solid ${color}60`,
     padding:'22px 24px 20px',
     position:'relative', overflow:'hidden',
     animation:`fadeUp 0.5s ${index * 0.08}s ease both`,
-    boxShadow:`inset 0 1px 0 ${color}10, 0 2px 20px rgba(0,0,0,0.4)`,
   }}>
     {/* corner glow */}
     <div style={{position:'absolute',top:-20,right:-20,width:80,height:80,borderRadius:'50%',background:`radial-gradient(circle, ${color}20 0%, transparent 70%)`}}/>
@@ -162,12 +159,12 @@ export default function TimeReport() {
         to   { background-position:  200% center }
       }
       @keyframes pulse {
-        0%,100% { opacity:1; box-shadow:0 0 10px #00ffb3, 0 0 20px #00ffb380 }
-        50%     { opacity:0.5; box-shadow:0 0 4px #00ffb3 }
+        0%,100% { opacity:1; box-shadow:0 0 8px #00d4ff, 0 0 16px rgba(0,212,255,0.5) }
+        50%     { opacity:0.5; box-shadow:0 0 3px #00d4ff }
       }
       @keyframes livering {
-        0%   { transform:scale(1);   opacity:0.8 }
-        100% { transform:scale(2.4); opacity:0 }
+        0%   { transform:scale(1);   opacity:0.6 }
+        100% { transform:scale(2.6); opacity:0 }
       }
       @keyframes heroIn {
         from { opacity:0; filter:blur(12px); transform:translateY(12px) }
@@ -218,7 +215,6 @@ export default function TimeReport() {
   const TD        = todayData?.statuses || {}
   const TTOT      = todayData?.total || 0
   const keys      = Object.keys(S_ALL)
-  const topStatus = TTOT > 0 ? Object.keys(TD).reduce((a,b) => (TD[a]||0) > (TD[b]||0) ? a : b, null) : null
 
   const weekTotal = weekData.reduce((a,d) => a + d.total, 0)
   const weekAvg   = weekTotal > 0 ? Math.floor(weekTotal / weekData.filter(d => d.total > 0).length) : 0
@@ -246,31 +242,24 @@ export default function TimeReport() {
 
       {/* ── HEADER ── */}
       <div style={{
-        borderBottom: '1px solid rgba(0,212,255,0.12)',
-        padding: '16px 48px',
+        padding: '18px 48px',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        background: 'linear-gradient(180deg, rgba(0,212,255,0.04) 0%, transparent 100%)',
-        backdropFilter: 'blur(8px)',
       }}>
-        {/* Left — brand */}
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <div style={{width:2,height:24,background:'linear-gradient(180deg,#00d4ff,#00ffb3)',borderRadius:2}}/>
-          <span style={{fontFamily:MONO,fontSize:9,fontWeight:700,color:'rgba(0,212,255,0.4)',letterSpacing:'0.22em',textTransform:'uppercase'}}>Time Report</span>
-        </div>
+        <div/>
 
-        {/* Center — LIVE badge */}
+        {/* Center — LIVE */}
         <div style={{display:'flex',justifyContent:'center',alignItems:'center'}}>
           {todayData?.live ? (
-            <div style={{display:'flex',alignItems:'center',gap:8,padding:'6px 16px',background:'rgba(0,255,179,0.06)',border:'1px solid rgba(0,255,179,0.2)',borderRadius:2}}>
-              <div style={{position:'relative',width:8,height:8,flexShrink:0}}>
-                <div style={{position:'absolute',inset:0,borderRadius:'50%',background:'#00ffb3',animation:'pulse 1.8s ease-in-out infinite'}}/>
-                <div style={{position:'absolute',inset:-3,borderRadius:'50%',background:'rgba(0,255,179,0.3)',animation:'livering 1.8s ease-out infinite'}}/>
+            <div style={{display:'flex',alignItems:'center',gap:9}}>
+              <div style={{position:'relative',width:7,height:7,flexShrink:0}}>
+                <div style={{position:'absolute',inset:0,borderRadius:'50%',background:'#00d4ff',animation:'pulse 1.8s ease-in-out infinite'}}/>
+                <div style={{position:'absolute',inset:-4,borderRadius:'50%',background:'rgba(0,212,255,0.25)',animation:'livering 1.8s ease-out infinite'}}/>
               </div>
-              <span style={{fontFamily:MONO,fontSize:9,fontWeight:800,color:'#00ffb3',letterSpacing:'0.22em'}}>LIVE</span>
+              <span style={{fontFamily:MONO,fontSize:9,fontWeight:800,color:'rgba(0,212,255,0.7)',letterSpacing:'0.24em'}}>LIVE</span>
               {todayData?.currentStatus && (
-                <span style={{fontFamily:MONO,fontSize:8,color:'rgba(0,255,179,0.5)',letterSpacing:'0.08em'}}>
+                <span style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.22)',letterSpacing:'0.06em'}}>
                   · {S_ALL[todayData.currentStatus]?.label || todayData.currentStatus}
                 </span>
               )}
@@ -302,27 +291,15 @@ export default function TimeReport() {
                 fontSize: 'clamp(64px,10vw,108px)',
                 letterSpacing: '-0.04em', lineHeight: 0.85,
                 background: TTOT > 0
-                  ? 'linear-gradient(140deg, #ffffff 0%, #00d4ff 45%, #00ffb3 100%)'
-                  : 'linear-gradient(140deg, rgba(255,255,255,0.12), rgba(0,212,255,0.25))',
+                  ? 'linear-gradient(140deg, #ffffff 0%, #e8f4fd 30%, #00d4ff 100%)'
+                  : 'linear-gradient(140deg, rgba(255,255,255,0.1), rgba(0,212,255,0.2))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                filter: TTOT > 0 ? 'drop-shadow(0 0 40px rgba(0,212,255,0.35))' : 'none',
+                filter: TTOT > 0 ? 'drop-shadow(0 0 40px rgba(0,212,255,0.3))' : 'none',
                 animation: 'heroIn 0.7s ease both',
               }}>
                 {TTOT > 0 ? fmtSecs(TTOT) : '——'}
               </span>
-
-              {topStatus && (
-                <div style={{paddingBottom:8,animation:'fadeUp 0.8s 0.2s ease both'}}>
-                  <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.2)',letterSpacing:'0.18em',textTransform:'uppercase',marginBottom:6}}>TOP STATUS</p>
-                  <div style={{display:'flex',alignItems:'center',gap:8,padding:'6px 14px',background:`${S_ALL[topStatus]?.color || '#00d4ff'}10`,border:`1px solid ${S_ALL[topStatus]?.color || '#00d4ff'}30`}}>
-                    <div style={{width:6,height:6,background:S_ALL[topStatus]?.color||'#00d4ff',boxShadow:`0 0 8px ${S_ALL[topStatus]?.color||'#00d4ff'}`}}/>
-                    <span style={{fontFamily:MONO,fontSize:10,color:S_ALL[topStatus]?.color||'#00d4ff',letterSpacing:'0.06em',fontWeight:700}}>
-                      {S_ALL[topStatus]?.label} · {fmtSecs(TD[topStatus]||0)}
-                    </span>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -334,8 +311,7 @@ export default function TimeReport() {
                   display:'flex',alignItems:'center',justifyContent:'space-between',gap:20,
                   padding:'6px 14px',
                   background:`linear-gradient(90deg, ${S_ALL[k]?.color || '#00d4ff'}10, transparent)`,
-                  border:`1px solid ${S_ALL[k]?.color || '#00d4ff'}20`,
-                  borderLeft:`2px solid ${S_ALL[k]?.color || '#00d4ff'}80`,
+                  borderLeft:`2px solid ${S_ALL[k]?.color || '#00d4ff'}70`,
                 }}>
                   <span style={{fontFamily:MONO,fontSize:9,color:S_ALL[k]?.color||'#00d4ff',letterSpacing:'0.08em',textTransform:'uppercase',fontWeight:600}}>{S_ALL[k]?.label||k}</span>
                   <span style={{fontFamily:MONO,fontSize:9,color:`${S_ALL[k]?.color||'#00d4ff'}70`,fontWeight:700}}>{fmtSecs(TD[k]||0)}</span>
@@ -389,7 +365,7 @@ export default function TimeReport() {
               <>
                 <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:3,marginBottom:3}}>
                   <StatCard label="Total Time"   value={fmtSecs(TTOT)}  color="#00d4ff" index={0}/>
-                  <StatCard label="Shift Start"  color="#00ffb3" index={1}
+                  <StatCard label="Shift Start"  color="#a78bfa" index={1}
                     value={todayData.shiftStart ? new Date(todayData.shiftStart).toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}) : '—'}/>
                   <StatCard label="Status" index={2}
                     value={todayData.currentStatus ? S_ALL[todayData.currentStatus]?.label||'—' : 'Off'}
@@ -397,9 +373,7 @@ export default function TimeReport() {
                 </div>
 
                 <div style={{
-                  background:'linear-gradient(180deg, rgba(0,212,255,0.02) 0%, transparent 100%)',
-                  border:'1px solid rgba(0,212,255,0.08)',
-                  padding:'22px 22px 18px',
+                  padding:'22px 0 18px',
                   animation:'fadeUp 0.5s 0.2s ease both',
                   animationFillMode:'both',
                 }}>
@@ -432,7 +406,7 @@ export default function TimeReport() {
             </div>
 
             {/* Chart */}
-            <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(0,212,255,0.08)',padding:'22px 22px 12px',marginBottom:3,animation:'fadeUp 0.5s 0.2s ease both',animationFillMode:'both'}}>
+            <div style={{padding:'22px 0 12px',marginBottom:3,animation:'fadeUp 0.5s 0.2s ease both',animationFillMode:'both'}}>
               <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.18)',letterSpacing:'0.22em',textTransform:'uppercase',marginBottom:20,fontWeight:700}}>Last 7 Days</p>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={weekData} barSize={28} margin={{top:0,right:0,left:-20,bottom:0}}>
@@ -469,7 +443,7 @@ export default function TimeReport() {
             </div>
 
             {/* Weekly breakdown */}
-            <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(0,212,255,0.08)',padding:'22px 22px 18px',animation:'fadeUp 0.5s 0.3s ease both',animationFillMode:'both'}}>
+            <div style={{padding:'22px 0 18px',animation:'fadeUp 0.5s 0.3s ease both',animationFillMode:'both'}}>
               <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.18)',letterSpacing:'0.22em',textTransform:'uppercase',marginBottom:16,fontWeight:700}}>This Week By Status</p>
               {(() => {
                 const wt = {}; let wg = 0
@@ -501,13 +475,13 @@ export default function TimeReport() {
                 </div>
 
                 {/* Distribution */}
-                <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(0,212,255,0.08)',padding:'22px 22px 18px',marginBottom:3,animation:'fadeUp 0.5s 0.2s ease both',animationFillMode:'both'}}>
+                <div style={{padding:'22px 0 18px',marginBottom:3,animation:'fadeUp 0.5s 0.2s ease both',animationFillMode:'both'}}>
                   <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.18)',letterSpacing:'0.22em',textTransform:'uppercase',marginBottom:16,fontWeight:700}}>All-Time Distribution</p>
                   {keys.map((k, i) => { const s=overall.s[k]||0; if (!s) return null; return <Row key={k} k={k} secs={s} total={overall.total} S_ALL={S_ALL} index={i}/> })}
                 </div>
 
                 {/* History log */}
-                <div style={{background:'rgba(255,255,255,0.01)',border:'1px solid rgba(0,212,255,0.08)',padding:'22px 22px 8px',animation:'fadeUp 0.5s 0.3s ease both',animationFillMode:'both'}}>
+                <div style={{padding:'22px 0 8px',animation:'fadeUp 0.5s 0.3s ease both',animationFillMode:'both'}}>
                   <p style={{fontFamily:MONO,fontSize:8,color:'rgba(255,255,255,0.18)',letterSpacing:'0.22em',textTransform:'uppercase',marginBottom:18,fontWeight:700}}>History Log</p>
                   {allData.map((d, i) => (
                     <div key={d.date} style={{
