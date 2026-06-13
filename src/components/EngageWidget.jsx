@@ -599,30 +599,24 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
 
                   {pending.map((t, idx) => (
                     <div key={t.id}
+                      draggable={true}
+                      onDragStart={e => { setWDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
+                      onDragEnd={() => { setWDragIdx(null); setWDragOver(null) }}
                       onClick={() => openEdit(t)}
                       onDragOver={e => { e.preventDefault(); setWDragOver(idx) }}
                       onDrop={e => { e.preventDefault(); reorderWidgetTasks(wDragIdx, idx); setWDragIdx(null); setWDragOver(null) }}
                       style={{
                         display:'flex', alignItems:'center', gap:6, padding:'7px 10px',
-                        borderTop: wDragOver === idx && wDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.5)' : '1.5px solid transparent',
-                        opacity: wDragIdx === idx ? 0.35 : 1,
-                        cursor:'pointer', transition:'background 0.12s, opacity 0.1s',
+                        borderTop: wDragOver === idx && wDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.55)' : '1.5px solid transparent',
+                        background: wDragIdx === idx ? 'rgba(96,165,250,0.1)' : 'transparent',
+                        outline: wDragIdx === idx ? '1px solid rgba(96,165,250,0.35)' : 'none',
+                        cursor: wDragIdx === idx ? 'grabbing' : 'grab',
+                        transition:'background 0.1s',
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background='rgba(96,165,250,0.05)'}
-                      onMouseLeave={e => e.currentTarget.style.background='transparent'}>
+                      onMouseEnter={e => { if (wDragIdx === null) e.currentTarget.style.background='rgba(96,165,250,0.05)' }}
+                      onMouseLeave={e => { if (wDragIdx === null) e.currentTarget.style.background='transparent' }}>
 
-                      {/* Drag handle */}
-                      <div
-                        draggable={true}
-                        onDragStart={e => { setWDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
-                        onDragEnd={() => { setWDragIdx(null); setWDragOver(null) }}
-                        onClick={e => e.stopPropagation()}
-                        style={{ cursor:'grab', color:'rgba(96,165,250,0.18)', display:'flex', flexShrink:0 }}
-                        onMouseEnter={e=>e.currentTarget.style.color='rgba(96,165,250,0.45)'}
-                        onMouseLeave={e=>e.currentTarget.style.color='rgba(96,165,250,0.18)'}
-                      >
-                        <GripVertical size={11}/>
-                      </div>
+                      <GripVertical size={11} style={{ color:'rgba(96,165,250,0.22)', flexShrink:0, pointerEvents:'none' }}/>
 
                       <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }}
                         style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#2a4898',display:'flex',transition:'color 0.15s'}}
@@ -633,7 +627,7 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
 
                       <span
                         title={t.title}
-                        style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                        style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',userSelect:'none'}}>
                         {t.title}
                       </span>
 

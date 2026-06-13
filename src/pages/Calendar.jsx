@@ -230,10 +230,12 @@ export default function Calendar() {
   const [sessions, setSessions] = useLocalStorage('trackr_sessions', [])
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
 
-  /* task modal + drag */
+  /* task modal + drag + scroll */
   const [calTaskModal, setCalTaskModal] = useState({ open: false, task: null })
   const [calDragIdx,  setCalDragIdx]  = useState(null)
   const [calDragOver, setCalDragOver] = useState(null)
+  const taskListRef = useRef(null)
+  const [taskListScrollable, setTaskListScrollable] = useState(false)
   /* goal form */
   const [goalForm, setGoalForm] = useState({ open: false, title: '', target: '', unit: 'applications', period: 'week' })
   const [motivation, setMotivation] = useState({ goalId: null, text: '' })
@@ -259,6 +261,16 @@ export default function Calendar() {
   ].filter(Boolean), [tasks, sessions, applications])
 
   /* ── Helpers ── */
+  useEffect(() => {
+    const el = taskListRef.current
+    if (!el) return
+    const check = () => setTaskListScrollable(el.scrollHeight > el.clientHeight + 4)
+    check()
+    el.addEventListener('scroll', check)
+    window.addEventListener('resize', check)
+    return () => { el.removeEventListener('scroll', check); window.removeEventListener('resize', check) }
+  }, [pendingTasks])
+
   function reorderPendingTasks(fromIdx, toIdx) {
     if (fromIdx === null || fromIdx === toIdx) return
     const pending = tasks.filter(t => !t.done)
@@ -421,73 +433,88 @@ export default function Calendar() {
             />
 
             {/* Task list */}
-            <div style={{ display:'flex', flexDirection:'column', maxHeight:340, overflowY:'auto' }}>
-              {pendingTasks.length === 0 && (
-                <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'12px 10px' }}>No pending tasks — add one above.</p>
-              )}
-              {pendingTasks.map((t, idx) => (
-                <div
-                  key={t.id}
-                  onClick={() => setCalTaskModal({ open: true, task: t })}
-                  onDragOver={e => { e.preventDefault(); setCalDragOver(idx) }}
-                  onDrop={e => { e.preventDefault(); reorderPendingTasks(calDragIdx, idx); setCalDragIdx(null); setCalDragOver(null) }}
-                  style={{
-                    display:'flex', alignItems:'center', gap:8, padding:'8px 10px',
-                    borderBottom:`0.5px solid rgba(163,201,255,0.05)`,
-                    borderTop: calDragOver === idx && calDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.5)' : '1.5px solid transparent',
-                    cursor: 'pointer',
-                    opacity: calDragIdx === idx ? 0.35 : 1,
-                    transition:'background 0.1s, opacity 0.1s',
-                  }}
-                  onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.04)'}
-                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-                >
-                  {/* Drag handle */}
+            <div style={{ position:'relative' }}>
+              <div ref={taskListRef} style={{ display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto', padding:'4px 0 2px' }}>
+                {pendingTasks.length === 0 && (
+                  <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'10px 10px' }}>No pending tasks — add one above.</p>
+                )}
+                {pendingTasks.map((t, idx) => (
                   <div
+                    key={t.id}
                     draggable={true}
                     onDragStart={e => { setCalDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
                     onDragEnd={() => { setCalDragIdx(null); setCalDragOver(null) }}
-                    onClick={e => e.stopPropagation()}
-                    style={{ cursor:'grab', color:'rgba(163,201,255,0.18)', display:'flex', flexShrink:0, padding:'0 1px' }}
-                    onMouseEnter={e=>e.currentTarget.style.color='rgba(163,201,255,0.45)'}
-                    onMouseLeave={e=>e.currentTarget.style.color='rgba(163,201,255,0.18)'}
+                    onClick={() => setCalTaskModal({ open: true, task: t })}
+                    onDragOver={e => { e.preventDefault(); setCalDragOver(idx) }}
+                    onDrop={e => { e.preventDefault(); reorderPendingTasks(calDragIdx, idx); setCalDragIdx(null); setCalDragOver(null) }}
+                    style={{
+                      display:'flex', alignItems:'center', gap:8, padding:'8px 10px',
+                      border: calDragIdx === idx
+                        ? '1px solid rgba(96,165,250,0.6)'
+                        : calDragOver === idx && calDragIdx !== null
+                        ? '1px solid rgba(96,165,250,0.55)'
+                        : '1px solid rgba(96,165,250,0.15)',
+                      background: calDragIdx === idx
+                        ? 'rgba(96,165,250,0.1)'
+                        : calDragOver === idx && calDragIdx !== null
+                        ? 'rgba(96,165,250,0.06)'
+                        : 'rgba(96,165,250,0.02)',
+                      cursor: calDragIdx === idx ? 'grabbing' : 'grab',
+                      userSelect: 'none',
+                      transition: 'border-color 0.1s, background 0.1s',
+                    }}
+                    onMouseEnter={e => { if (calDragIdx === null) { e.currentTarget.style.background='rgba(96,165,250,0.06)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.28)' } }}
+                    onMouseLeave={e => { if (calDragIdx === null) { e.currentTarget.style.background='rgba(96,165,250,0.02)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.15)' } }}
                   >
-                    <GripVertical size={12}/>
+                    <GripVertical size={12} style={{ color:'rgba(163,201,255,0.22)', flexShrink:0, pointerEvents:'none' }}/>
+
+                    <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority||'medium'], display:'flex', flexShrink:0, padding:0 }}>
+                      <Circle size={14}/>
+                    </button>
+
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <p title={t.title} style={{ fontSize:12, color:'#c0c7d5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{t.title}</p>
+                      <p style={{ fontFamily:MONO, fontSize:8, marginTop:1, color: isPast(startOfDay(parseISO(t.due))) && !isToday(parseISO(t.due)) ? '#a78bfa' : '#3a4455' }}>
+                        {isToday(parseISO(t.due)) ? 'Today' : format(parseISO(t.due), 'MMM d')}
+                      </p>
+                    </div>
+
+                    <button onClick={e => { e.stopPropagation(); deleteTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.18)', display:'flex', padding:0, flexShrink:0, transition:'color 0.15s' }}
+                      onMouseEnter={e=>e.currentTarget.style.color='#f87171'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.18)'}>
+                      <Trash2 size={11}/>
+                    </button>
                   </div>
+                ))}
+                {doneTasks.length > 0 && (
+                  <details style={{ marginTop:2 }}>
+                    <summary style={{ fontFamily:MONO, fontSize:8, color:'rgba(160,200,255,0.3)', cursor:'pointer', padding:'4px 2px', letterSpacing:'0.06em', textTransform:'uppercase' }}>
+                      {doneTasks.length} completed
+                    </summary>
+                    {doneTasks.map(t => (
+                      <div key={t.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', opacity:0.4 }}>
+                        <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#4edea3', display:'flex', flexShrink:0, padding:0 }}><Check size={14}/></button>
+                        <p style={{ fontSize:11, color:'#5a6478', textDecoration:'line-through', flex:1 }}>{t.title}</p>
+                        <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0 }}><X size={10}/></button>
+                      </div>
+                    ))}
+                  </details>
+                )}
+              </div>
 
-                  {/* Complete toggle */}
-                  <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority||'medium'], display:'flex', flexShrink:0, padding:0 }}>
-                    <Circle size={14}/>
-                  </button>
-
-                  {/* Title + date */}
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <p title={t.title} style={{ fontSize:12, color:'#c0c7d5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{t.title}</p>
-                    <p style={{ fontFamily:MONO, fontSize:8, marginTop:1, color: isPast(startOfDay(parseISO(t.due))) && !isToday(parseISO(t.due)) ? '#a78bfa' : '#3a4455' }}>
-                      {isToday(parseISO(t.due)) ? 'Today' : format(parseISO(t.due), 'MMM d')}
-                    </p>
-                  </div>
-
-                  {/* Delete */}
-                  <button onClick={e => { e.stopPropagation(); deleteTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.18)', display:'flex', padding:0, flexShrink:0, transition:'color 0.15s' }}
-                    onMouseEnter={e=>e.currentTarget.style.color='#f87171'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.18)'}>
-                    <Trash2 size={11}/>
+              {/* Scroll-down indicator */}
+              {taskListScrollable && (
+                <div style={{ position:'absolute', bottom:0, left:0, right:0, pointerEvents:'none',
+                  background:'linear-gradient(to bottom, transparent, rgba(6,11,20,0.9))',
+                  height:36, display:'flex', alignItems:'flex-end', justifyContent:'center', paddingBottom:4 }}>
+                  <button
+                    style={{ pointerEvents:'all', background:'rgba(96,165,250,0.12)', border:'0.5px solid rgba(96,165,250,0.3)', color:'#60a5fa',
+                      fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.08em', padding:'3px 10px', cursor:'pointer', transition:'background 0.15s' }}
+                    onClick={() => taskListRef.current?.scrollBy({ top: 120, behavior:'smooth' })}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.22)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.12)'}>
+                    ↓ more
                   </button>
                 </div>
-              ))}
-              {doneTasks.length > 0 && (
-                <details style={{ marginTop:4 }}>
-                  <summary style={{ fontFamily:MONO, fontSize:8, color:'rgba(160,200,255,0.3)', cursor:'pointer', padding:'4px 0', letterSpacing:'0.06em', textTransform:'uppercase' }}>
-                    {doneTasks.length} completed
-                  </summary>
-                  {doneTasks.map(t => (
-                    <div key={t.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'6px 10px', opacity:0.4 }}>
-                      <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'#4edea3', display:'flex', flexShrink:0, padding:0 }}><Check size={14}/></button>
-                      <p style={{ fontSize:11, color:'#5a6478', textDecoration:'line-through', flex:1 }}>{t.title}</p>
-                      <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0 }}><X size={10}/></button>
-                    </div>
-                  ))}
-                </details>
               )}
             </div>
           </Card>
