@@ -597,6 +597,7 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                         <Circle size={13}/>
                       </button>
                       <span onClick={() => openEdit(t)}
+                        title={t.title}
                         style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',cursor:'pointer',transition:'color 0.15s'}}
                         onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
                         onMouseLeave={e => e.currentTarget.style.color='#c8dcff'}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const NUM  = 'Geist Mono, monospace'
 const BODY = 'Geist, Inter, -apple-system, sans-serif'
@@ -11,11 +11,31 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
+// Small chevron SVGs — no lucide dependency needed here
+function ChevronDown() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  )
+}
+function ChevronUp() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  )
+}
+
 export default function TaskModal({ open, task, onClose, onSave }) {
   const isNew = !task?.id
-  const [form, setForm] = useState({ title: '', date: todayISO(), desc: '', importance: 3 })
-  const [visible, setVisible] = useState(false)
+  const [form, setForm]           = useState({ title: '', date: todayISO(), desc: '', importance: 3 })
+  const [visible, setVisible]     = useState(false)
+  const [expanded, setExpanded]   = useState(false)
+  const [overflows, setOverflows] = useState(false)
+  const titleRef = useRef(null)
 
+  // Reset form + expansion whenever the modal opens for a (new) task
   useEffect(() => {
     if (open) {
       setForm({
@@ -24,18 +44,31 @@ export default function TaskModal({ open, task, onClose, onSave }) {
         desc:       task?.note     || '',
         importance: priorityToImp(task?.priority || 'medium'),
       })
+      setExpanded(false)
+      setOverflows(false)
       requestAnimationFrame(() => setVisible(true))
     } else {
       setVisible(false)
     }
   }, [open, task])
 
+  // Escape key
   useEffect(() => {
     if (!open) return
     const h = e => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [open, onClose])
+
+  // Detect whether the single-line input overflows so we can show the expand arrow
+  useEffect(() => {
+    if (expanded) return
+    requestAnimationFrame(() => {
+      if (titleRef.current) {
+        setOverflows(titleRef.current.scrollWidth > titleRef.current.clientWidth)
+      }
+    })
+  }, [form.title, expanded, visible])
 
   function save() {
     if (!form.title.trim()) return
@@ -49,6 +82,15 @@ export default function TaskModal({ open, task, onClose, onSave }) {
   }
 
   if (!open && !visible) return null
+
+  const inputBase = {
+    background: 'rgba(255,255,255,0.03)',
+    border: '0.5px solid rgba(163,201,255,0.14)',
+    color: '#e2e2e8', fontSize: 14, fontFamily: BODY,
+    outline: 'none', width: '100%', boxSizing: 'border-box',
+    // leave room on the right for the expand button
+    padding: '10px 36px 10px 14px',
+  }
 
   return (
     <div
@@ -74,6 +116,7 @@ export default function TaskModal({ open, task, onClose, onSave }) {
         }}
         onClick={e => e.stopPropagation()}
       >
+        {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h2 style={{ fontFamily: NUM, fontSize: 13, fontWeight: 800, color: '#e2e2e8', letterSpacing: '-0.01em', margin: 0 }}>
             {isNew ? 'New Task' : 'Edit Task'}
@@ -86,21 +129,53 @@ export default function TaskModal({ open, task, onClose, onSave }) {
           >×</button>
         </div>
 
-        <input
-          autoFocus
-          value={form.title}
-          onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-          onKeyDown={e => e.key === 'Enter' && save()}
-          placeholder="Task title…"
-          style={{
-            padding: '10px 14px',
-            background: 'rgba(255,255,255,0.03)',
-            border: '0.5px solid rgba(163,201,255,0.14)',
-            color: '#e2e2e8', fontSize: 14, fontFamily: BODY,
-            outline: 'none', width: '100%', boxSizing: 'border-box',
-          }}
-        />
+        {/* Title field with expand toggle */}
+        <div style={{ position: 'relative' }}>
+          {expanded ? (
+            <textarea
+              ref={titleRef}
+              autoFocus
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              rows={3}
+              style={{ ...inputBase, resize: 'none', lineHeight: 1.5 }}
+            />
+          ) : (
+            <input
+              ref={titleRef}
+              autoFocus
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              onKeyDown={e => e.key === 'Enter' && save()}
+              placeholder="Task title…"
+              style={inputBase}
+            />
+          )}
 
+          {/* Expand/collapse arrow — only visible when text overflows or is already expanded */}
+          {(overflows || expanded) && (
+            <button
+              onClick={() => setExpanded(v => !v)}
+              title={expanded ? 'Collapse' : 'Expand'}
+              style={{
+                position: 'absolute',
+                right: 8,
+                top: expanded ? 10 : '50%',
+                transform: expanded ? 'none' : 'translateY(-50%)',
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: 'rgba(163,201,255,0.35)',
+                display: 'flex', padding: 2,
+                transition: 'color 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'rgba(163,201,255,0.75)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(163,201,255,0.35)'}
+            >
+              {expanded ? <ChevronUp /> : <ChevronDown />}
+            </button>
+          )}
+        </div>
+
+        {/* Date */}
         <input
           type="date"
           value={form.date}
@@ -115,6 +190,7 @@ export default function TaskModal({ open, task, onClose, onSave }) {
           }}
         />
 
+        {/* Description */}
         <textarea
           value={form.desc}
           onChange={e => setForm(f => ({ ...f, desc: e.target.value }))}
@@ -130,6 +206,7 @@ export default function TaskModal({ open, task, onClose, onSave }) {
           }}
         />
 
+        {/* Importance */}
         <div>
           <p style={{ fontFamily: NUM, fontSize: 9, color: 'rgba(163,201,255,0.3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
             Importance
@@ -153,6 +230,7 @@ export default function TaskModal({ open, task, onClose, onSave }) {
           </div>
         </div>
 
+        {/* Save */}
         <button
           onClick={save}
           style={{
