@@ -140,9 +140,9 @@ export default function Sidebar() {
       {/* Close strip */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'8px 10px 6px', borderBottom:'1px solid rgba(48,54,61,0.4)', flexShrink:0 }}>
         <button onClick={toggle}
-          style={{ display:'flex', alignItems:'center', gap:5, background:'rgba(78,222,163,0.07)', border:'0.5px solid rgba(78,222,163,0.2)', cursor:'pointer', color:'#4edea3', padding:'4px 10px', fontFamily:MONO, fontSize:9, fontWeight:800, letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.15s' }}
-          onMouseEnter={e => { e.currentTarget.style.background='rgba(78,222,163,0.14)'; e.currentTarget.style.borderColor='rgba(78,222,163,0.4)' }}
-          onMouseLeave={e => { e.currentTarget.style.background='rgba(78,222,163,0.07)'; e.currentTarget.style.borderColor='rgba(78,222,163,0.2)' }}>
+          style={{ display:'flex', alignItems:'center', gap:4, background:'none', border:'none', cursor:'pointer', color:'#4a6fa5', padding:'4px 8px', fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', transition:'color 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
+          onMouseLeave={e => e.currentTarget.style.color='#4a6fa5'}>
           <ChevronLeft size={11}/> Close
         </button>
       </div>
