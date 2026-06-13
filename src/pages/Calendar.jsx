@@ -235,6 +235,8 @@ export default function Calendar() {
   const [calDragIdx,  setCalDragIdx]  = useState(null)
   const [calDragOver, setCalDragOver] = useState(null)
   const [calDragItemH, setCalDragItemH] = useState(40)
+  const calDragFromRef = useRef(null)
+  const calDragToRef   = useRef(null)
   const taskListRef = useRef(null)
   const [taskListScrollable, setTaskListScrollable] = useState(false)
   const [taskScrollTop, setTaskScrollTop] = useState(0)
@@ -471,7 +473,7 @@ export default function Calendar() {
 
             {/* Task list */}
             <div style={{ display:'flex', gap:6 }}>
-              <div ref={taskListRef} style={{ flex:1, display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto', padding:'4px 0 2px', scrollbarWidth:'none', msOverflowStyle:'none' }}>
+              <div ref={taskListRef} onDragOver={e => e.preventDefault()} style={{ flex:1, display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto', padding:'4px 0 2px', scrollbarWidth:'none', msOverflowStyle:'none' }}>
                 {pendingTasks.length === 0 && (
                   <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'10px 10px' }}>No pending tasks — add one above.</p>
                 )}
@@ -484,6 +486,8 @@ export default function Calendar() {
                       const rect = el.getBoundingClientRect()
                       setCalDragItemH(rect.height)
                       setCalDragIdx(idx)
+                      calDragFromRef.current = idx
+                      calDragToRef.current   = idx
                       e.dataTransfer.effectAllowed = 'move'
                       const clone = el.cloneNode(true)
                       Object.assign(clone.style, {
@@ -495,10 +499,18 @@ export default function Calendar() {
                       e.dataTransfer.setDragImage(clone, e.clientX - rect.left, e.clientY - rect.top)
                       requestAnimationFrame(() => { if (document.body.contains(clone)) document.body.removeChild(clone) })
                     }}
-                    onDragEnd={() => { setCalDragIdx(null); setCalDragOver(null) }}
+                    onDragEnd={() => {
+                      const from = calDragFromRef.current
+                      const to   = calDragToRef.current
+                      calDragFromRef.current = null
+                      calDragToRef.current   = null
+                      setCalDragIdx(null)
+                      setCalDragOver(null)
+                      if (from !== null && to !== null && from !== to) reorderPendingTasks(from, to)
+                    }}
                     onClick={() => { if (calDragIdx === null) setCalTaskModal({ open: true, task: t }) }}
-                    onDragOver={e => { e.preventDefault(); setCalDragOver(idx) }}
-                    onDrop={e => { e.preventDefault(); reorderPendingTasks(calDragIdx, idx); setCalDragIdx(null); setCalDragOver(null) }}
+                    onDragOver={e => { e.preventDefault(); setCalDragOver(idx); calDragToRef.current = idx }}
+                    onDrop={e => { e.preventDefault() }}
                     style={{
                       display:'flex', alignItems:'center', gap:8, padding:'8px 10px',
                       border: calDragOver === idx && calDragIdx !== null && calDragIdx !== idx

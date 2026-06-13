@@ -52,6 +52,8 @@ export default function EngageWidget() {
   const [wDragIdx,  setWDragIdx]  = useState(null)
   const [wDragOver, setWDragOver] = useState(null)
   const [wDragItemH, setWDragItemH] = useState(36)
+  const wDragFromRef = useRef(null)
+  const wDragToRef   = useRef(null)
 
   const [lastCompleted, setLastCompleted] = useState(null)
   const undoTimer = useRef(null)
@@ -602,7 +604,7 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                 </div>
 
                 {/* Task list */}
-                <div style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
+                <div onDragOver={e => e.preventDefault()} style={{ flex:1, overflowY:'auto', paddingBottom:8 }}>
                   {/* Undo toast */}
                   {lastCompleted && (
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 12px',background:'rgba(78,222,163,0.07)',borderBottom:'1px solid rgba(78,222,163,0.15)'}}>
@@ -627,6 +629,8 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                         const rect = el.getBoundingClientRect()
                         setWDragItemH(rect.height)
                         setWDragIdx(idx)
+                        wDragFromRef.current = idx
+                        wDragToRef.current   = idx
                         e.dataTransfer.effectAllowed = 'move'
                         const clone = el.cloneNode(true)
                         Object.assign(clone.style, {
@@ -638,10 +642,18 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                         e.dataTransfer.setDragImage(clone, e.clientX - rect.left, e.clientY - rect.top)
                         requestAnimationFrame(() => { if (document.body.contains(clone)) document.body.removeChild(clone) })
                       }}
-                      onDragEnd={() => { setWDragIdx(null); setWDragOver(null) }}
+                      onDragEnd={() => {
+                        const from = wDragFromRef.current
+                        const to   = wDragToRef.current
+                        wDragFromRef.current = null
+                        wDragToRef.current   = null
+                        setWDragIdx(null)
+                        setWDragOver(null)
+                        if (from !== null && to !== null && from !== to) reorderWidgetTasks(from, to)
+                      }}
                       onClick={() => { if (wDragIdx === null) openEdit(t) }}
-                      onDragOver={e => { e.preventDefault(); setWDragOver(idx) }}
-                      onDrop={e => { e.preventDefault(); reorderWidgetTasks(wDragIdx, idx); setWDragIdx(null); setWDragOver(null) }}
+                      onDragOver={e => { e.preventDefault(); setWDragOver(idx); wDragToRef.current = idx }}
+                      onDrop={e => { e.preventDefault() }}
                       style={{
                         display:'flex', alignItems:'center', gap:6, padding:'7px 10px',
                         borderTop: wDragOver === idx && wDragIdx !== null && wDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.55)' : '1.5px solid transparent',
