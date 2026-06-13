@@ -45,23 +45,46 @@ export default function Auth() {
       </div>
 
       {/* ── Top bar ── */}
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '30px 52px' }}>
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 48px', height: 58, borderBottom: '1px solid rgba(255,255,255,0.055)' }}>
 
-        {/* Logo: T + trackr */}
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 11 }}>
-          <span style={{ fontFamily: SERIF, fontSize: 46, fontWeight: 700, color: '#ffffff', lineHeight: 1, letterSpacing: '-0.02em' }}>T</span>
-          <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 400, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.32em', textTransform: 'uppercase', paddingBottom: 3 }}>TRACKR</span>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexShrink: 0 }}>
+          <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
+            <rect width="34" height="34" fill="#0c1a2e"/>
+            <polyline points="4,17 8,17 10.5,10 14,24 17,12 20,20 23,20 26,17 30,17"
+              stroke="#00d4ff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em' }}>Trackr</span>
         </div>
 
-        {/* Sign in trigger */}
-        <button
-          onClick={() => setShowForm(true)}
-          style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: 'rgba(163,201,255,0.6)', letterSpacing: '0.12em', textTransform: 'uppercase', background: 'rgba(163,201,255,0.04)', border: '0.5px solid rgba(163,201,255,0.12)', padding: '9px 24px', cursor: 'pointer', transition: 'all .18s' }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(163,201,255,0.09)'; e.currentTarget.style.color = '#a3c9ff'; e.currentTarget.style.borderColor = 'rgba(163,201,255,0.28)' }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(163,201,255,0.04)'; e.currentTarget.style.color = 'rgba(163,201,255,0.6)'; e.currentTarget.style.borderColor = 'rgba(163,201,255,0.12)' }}
-        >
-          Sign in →
-        </button>
+        {/* Center nav */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+          {[['Product', null], ['Features', null], ['Pricing', null], ['Roadmap', null]].map(([label]) => (
+            <button key={label}
+              onClick={() => label === 'Pricing' || label === 'Product' ? null : null}
+              style={{ fontFamily: SANS, fontSize: 13, fontWeight: 400, color: 'rgba(200,210,230,0.55)', background: 'none', border: 'none', padding: '6px 16px', cursor: 'pointer', letterSpacing: '-0.01em', whiteSpace: 'nowrap', transition: 'color 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(200,210,230,0.55)'}
+            >{label}</button>
+          ))}
+        </nav>
+
+        {/* Right: Log in + Sign up */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          <button
+            onClick={() => { setMode('signin'); setShowForm(true) }}
+            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: 'rgba(200,210,230,0.65)', background: 'none', border: 'none', padding: '7px 16px', cursor: 'pointer', transition: 'color 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
+            onMouseLeave={e => e.currentTarget.style.color = 'rgba(200,210,230,0.65)'}
+          >Log in</button>
+          <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)', margin: '0 4px' }}/>
+          <button
+            onClick={() => { setMode('signup'); setShowForm(true) }}
+            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: '#050810', background: '#ffffff', border: 'none', padding: '7px 18px', cursor: 'pointer', letterSpacing: '-0.01em', transition: 'background 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.88)'}
+            onMouseLeave={e => e.currentTarget.style.background = '#ffffff'}
+          >Sign up</button>
+        </div>
       </div>
 
       {/* ── Centered hero ── */}
