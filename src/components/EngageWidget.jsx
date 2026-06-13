@@ -529,7 +529,7 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                       style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:shiftGoal?'rgba(96,165,250,0.08)':'transparent',border:`1px solid ${shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)'}`,color:shiftGoal?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s',whiteSpace:'nowrap'}}
                       onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
                       onMouseLeave={e=>{e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)';e.currentTarget.style.color=shiftGoal?'#60a5fa':'#3a6090'}}>
-                      <Plus size={9}/> {shiftGoalLabel || 'Add shift'}
+                      {!shiftGoal && <Plus size={9}/>} {shiftGoalLabel || 'Add shift'}
                     </button>
                     <button onClick={()=>setShowAdd(true)}
                       style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
@@ -559,7 +559,16 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                       Tasks
                     </button>
                     {pending.length > 0 && (
-                      <span style={{fontFamily:NUM,fontSize:8,fontWeight:900,color:'#60a5fa',background:'rgba(96,165,250,0.15)',border:'1px solid rgba(96,165,250,0.3)',padding:'1px 6px',boxShadow:'0 0 6px rgba(96,165,250,0.2)'}}>
+                      <span style={{
+                        fontFamily:NUM, fontSize:9, fontWeight:900,
+                        color:'#60a5fa',
+                        background:'rgba(96,165,250,0.14)',
+                        border:'1px solid rgba(96,165,250,0.35)',
+                        boxShadow:'0 0 8px rgba(96,165,250,0.22), inset 0 1px 0 rgba(163,201,255,0.15)',
+                        display:'inline-flex', alignItems:'center', justifyContent:'center',
+                        minWidth:18, height:18, padding:'0 5px',
+                        lineHeight:1,
+                      }}>
                         {pending.length}
                       </span>
                     )}
