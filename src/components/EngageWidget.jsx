@@ -56,6 +56,18 @@ export default function EngageWidget() {
   const [lastCompleted, setLastCompleted] = useState(null)
   const undoTimer = useRef(null)
 
+  const [shiftGoal, setShiftGoal]       = useState(null)
+  const [goalForm, setGoalForm]         = useState({ type: 'duration', hours: 8, endTime: '18:00' })
+  const [showSetShift, setShowSetShift] = useState(false)
+  const [checkInState, setCheckInState] = useState(null)
+  const [lastCheckIn, setLastCheckIn]   = useState(null)
+  const twoHourRef   = useRef(null)
+  const checkInRef   = useRef(null)
+  const shiftGoalRef = useRef(null)
+  const logRef         = useRef([])
+  const shiftStartRef  = useRef(null)
+  const sessionDateRef = useRef(null)
+
   const navigate  = useNavigate()
   const timer     = useRef(null)
   const widgetRef = useRef(null)
@@ -88,6 +100,53 @@ export default function EngageWidget() {
 
   useEffect(() => { save({ status, log, custom, shiftStart, sessionDate, date: today }) }, [status, log, custom, shiftStart, sessionDate])
   useEffect(() => { saveTasks(tasks) }, [tasks])
+
+  // Keep refs in sync so timer callbacks always read latest state
+  useEffect(() => { logRef.current = log }, [log])
+  useEffect(() => { shiftStartRef.current = shiftStart }, [shiftStart])
+  useEffect(() => { sessionDateRef.current = sessionDate }, [sessionDate])
+
+  // Load / persist shift goal across sessions
+  useEffect(() => {
+    try { const g = localStorage.getItem('trackr_shift_goal'); if (g) setShiftGoal(JSON.parse(g)) } catch {}
+  }, [])
+  useEffect(() => {
+    try {
+      if (shiftGoal) localStorage.setItem('trackr_shift_goal', JSON.stringify(shiftGoal))
+      else localStorage.removeItem('trackr_shift_goal')
+    } catch {}
+  }, [shiftGoal])
+
+  // 2-hour check-in timer: fires when worker has been active for 2h without confirming
+  useEffect(() => {
+    clearTimeout(twoHourRef.current)
+    if (status === null || shiftStart === null || checkInState) return
+    const base   = lastCheckIn || shiftStart
+    const cutoff = base + 2 * 60 * 60 * 1000
+    const ms     = cutoff - Date.now()
+    if (ms <= 0) {
+      fireCheckIn(cutoff)
+    } else {
+      twoHourRef.current = setTimeout(() => fireCheckIn(cutoff), ms)
+    }
+    return () => clearTimeout(twoHourRef.current)
+  }, [status, shiftStart, lastCheckIn, checkInState]) // eslint-disable-line
+
+  // Shift goal notification when goal time is reached
+  useEffect(() => {
+    clearTimeout(shiftGoalRef.current)
+    if (!shiftGoal || !shiftStart || status === null) return
+    const goalEnd = getGoalEnd(shiftGoal, shiftStart)
+    if (!goalEnd) return
+    const ms = goalEnd - Date.now()
+    if (ms <= 0) return
+    shiftGoalRef.current = setTimeout(() => {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification('Trackr — Shift complete!', { body: 'Your shift goal is up. Time to clock out!', tag: 'trackr-goal' })
+      }
+    }, ms)
+    return () => clearTimeout(shiftGoalRef.current)
+  }, [shiftGoal, shiftStart, status]) // eslint-disable-line
 
   useEffect(() => {
     const handler = () => setTasks(loadTasks())
@@ -131,22 +190,91 @@ export default function EngageWidget() {
     setStatus(key)
   }
 
-  function endShift() {
-    const now = Date.now()
-    const recordDate = sessionDate || today  // always attribute to the day clock-in happened
-    const finalLog = log.map((e,i) => i===log.length-1 && !e.end ? {...e,end:now} : e)
+  function fmtCountdown(ms) {
+    if (!ms || ms <= 0) return '0:00'
+    const m = Math.floor(ms / 60000)
+    const s = Math.floor((ms % 60000) / 1000)
+    return `${m}:${String(s).padStart(2, '0')}`
+  }
+
+  function getGoalEnd(goal, start) {
+    if (!goal || !start) return null
+    if (goal.type === 'duration') return start + goal.hours * 3600 * 1000
+    const [h, m] = goal.endTime.split(':').map(Number)
+    const d = new Date(start); d.setHours(h, m, 0, 0)
+    if (d.getTime() <= start) d.setDate(d.getDate() + 1)
+    return d.getTime()
+  }
+
+  function doEndShift(rawLog, endTime, theShiftStart, theSessionDate) {
+    const now = endTime ?? Date.now()
+    const recordDate = theSessionDate || today
+    const finalLog = rawLog.map((e, i) => i === rawLog.length - 1 && !e.end ? { ...e, end: now } : e)
     const finalTotals = {}
-    for (const e of finalLog) { const s=Math.floor((e.end-e.start)/1000); finalTotals[e.status]=(finalTotals[e.status]||0)+s }
-    const totalSecs = shiftStart ? Math.floor((now-shiftStart)/1000) : 0
+    for (const e of finalLog) {
+      if (e.end && e.start) {
+        const s = Math.floor((e.end - e.start) / 1000)
+        finalTotals[e.status] = (finalTotals[e.status] || 0) + s
+      }
+    }
+    const totalSecs = theShiftStart ? Math.floor((now - theShiftStart) / 1000) : 0
     try {
-      const hist = JSON.parse(localStorage.getItem('trackr_history')||'[]')
-      const idx  = hist.findIndex(h=>h.date===recordDate)
-      const record = { date:recordDate, total:totalSecs, statuses:finalTotals, shiftStart, shiftEnd:now }
-      if (idx>=0) hist[idx]=record; else hist.push(record)
-      hist.sort((a,b)=>new Date(b.date)-new Date(a.date))
-      localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0,60)))
+      const hist = JSON.parse(localStorage.getItem('trackr_history') || '[]')
+      const idx  = hist.findIndex(h => h.date === recordDate)
+      const record = { date: recordDate, total: totalSecs, statuses: finalTotals, shiftStart: theShiftStart, shiftEnd: now }
+      if (idx >= 0) hist[idx] = record; else hist.push(record)
+      hist.sort((a, b) => new Date(b.date) - new Date(a.date))
+      localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0, 60)))
     } catch {}
-    setLog(finalLog); setStatus(null); setShiftStart(null); setTab('activity')
+    clearTimeout(twoHourRef.current)
+    clearTimeout(checkInRef.current)
+    clearTimeout(shiftGoalRef.current)
+    setLog(finalLog); setStatus(null); setShiftStart(null); setSessionDate(null)
+    setCheckInState(null); setLastCheckIn(null); setTab('activity')
+  }
+
+  function endShift() {
+    doEndShift(log, Date.now(), shiftStart, sessionDate)
+  }
+
+  function fireCheckIn(cutoffTime) {
+    if (typeof Notification !== 'undefined') {
+      const send = () => new Notification('Trackr — Still working?', {
+        body: 'You have 30 minutes to confirm, or your shift auto-ends.',
+        tag: 'trackr-checkin',
+      })
+      if (Notification.permission === 'granted') send()
+      else if (Notification.permission === 'default') {
+        Notification.requestPermission().then(p => { if (p === 'granted') send() })
+      }
+    }
+    const deadline = Date.now() + 30 * 60 * 1000
+    setCheckInState({ deadline, cutoffTime })
+    clearTimeout(checkInRef.current)
+    checkInRef.current = setTimeout(() => {
+      const cur = logRef.current
+      const trimmed = cur.reduce((acc, e) => {
+        if (e.start >= cutoffTime) return acc
+        acc.push(!e.end || e.end > cutoffTime ? { ...e, end: cutoffTime } : e)
+        return acc
+      }, [])
+      doEndShift(trimmed, cutoffTime, shiftStartRef.current, sessionDateRef.current)
+    }, 30 * 60 * 1000)
+  }
+
+  function confirmStillHere() {
+    clearTimeout(checkInRef.current)
+    setCheckInState(null)
+    setLastCheckIn(Date.now())
+  }
+
+  function saveShiftGoal() {
+    setShiftGoal(
+      goalForm.type === 'duration'
+        ? { type: 'duration', hours: Math.max(0.5, parseFloat(goalForm.hours) || 8) }
+        : { type: 'deadline', endTime: goalForm.endTime }
+    )
+    setShowSetShift(false)
   }
 
   function addCustom() {
@@ -216,6 +344,14 @@ export default function EngageWidget() {
   const BG      = '#07090f'
   const BORDER  = 'rgba(60,100,200,0.18)'
   const DIVIDER = 'rgba(40,80,180,0.12)'
+
+  const goalEnd       = getGoalEnd(shiftGoal, shiftStart)
+  const goalRemaining = goalEnd ? Math.max(0, goalEnd - Date.now()) : null
+  const goalOver      = goalEnd !== null && goalRemaining === 0
+
+  const shiftGoalLabel = !shiftGoal ? null
+    : shiftGoal.type === 'duration' ? `${shiftGoal.hours}h shift`
+    : `ends ${shiftGoal.endTime}`
 
   return (
     <div ref={widgetRef} style={{ position:'fixed', bottom:0, right:0, width: tab ? 620 : 340, zIndex:9999, fontFamily:BODY, display:'flex', flexDirection:'column', transition:'width 0.2s cubic-bezier(0.22,1,0.36,1)' }}>
@@ -318,7 +454,33 @@ export default function EngageWidget() {
                       <div style={{width:7,height:7,borderRadius:'50%',background:cur.color,boxShadow:`0 0 8px ${cur.color}`,animation:'status-pulse 2s ease-in-out infinite'}}/>
                       <span style={{fontSize:13,fontWeight:800,color:cur.color,letterSpacing:'-0.01em'}}>{cur.label}</span>
                     </div>
-                    <span style={{fontFamily:NUM,fontSize:12,fontWeight:700,color:cur.color}}>{fmt(curSecs)}</span>
+                    <div style={{display:'flex',alignItems:'center',gap:8}}>
+                      {goalRemaining !== null && (
+                        <span style={{fontFamily:NUM,fontSize:9,color: goalOver ? '#ff6b6b' : '#3a6090',letterSpacing:'0.04em'}}>
+                          {goalOver ? 'SHIFT OVER' : fmtCountdown(goalRemaining)}
+                        </span>
+                      )}
+                      <span style={{fontFamily:NUM,fontSize:12,fontWeight:700,color:cur.color}}>{fmt(curSecs)}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2h check-in banner */}
+                {checkInState && (
+                  <div style={{padding:'10px 14px',background:'rgba(255,107,107,0.08)',borderBottom:`1px solid rgba(255,107,107,0.2)`}}>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
+                      <span style={{fontFamily:NUM,fontSize:9,color:'#ff6b6b',letterSpacing:'0.08em',fontWeight:800}}>STILL WORKING?</span>
+                      <span style={{fontFamily:NUM,fontSize:12,color:'#ff6b6b',fontWeight:700}}>{fmtCountdown(checkInState.deadline - Date.now())}</span>
+                    </div>
+                    <p style={{fontSize:10,color:'rgba(255,150,150,0.6)',fontFamily:BODY,margin:'0 0 8px',lineHeight:1.4}}>
+                      No response → auto clock-out, last 30m removed
+                    </p>
+                    <button onClick={confirmStillHere}
+                      style={{width:'100%',padding:'7px',background:'rgba(78,222,163,0.12)',border:'1px solid rgba(78,222,163,0.3)',color:'#4edea3',fontSize:10,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(78,222,163,0.2)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(78,222,163,0.12)'}>
+                      ✓ &nbsp;I'm still here
+                    </button>
                   </div>
                 )}
 
@@ -377,14 +539,69 @@ export default function EngageWidget() {
                     <button onClick={()=>{setShowAdd(false);setNewLabel('')}} style={{padding:'6px 8px',background:'transparent',border:`1px solid rgba(60,120,255,0.25)`,color:'#60a5fa',cursor:'pointer',display:'flex',alignItems:'center'}}><X size={11}/></button>
                   </div>
                 ) : (
-                  <div style={{display:'flex',justifyContent:'flex-end',padding:'7px 14px',borderTop:`1px solid ${DIVIDER}`}}>
-                    <button onClick={()=>setShowAdd(true)}
-                      style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
-                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
-                      onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
-                      <Plus size={9}/> Add status
-                    </button>
-                  </div>
+                  <>
+                    {/* Set Shift panel */}
+                    {showSetShift && (
+                      <div style={{borderTop:`1px solid ${DIVIDER}`,padding:'10px 14px',display:'flex',flexDirection:'column',gap:8}}>
+                        <div style={{display:'flex',gap:5}}>
+                          <button onClick={()=>setGoalForm(f=>({...f,type:'duration'}))}
+                            style={{flex:1,padding:'5px',border:`1px solid ${goalForm.type==='duration'?'rgba(96,165,250,0.45)':'rgba(60,100,200,0.2)'}`,background:goalForm.type==='duration'?'rgba(96,165,250,0.1)':'transparent',color:goalForm.type==='duration'?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}>
+                            Duration
+                          </button>
+                          <button onClick={()=>setGoalForm(f=>({...f,type:'deadline'}))}
+                            style={{flex:1,padding:'5px',border:`1px solid ${goalForm.type==='deadline'?'rgba(96,165,250,0.45)':'rgba(60,100,200,0.2)'}`,background:goalForm.type==='deadline'?'rgba(96,165,250,0.1)':'transparent',color:goalForm.type==='deadline'?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}>
+                            End Time
+                          </button>
+                        </div>
+                        {goalForm.type === 'duration' ? (
+                          <div style={{display:'flex',alignItems:'center',gap:8}}>
+                            <input type="number" min="0.5" max="24" step="0.5" value={goalForm.hours}
+                              onChange={e=>setGoalForm(f=>({...f,hours:e.target.value}))}
+                              style={{flex:1,padding:'6px 8px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:13,fontFamily:NUM,outline:'none',colorScheme:'dark'}}/>
+                            <span style={{fontSize:10,color:'#3a6090',fontFamily:BODY}}>hours</span>
+                          </div>
+                        ) : (
+                          <input type="time" value={goalForm.endTime}
+                            onChange={e=>setGoalForm(f=>({...f,endTime:e.target.value}))}
+                            style={{padding:'6px 8px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:13,fontFamily:NUM,outline:'none',colorScheme:'dark',width:'100%',boxSizing:'border-box'}}/>
+                        )}
+                        <div style={{display:'flex',gap:5}}>
+                          <button onClick={saveShiftGoal}
+                            style={{flex:1,padding:'6px',background:'rgba(96,165,250,0.15)',border:'1px solid rgba(96,165,250,0.35)',color:'#60a5fa',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'background 0.15s'}}
+                            onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.25)'}
+                            onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.15)'}>
+                            Set
+                          </button>
+                          {shiftGoal && (
+                            <button onClick={()=>{setShiftGoal(null);setShowSetShift(false)}}
+                              style={{padding:'6px 10px',background:'transparent',border:'1px solid rgba(255,107,107,0.25)',color:'#ff6b6b',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em'}}>
+                              Clear
+                            </button>
+                          )}
+                          <button onClick={()=>setShowSetShift(false)}
+                            style={{padding:'6px 10px',background:'transparent',border:`1px solid rgba(60,100,200,0.2)`,color:'#3a6090',fontSize:9,fontFamily:BODY,cursor:'pointer'}}>
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bottom action row: Set Shift (left) | Add Status (right) */}
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 14px',borderTop:`1px solid ${DIVIDER}`}}>
+                      <button onClick={()=>setShowSetShift(v=>!v)}
+                        style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background: showSetShift?'rgba(96,165,250,0.1)':'transparent',border:`1px solid ${showSetShift?'rgba(96,165,250,0.4)':shiftGoal?'rgba(96,165,250,0.25)':'rgba(60,100,200,0.2)'}`,color:showSetShift?'#60a5fa':shiftGoal?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s',whiteSpace:'nowrap'}}
+                        onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
+                        onMouseLeave={e=>{if(!showSetShift){e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.25)':'rgba(60,100,200,0.2)';e.currentTarget.style.color=shiftGoal?'#60a5fa':'#3a6090'}}}>
+                        ⏱ {shiftGoalLabel || 'Set shift'}
+                      </button>
+                      <button onClick={()=>setShowAdd(true)}
+                        style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
+                        onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
+                        onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
+                        <Plus size={9}/> Add status
+                      </button>
+                    </div>
+                  </>
                 )}
               </div>
 
