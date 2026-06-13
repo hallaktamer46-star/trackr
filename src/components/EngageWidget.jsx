@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { Power, Play, Plus, X, Check, Circle, CheckCircle2, GripVertical } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
@@ -136,10 +136,22 @@ export default function EngageWidget() {
   // Shift goal notification when goal time is reached
   useEffect(() => {
     clearTimeout(shiftGoalRef.current)
-    if (!shiftGoal || !shiftStart || status === null) return
-    const goalEnd = getGoalEnd(shiftGoal, shiftStart)
-    if (!goalEnd) return
-    const ms = goalEnd - Date.now()
+    if (!shiftGoal || status === null) return
+    let ms
+    if (shiftGoal.type === 'duration') {
+      try {
+        const hist = JSON.parse(localStorage.getItem('trackr_history') || '[]')
+        const rec  = hist.find(h => h.date === todayStr)
+        const alreadyDone = rec ? rec.total : 0
+        const remaining = Math.max(0, shiftGoal.hours * 3600 - alreadyDone - shiftSecs)
+        ms = remaining * 1000
+      } catch { return }
+    } else {
+      if (!shiftStart) return
+      const goalEnd = getGoalEnd(shiftGoal, shiftStart)
+      if (!goalEnd) return
+      ms = goalEnd - Date.now()
+    }
     if (ms <= 0) return
     shiftGoalRef.current = setTimeout(() => {
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
@@ -147,7 +159,7 @@ export default function EngageWidget() {
       }
     }, ms)
     return () => clearTimeout(shiftGoalRef.current)
-  }, [shiftGoal, shiftStart, status]) // eslint-disable-line
+  }, [shiftGoal, shiftStart, status, shiftSecs]) // eslint-disable-line
 
   useEffect(() => {
     const handler = () => setTasks(loadTasks())
@@ -345,9 +357,24 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
   const BORDER  = 'rgba(60,100,200,0.18)'
   const DIVIDER = 'rgba(40,80,180,0.12)'
 
-  const goalEnd       = getGoalEnd(shiftGoal, shiftStart)
-  const goalRemaining = goalEnd ? Math.max(0, goalEnd - Date.now()) : null
-  const goalOver      = goalEnd !== null && goalRemaining === 0
+  // Total seconds worked today = completed sessions in history + current session
+  const todayHistoryTotal = useMemo(() => {
+    try {
+      const hist = JSON.parse(localStorage.getItem('trackr_history') || '[]')
+      const rec = hist.find(h => h.date === todayStr)
+      return rec ? rec.total : 0
+    } catch { return 0 }
+  }, [todayStr])
+  const totalSecsToday = todayHistoryTotal + shiftSecs
+
+  // Duration goals: remaining = goal - ALL time worked today (survives clock-out/login)
+  // End-time goals: remaining = goalEnd timestamp - now (unchanged)
+  const goalEnd = getGoalEnd(shiftGoal, shiftStart)
+  const goalRemaining = !shiftGoal ? null
+    : shiftGoal.type === 'duration'
+      ? Math.max(0, shiftGoal.hours * 3600 - totalSecsToday) * 1000
+      : goalEnd ? Math.max(0, goalEnd - Date.now()) : null
+  const goalOver = goalRemaining !== null && goalRemaining === 0
 
   const shiftGoalLabel = !shiftGoal ? null
     : shiftGoal.type === 'duration' ? `${shiftGoal.hours}h shift`
