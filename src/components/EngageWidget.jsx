@@ -669,7 +669,7 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                       <GripVertical size={11} style={{ color:'rgba(96,165,250,0.22)', flexShrink:0, pointerEvents:'none' }}/>
 
                       <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }}
-                        style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#2a4898',display:'flex',transition:'color 0.15s'}}
+                        style={{background:'none',border:'none',padding:'8px',margin:'-8px',cursor:'pointer',flexShrink:0,color:'#2a4898',display:'flex',transition:'color 0.15s'}}
                         onMouseEnter={e => e.currentTarget.style.color='#4edea3'}
                         onMouseLeave={e => e.currentTarget.style.color='#2a4898'}>
                         <Circle size={13}/>

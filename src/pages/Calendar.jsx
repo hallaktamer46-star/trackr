@@ -530,7 +530,7 @@ export default function Calendar() {
                   >
                     <GripVertical size={12} style={{ color:'rgba(163,201,255,0.22)', flexShrink:0, pointerEvents:'none' }}/>
 
-                    <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority||'medium'], display:'flex', flexShrink:0, padding:0 }}>
+                    <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority||'medium'], display:'flex', flexShrink:0, padding:'8px', margin:'-8px' }}>
                       <Circle size={14}/>
                     </button>
 
