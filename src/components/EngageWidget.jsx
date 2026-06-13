@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Power, Play, Plus, X, Check, Circle, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
+import SetShiftModal from './SetShiftModal'
 
 const NUM  = 'Geist Mono, monospace'
 const BODY = 'Geist, Inter, -apple-system, sans-serif'
@@ -57,7 +58,6 @@ export default function EngageWidget() {
   const undoTimer = useRef(null)
 
   const [shiftGoal, setShiftGoal]       = useState(null)
-  const [goalForm, setGoalForm]         = useState({ type: 'duration', hours: 8, endTime: '18:00' })
   const [showSetShift, setShowSetShift] = useState(false)
   const [checkInState, setCheckInState] = useState(null)
   const [lastCheckIn, setLastCheckIn]   = useState(null)
@@ -268,14 +268,6 @@ export default function EngageWidget() {
     setLastCheckIn(Date.now())
   }
 
-  function saveShiftGoal() {
-    setShiftGoal(
-      goalForm.type === 'duration'
-        ? { type: 'duration', hours: Math.max(0.5, parseFloat(goalForm.hours) || 8) }
-        : { type: 'deadline', endTime: goalForm.endTime }
-    )
-    setShowSetShift(false)
-  }
 
   function addCustom() {
     const lbl = newLabel.trim(); if (!lbl) return
@@ -539,69 +531,20 @@ export default function EngageWidget() {
                     <button onClick={()=>{setShowAdd(false);setNewLabel('')}} style={{padding:'6px 8px',background:'transparent',border:`1px solid rgba(60,120,255,0.25)`,color:'#60a5fa',cursor:'pointer',display:'flex',alignItems:'center'}}><X size={11}/></button>
                   </div>
                 ) : (
-                  <>
-                    {/* Set Shift panel */}
-                    {showSetShift && (
-                      <div style={{borderTop:`1px solid ${DIVIDER}`,padding:'10px 14px',display:'flex',flexDirection:'column',gap:8}}>
-                        <div style={{display:'flex',gap:5}}>
-                          <button onClick={()=>setGoalForm(f=>({...f,type:'duration'}))}
-                            style={{flex:1,padding:'5px',border:`1px solid ${goalForm.type==='duration'?'rgba(96,165,250,0.45)':'rgba(60,100,200,0.2)'}`,background:goalForm.type==='duration'?'rgba(96,165,250,0.1)':'transparent',color:goalForm.type==='duration'?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}>
-                            Duration
-                          </button>
-                          <button onClick={()=>setGoalForm(f=>({...f,type:'deadline'}))}
-                            style={{flex:1,padding:'5px',border:`1px solid ${goalForm.type==='deadline'?'rgba(96,165,250,0.45)':'rgba(60,100,200,0.2)'}`,background:goalForm.type==='deadline'?'rgba(96,165,250,0.1)':'transparent',color:goalForm.type==='deadline'?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}>
-                            End Time
-                          </button>
-                        </div>
-                        {goalForm.type === 'duration' ? (
-                          <div style={{display:'flex',alignItems:'center',gap:8}}>
-                            <input type="number" min="0.5" max="24" step="0.5" value={goalForm.hours}
-                              onChange={e=>setGoalForm(f=>({...f,hours:e.target.value}))}
-                              style={{flex:1,padding:'6px 8px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:13,fontFamily:NUM,outline:'none',colorScheme:'dark'}}/>
-                            <span style={{fontSize:10,color:'#3a6090',fontFamily:BODY}}>hours</span>
-                          </div>
-                        ) : (
-                          <input type="time" value={goalForm.endTime}
-                            onChange={e=>setGoalForm(f=>({...f,endTime:e.target.value}))}
-                            style={{padding:'6px 8px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:13,fontFamily:NUM,outline:'none',colorScheme:'dark',width:'100%',boxSizing:'border-box'}}/>
-                        )}
-                        <div style={{display:'flex',gap:5}}>
-                          <button onClick={saveShiftGoal}
-                            style={{flex:1,padding:'6px',background:'rgba(96,165,250,0.15)',border:'1px solid rgba(96,165,250,0.35)',color:'#60a5fa',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'background 0.15s'}}
-                            onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.25)'}
-                            onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.15)'}>
-                            Set
-                          </button>
-                          {shiftGoal && (
-                            <button onClick={()=>{setShiftGoal(null);setShowSetShift(false)}}
-                              style={{padding:'6px 10px',background:'transparent',border:'1px solid rgba(255,107,107,0.25)',color:'#ff6b6b',fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em'}}>
-                              Clear
-                            </button>
-                          )}
-                          <button onClick={()=>setShowSetShift(false)}
-                            style={{padding:'6px 10px',background:'transparent',border:`1px solid rgba(60,100,200,0.2)`,color:'#3a6090',fontSize:9,fontFamily:BODY,cursor:'pointer'}}>
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Bottom action row: Set Shift (left) | Add Status (right) */}
-                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 14px',borderTop:`1px solid ${DIVIDER}`}}>
-                      <button onClick={()=>setShowSetShift(v=>!v)}
-                        style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background: showSetShift?'rgba(96,165,250,0.1)':'transparent',border:`1px solid ${showSetShift?'rgba(96,165,250,0.4)':shiftGoal?'rgba(96,165,250,0.25)':'rgba(60,100,200,0.2)'}`,color:showSetShift?'#60a5fa':shiftGoal?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s',whiteSpace:'nowrap'}}
-                        onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
-                        onMouseLeave={e=>{if(!showSetShift){e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.25)':'rgba(60,100,200,0.2)';e.currentTarget.style.color=shiftGoal?'#60a5fa':'#3a6090'}}}>
-                        ⏱ {shiftGoalLabel || 'Set shift'}
-                      </button>
-                      <button onClick={()=>setShowAdd(true)}
-                        style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
-                        onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
-                        onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
-                        <Plus size={9}/> Add status
-                      </button>
-                    </div>
-                  </>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 14px',borderTop:`1px solid ${DIVIDER}`}}>
+                    <button onClick={()=>setShowSetShift(true)}
+                      style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:shiftGoal?'rgba(96,165,250,0.08)':'transparent',border:`1px solid ${shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)'}`,color:shiftGoal?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s',whiteSpace:'nowrap'}}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)';e.currentTarget.style.color=shiftGoal?'#60a5fa':'#3a6090'}}>
+                      ⏱ {shiftGoalLabel || 'Set shift'}
+                    </button>
+                    <button onClick={()=>setShowAdd(true)}
+                      style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
+                      <Plus size={9}/> Add status
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -822,6 +765,14 @@ export default function EngageWidget() {
           </div>
         </div>
       )}
+
+      {/* ── Set Shift full-screen modal ── */}
+      <SetShiftModal
+        open={showSetShift}
+        onClose={() => setShowSetShift(false)}
+        current={shiftGoal}
+        onSave={goal => setShiftGoal(goal)}
+      />
     </div>
   )
 }
