@@ -1,10 +1,11 @@
+import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useSidebar } from '../../contexts/SidebarContext'
 import {
-  Home, LayoutDashboard, Sparkles, Telescope, Rocket, Building2,
-  Briefcase, CalendarDays, BarChart3, Clock, BookOpen, Map, Newspaper,
+  Home, LayoutDashboard, Briefcase, Telescope, Rocket, Building2,
+  CalendarDays, BarChart3, Clock, BookOpen, Map, Newspaper,
   LayoutList, Flame, Brain, Users, PenLine, FileText, Mail,
-  GraduationCap, ChevronLeft, DollarSign,
+  GraduationCap, ChevronLeft, ChevronRight, DollarSign,
 } from 'lucide-react'
 
 const MONO = '"Geist Mono", monospace'
@@ -13,29 +14,19 @@ export const SIDEBAR_W = 230
 
 const SECTIONS = [
   {
-    label: 'MAIN',
+    key: 'main',
+    label: 'MAIN TOOLS',
     items: [
       { to: '/',        icon: Home,            label: 'Home',           end: true },
       { to: '/board',   icon: LayoutDashboard, label: 'Dashboard'               },
-      { to: '/ai',      icon: Sparkles,        label: 'AI Tools'                },
+      { to: '/ai',      icon: Briefcase,       label: 'Job Toolkit'             },
       { to: '/growth',  icon: Telescope,       label: 'Growth Lab'              },
       { to: '/startup', icon: Rocket,          label: 'Startup Studio'          },
       { to: '/pitch',   icon: Building2,       label: 'Pitch Lab'               },
     ],
   },
   {
-    label: 'TOOLS',
-    items: [
-      { to: '/jobs',        icon: Briefcase,    label: 'Jobs'        },
-      { to: '/calendar',    icon: CalendarDays, label: 'Calendar'    },
-      { to: '/stats',       icon: BarChart3,    label: 'Stats'       },
-      { to: '/time-report', icon: Clock,        label: 'Time Report' },
-      { to: '/blog',        icon: Newspaper,    label: 'Community'   },
-      { to: '/roadmap',     icon: Map,          label: 'Roadmap'     },
-      { to: '/library',     icon: BookOpen,     label: 'Library'     },
-    ],
-  },
-  {
+    key: 'cv',
     label: 'CV HUB',
     items: [
       { to: '/cv/builder',      icon: PenLine,  label: 'CV Builder',   tag: 'PRO',  accent: '#a3c9ff' },
@@ -44,6 +35,7 @@ const SECTIONS = [
     ],
   },
   {
+    key: 'personal',
     label: 'PERSONAL',
     items: [
       { to: '/life',       icon: LayoutList, label: 'Life Plan'      },
@@ -53,21 +45,31 @@ const SECTIONS = [
     ],
   },
   {
+    key: 'more',
     label: 'MORE',
     items: [
-      { to: '/plans',  icon: DollarSign,    label: 'Pricing'  },
-      { label: 'Market', icon: BarChart3,   soon: true        },
-      { label: 'Skills', icon: GraduationCap, soon: true      },
+      { to: '/jobs',        icon: Briefcase,     label: 'Jobs'        },
+      { to: '/calendar',    icon: CalendarDays,  label: 'Calendar'    },
+      { to: '/stats',       icon: BarChart3,     label: 'Stats'       },
+      { to: '/time-report', icon: Clock,         label: 'Time Report' },
+      { to: '/blog',        icon: Newspaper,     label: 'Community'   },
+      { to: '/roadmap',     icon: Map,           label: 'Roadmap'     },
+      { to: '/library',     icon: BookOpen,      label: 'Library'     },
+      { to: '/plans',       icon: DollarSign,    label: 'Pricing'     },
+      { label: 'Market',    icon: BarChart3,     soon: true           },
+      { label: 'Skills',    icon: GraduationCap, soon: true           },
     ],
   },
 ]
 
+const DEFAULT_EXPANDED = { main: true, cv: true, personal: true, more: false }
+
 function NavItem({ to, icon: Icon, label, end, soon, tag, accent }) {
   if (soon) {
     return (
-      <div style={{ display:'flex', alignItems:'center', gap:9, padding:'6px 14px', opacity:0.28, cursor:'default' }}>
-        <Icon size={13} style={{ color:'#3a5070', flexShrink:0 }}/>
-        <span style={{ fontFamily:SANS, fontSize:13, color:'#3a5070', flex:1 }}>{label}</span>
+      <div style={{ display:'flex', alignItems:'center', gap:9, padding:'5px 14px 5px 26px', opacity:0.25, cursor:'default' }}>
+        <Icon size={12} style={{ color:'#3a5070', flexShrink:0 }}/>
+        <span style={{ fontFamily:SANS, fontSize:12, color:'#3a5070', flex:1 }}>{label}</span>
         <span style={{ fontFamily:MONO, fontSize:7, color:'#1e3050', letterSpacing:'0.08em' }}>SOON</span>
       </div>
     )
@@ -77,7 +79,7 @@ function NavItem({ to, icon: Icon, label, end, soon, tag, accent }) {
       {({ isActive }) => (
         <div
           style={{
-            display:'flex', alignItems:'center', gap:9, padding:'6px 14px',
+            display:'flex', alignItems:'center', gap:9, padding:'5px 14px 5px 26px',
             background: isActive ? `${accent||'#60a5fa'}0f` : 'transparent',
             borderLeft: `2px solid ${isActive ? (accent||'#60a5fa') : 'transparent'}`,
             transition:'background 0.12s',
@@ -86,8 +88,8 @@ function NavItem({ to, icon: Icon, label, end, soon, tag, accent }) {
           onMouseEnter={e => { if (!isActive) e.currentTarget.style.background='rgba(96,165,250,0.05)' }}
           onMouseLeave={e => { if (!isActive) e.currentTarget.style.background='transparent' }}
         >
-          <Icon size={13} style={{ color: isActive ? (accent||'#60a5fa') : 'rgba(80,120,180,0.6)', flexShrink:0 }}/>
-          <span style={{ fontFamily:SANS, fontSize:13, fontWeight:isActive?600:400, color:isActive?'#e2e2e8':'rgba(150,185,230,0.7)', flex:1, letterSpacing:'-0.01em' }}>
+          <Icon size={12} style={{ color: isActive ? (accent||'#60a5fa') : 'rgba(80,120,180,0.55)', flexShrink:0 }}/>
+          <span style={{ fontFamily:SANS, fontSize:12, fontWeight:isActive?600:400, color:isActive?'#e2e2e8':'rgba(140,175,220,0.7)', flex:1, letterSpacing:'-0.01em' }}>
             {label}
           </span>
           {tag && (
@@ -103,6 +105,17 @@ function NavItem({ to, icon: Icon, label, end, soon, tag, accent }) {
 
 export default function Sidebar() {
   const { open, toggle } = useSidebar()
+
+  const [expanded, setExpanded] = useState(() => {
+    try { return { ...DEFAULT_EXPANDED, ...JSON.parse(localStorage.getItem('trackr_sidebar_sections') || '{}') } }
+    catch { return DEFAULT_EXPANDED }
+  })
+
+  useEffect(() => {
+    try { localStorage.setItem('trackr_sidebar_sections', JSON.stringify(expanded)) } catch {}
+  }, [expanded])
+
+  const toggleSection = key => setExpanded(e => ({ ...e, [key]: !e[key] }))
 
   return (
     <div style={{
@@ -124,7 +137,7 @@ export default function Sidebar() {
       msOverflowStyle: 'none',
     }}>
 
-      {/* Close */}
+      {/* Close strip */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'8px 10px 6px', borderBottom:'1px solid rgba(48,54,61,0.4)', flexShrink:0 }}>
         <button onClick={toggle}
           style={{ display:'flex', alignItems:'center', gap:4, background:'none', border:'none', cursor:'pointer', color:'rgba(60,100,160,0.4)', padding:'3px 6px', fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', transition:'color 0.15s' }}
@@ -134,16 +147,48 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {/* Nav sections */}
+      {/* Sections */}
       <div style={{ flex:1, paddingBottom:16 }}>
-        {SECTIONS.map(({ label, items }) => (
-          <div key={label}>
-            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, color:'rgba(40,70,120,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', padding:'12px 14px 3px' }}>
-              {label}
-            </p>
-            {items.map(item => <NavItem key={item.to || item.label} {...item} />)}
-          </div>
-        ))}
+        {SECTIONS.map(({ key, label, items }) => {
+          const isOpen = expanded[key]
+          return (
+            <div key={key}>
+              {/* Section header — clickable */}
+              <button
+                onClick={() => toggleSection(key)}
+                style={{
+                  display:'flex', alignItems:'center', justifyContent:'space-between',
+                  width:'100%', padding:'11px 14px 7px',
+                  background:'none', border:'none', cursor:'pointer',
+                  borderTop: key !== 'main' ? '1px solid rgba(48,54,61,0.35)' : 'none',
+                  marginTop: key !== 'main' ? 4 : 0,
+                }}
+              >
+                <span style={{ fontFamily:MONO, fontSize:9, fontWeight:800, color: isOpen ? 'rgba(96,165,250,0.8)' : 'rgba(60,90,140,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', transition:'color 0.15s' }}>
+                  {label}
+                </span>
+                <ChevronRight
+                  size={12}
+                  style={{
+                    color: isOpen ? 'rgba(96,165,250,0.7)' : 'rgba(60,90,140,0.4)',
+                    transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.18s ease, color 0.15s',
+                    flexShrink: 0,
+                  }}
+                />
+              </button>
+
+              {/* Items — collapse/expand */}
+              <div style={{
+                overflow: 'hidden',
+                maxHeight: isOpen ? items.length * 34 + 8 : 0,
+                transition: 'max-height 0.22s cubic-bezier(0.22,1,0.36,1)',
+              }}>
+                {items.map(item => <NavItem key={item.to || item.label} {...item} />)}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {/* Footer */}
