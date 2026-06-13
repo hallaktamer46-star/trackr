@@ -5,7 +5,7 @@ import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
   ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
   Clock, Flag, Star, Circle, PlayCircle, Coffee, BookOpen,
-  BarChart3, CalendarIcon, ChevronDown, GripVertical
+  BarChart3, Edit3, CalendarIcon, ChevronDown, GripVertical
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
   isToday, addMonths, subMonths, parseISO, isFuture, isPast, startOfDay } from 'date-fns'
