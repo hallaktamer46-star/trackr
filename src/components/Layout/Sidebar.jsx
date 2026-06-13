@@ -140,9 +140,9 @@ export default function Sidebar() {
       {/* Close strip */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'8px 10px 6px', borderBottom:'1px solid rgba(48,54,61,0.4)', flexShrink:0 }}>
         <button onClick={toggle}
-          style={{ display:'flex', alignItems:'center', gap:4, background:'none', border:'none', cursor:'pointer', color:'rgba(60,100,160,0.4)', padding:'3px 6px', fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', transition:'color 0.15s' }}
-          onMouseEnter={e => e.currentTarget.style.color='#60a5fa'}
-          onMouseLeave={e => e.currentTarget.style.color='rgba(60,100,160,0.4)'}>
+          style={{ display:'flex', alignItems:'center', gap:5, background:'rgba(78,222,163,0.07)', border:'0.5px solid rgba(78,222,163,0.2)', cursor:'pointer', color:'#4edea3', padding:'4px 10px', fontFamily:MONO, fontSize:9, fontWeight:800, letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.15s' }}
+          onMouseEnter={e => { e.currentTarget.style.background='rgba(78,222,163,0.14)'; e.currentTarget.style.borderColor='rgba(78,222,163,0.4)' }}
+          onMouseLeave={e => { e.currentTarget.style.background='rgba(78,222,163,0.07)'; e.currentTarget.style.borderColor='rgba(78,222,163,0.2)' }}>
           <ChevronLeft size={11}/> Close
         </button>
       </div>
@@ -158,19 +158,31 @@ export default function Sidebar() {
                 onClick={() => toggleSection(key)}
                 style={{
                   display:'flex', alignItems:'center', justifyContent:'space-between',
-                  width:'100%', padding:'11px 14px 7px',
-                  background:'none', border:'none', cursor:'pointer',
-                  borderTop: key !== 'main' ? '1px solid rgba(48,54,61,0.35)' : 'none',
-                  marginTop: key !== 'main' ? 4 : 0,
+                  width:'100%', padding:'12px 14px 8px',
+                  background: isOpen ? 'rgba(0,212,255,0.04)' : 'none',
+                  border:'none', cursor:'pointer',
+                  borderTop: key !== 'main' ? '1px solid rgba(48,54,61,0.4)' : 'none',
+                  marginTop: key !== 'main' ? 2 : 0,
+                  transition:'background 0.15s',
                 }}
+                onMouseEnter={e => { if (!isOpen) e.currentTarget.style.background='rgba(96,165,250,0.04)' }}
+                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.background='none' }}
               >
-                <span style={{ fontFamily:MONO, fontSize:9, fontWeight:800, color: isOpen ? 'rgba(96,165,250,0.8)' : 'rgba(60,90,140,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', transition:'color 0.15s' }}>
+                <span style={{
+                  fontFamily: '"Geist", Inter, sans-serif',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  color: isOpen ? '#00d4ff' : '#4a6fa5',
+                  transition: 'color 0.15s',
+                }}>
                   {label}
                 </span>
                 <ChevronRight
-                  size={12}
+                  size={13}
                   style={{
-                    color: isOpen ? 'rgba(96,165,250,0.7)' : 'rgba(60,90,140,0.4)',
+                    color: isOpen ? '#00d4ff' : '#2a4878',
                     transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
                     transition: 'transform 0.18s ease, color 0.15s',
                     flexShrink: 0,
