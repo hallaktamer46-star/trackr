@@ -50,14 +50,42 @@ export default function ProfileDropdown() {
   return (
     <div className="relative" ref={ref}>
 
-      {/* Trigger — first name + avatar */}
+      {/* Trigger */}
       <button
         onClick={() => setOpen(v => !v)}
-        className="flex items-center group outline-none"
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, outline: 'none' }}
+        onMouseEnter={e => { const a = e.currentTarget.querySelector('.avatar-ring'); if (a) a.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.55), 0 4px 14px rgba(0,0,0,0.25)' }}
+        onMouseLeave={e => { const a = e.currentTarget.querySelector('.avatar-ring'); if (a) a.style.boxShadow = '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)' }}
       >
-        <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 group-hover:ring-sky-400 transition-all grid place-items-center text-xs font-bold font-mono text-slate-700 dark:text-slate-200">
-          {initials}
-        </div>
+        {m.avatar_url || m.picture ? (
+          <img
+            src={m.avatar_url || m.picture}
+            alt={initials}
+            className="avatar-ring"
+            style={{
+              width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', display: 'block',
+              boxShadow: '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)',
+              transition: 'box-shadow 0.2s',
+            }}
+          />
+        ) : (
+          <div
+            className="avatar-ring"
+            style={{
+              width: 34, height: 34, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #1e3a5f 0%, #0f1f3d 60%, #1a0e3a 100%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)',
+              transition: 'box-shadow 0.2s',
+              fontFamily: 'Inter, -apple-system, sans-serif',
+              fontSize: 12, fontWeight: 700, letterSpacing: '0.03em',
+              color: 'rgba(255,255,255,0.85)',
+              userSelect: 'none',
+            }}
+          >
+            {initials}
+          </div>
+        )}
       </button>
 
       {open && (

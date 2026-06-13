@@ -1,7 +1,22 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Sparkles, Rocket, Building2, Telescope, Map, Timer } from 'lucide-react'
+import { Home, Sparkles, Rocket, Building2, Telescope, Map } from 'lucide-react'
 import ProfileDropdown from './ProfileDropdown'
 import { cn } from '../../lib/cn'
+
+// Custom pulse / activity icon — bespoke, not from any icon library
+function ActivityIcon({ size = 17, style }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={style}>
+      <polyline
+        points="1,10 5,10 7,4 10,16 13,8 15,11 19,11"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
 
 const nav = [
   { to: '/',        label: 'Home',          icon: Home,      end: true },
@@ -72,11 +87,33 @@ export default function Header() {
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => navigate('/time-report')}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-sky-400 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-            aria-label="Time report"
             title="Time Report"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '5px 10px',
+              background: 'transparent',
+              border: 'none',
+              borderRadius: 6,
+              cursor: 'pointer',
+              color: 'rgba(148,163,184,0.7)',
+              transition: 'color 0.15s, background 0.15s',
+              fontFamily: '"Geist Mono", monospace',
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = '#38bdf8'
+              e.currentTarget.style.background = 'rgba(56,189,248,0.07)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = 'rgba(148,163,184,0.7)'
+              e.currentTarget.style.background = 'transparent'
+            }}
           >
-            <Timer size={17} />
+            <ActivityIcon size={15}/>
+            <span style={{ letterSpacing: '0.1em' }}>Report</span>
           </button>
           <ProfileDropdown />
         </div>
