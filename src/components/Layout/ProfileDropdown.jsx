@@ -73,17 +73,17 @@ export default function ProfileDropdown() {
             className="avatar-ring"
             style={{
               width: 34, height: 34, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1e3a5f 0%, #0f1f3d 60%, #1a0e3a 100%)',
+              background: 'linear-gradient(160deg, #1e2d4a 0%, #111827 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)',
               transition: 'box-shadow 0.2s',
-              fontFamily: 'Inter, -apple-system, sans-serif',
-              fontSize: 12, fontWeight: 700, letterSpacing: '0.03em',
-              color: 'rgba(255,255,255,0.85)',
-              userSelect: 'none',
+              overflow: 'hidden',
             }}
           >
-            {initials}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="3.5" fill="rgba(255,255,255,0.75)"/>
+              <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.75)"/>
+            </svg>
           </div>
         )}
       </button>
