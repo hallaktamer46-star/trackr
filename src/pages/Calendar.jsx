@@ -3,9 +3,9 @@ import BackToHome from '../components/BackToHome'
 import TaskModal from '../components/TaskModal'
 import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
-  ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
+  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Trash2, ExternalLink, Link2,
   Clock, Flag, Star, Circle, PlayCircle, Coffee, BookOpen,
-  BarChart3, Edit3, CalendarIcon, ChevronDown, GripVertical
+  BarChart3, Edit3, CalendarIcon, GripVertical
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
   isToday, addMonths, subMonths, parseISO, isFuture, isPast, startOfDay } from 'date-fns'
@@ -236,6 +236,9 @@ export default function Calendar() {
   const [calDragOver, setCalDragOver] = useState(null)
   const taskListRef = useRef(null)
   const [taskListScrollable, setTaskListScrollable] = useState(false)
+  const [taskScrollTop, setTaskScrollTop] = useState(0)
+  const [taskDims, setTaskDims] = useState({ sh: 0, ch: 0 })
+  const thumbDrag = useRef({ active: false, startY: 0, startST: 0 })
   /* goal form */
   const [goalForm, setGoalForm] = useState({ open: false, title: '', target: '', unit: 'applications', period: 'week' })
   const [motivation, setMotivation] = useState({ goalId: null, text: '' })
@@ -267,12 +270,33 @@ export default function Calendar() {
   useEffect(() => {
     const el = taskListRef.current
     if (!el) return
-    const check = () => setTaskListScrollable(el.scrollHeight > el.clientHeight + 4)
-    check()
-    el.addEventListener('scroll', check)
-    window.addEventListener('resize', check)
-    return () => { el.removeEventListener('scroll', check); window.removeEventListener('resize', check) }
+    const update = () => {
+      setTaskListScrollable(el.scrollHeight > el.clientHeight + 4)
+      setTaskDims({ sh: el.scrollHeight, ch: el.clientHeight })
+      setTaskScrollTop(el.scrollTop)
+    }
+    update()
+    el.addEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    return () => { el.removeEventListener('scroll', update); window.removeEventListener('resize', update) }
   }, [pendingTasks])
+
+  useEffect(() => {
+    const onMove = e => {
+      if (!thumbDrag.current.active) return
+      const el = taskListRef.current
+      if (!el) return
+      const ARROW = 22
+      const trackArea = taskDims.ch - ARROW * 2
+      const thumbH = Math.max(20, taskDims.sh > 0 ? (taskDims.ch / taskDims.sh) * trackArea : trackArea)
+      const ratio = (e.clientY - thumbDrag.current.startY) / Math.max(1, trackArea - thumbH)
+      el.scrollTop = Math.max(0, thumbDrag.current.startST + ratio * (taskDims.sh - taskDims.ch))
+    }
+    const onUp = () => { thumbDrag.current.active = false }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
+  }, [taskDims])
 
   function reorderPendingTasks(fromIdx, toIdx) {
     if (fromIdx === null || fromIdx === toIdx) return
@@ -433,8 +457,8 @@ export default function Calendar() {
             />
 
             {/* Task list */}
-            <div style={{ position:'relative' }}>
-              <div ref={taskListRef} style={{ display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto', padding:'4px 0 2px' }}>
+            <div style={{ display:'flex', gap:6 }}>
+              <div ref={taskListRef} style={{ flex:1, display:'flex', flexDirection:'column', gap:4, maxHeight:320, overflowY:'auto', padding:'4px 0 2px', scrollbarWidth:'none', msOverflowStyle:'none' }}>
                 {pendingTasks.length === 0 && (
                   <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'10px 10px' }}>No pending tasks — add one above.</p>
                 )}
@@ -501,21 +525,55 @@ export default function Calendar() {
                 )}
               </div>
 
-              {/* Scroll-down indicator */}
-              {taskListScrollable && (
-                <div style={{ position:'absolute', bottom:0, left:0, right:0, pointerEvents:'none',
-                  background:'linear-gradient(to bottom, transparent, rgba(6,11,20,0.9))',
-                  height:36, display:'flex', alignItems:'flex-end', justifyContent:'center', paddingBottom:4 }}>
-                  <button
-                    style={{ pointerEvents:'all', background:'rgba(96,165,250,0.12)', border:'0.5px solid rgba(96,165,250,0.3)', color:'#60a5fa',
-                      fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.08em', padding:'3px 10px', cursor:'pointer', transition:'background 0.15s' }}
-                    onClick={() => taskListRef.current?.scrollBy({ top: 120, behavior:'smooth' })}
-                    onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.22)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.12)'}>
-                    ↓ more
-                  </button>
-                </div>
-              )}
+              {/* Custom scrollbar — only when overflow */}
+              {taskListScrollable && (() => {
+                const ARROW = 22
+                const trackArea = Math.max(1, taskDims.ch - ARROW * 2)
+                const thumbH = Math.max(20, taskDims.sh > 0 ? (taskDims.ch / taskDims.sh) * trackArea : trackArea)
+                const thumbTop = taskDims.sh > taskDims.ch
+                  ? (taskScrollTop / (taskDims.sh - taskDims.ch)) * (trackArea - thumbH)
+                  : 0
+                return (
+                  <div style={{ width:10, display:'flex', flexDirection:'column', flexShrink:0, userSelect:'none' }}>
+                    {/* Up arrow */}
+                    <button
+                      onClick={() => taskListRef.current?.scrollBy({ top:-40, behavior:'smooth' })}
+                      style={{ width:10, height:ARROW, background:'rgba(96,165,250,0.1)', border:'0.5px solid rgba(96,165,250,0.25)', borderBottom:'none', color:'#60a5fa', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, padding:0 }}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.25)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.1)'}>
+                      <ChevronUp size={7}/>
+                    </button>
+                    {/* Track */}
+                    <div
+                      style={{ flex:1, position:'relative', background:'rgba(96,165,250,0.04)', border:'0.5px solid rgba(96,165,250,0.12)', borderTop:'none', borderBottom:'none', cursor:'pointer' }}
+                      onClick={e => {
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        const ratio = (e.clientY - rect.top) / trackArea
+                        if (taskListRef.current) taskListRef.current.scrollTop = ratio * (taskDims.sh - taskDims.ch)
+                      }}
+                    >
+                      <div
+                        onMouseDown={e => { e.preventDefault(); thumbDrag.current = { active:true, startY:e.clientY, startST:taskScrollTop } }}
+                        style={{
+                          position:'absolute', top:thumbTop, left:0, right:0, height:thumbH,
+                          background:'linear-gradient(180deg, #7ab4ff, #4d8fe0)',
+                          border:'0.5px solid rgba(96,165,250,0.6)',
+                          boxShadow:'0 0 6px rgba(96,165,250,0.3)',
+                          cursor:'grab',
+                        }}
+                      />
+                    </div>
+                    {/* Down arrow */}
+                    <button
+                      onClick={() => taskListRef.current?.scrollBy({ top:40, behavior:'smooth' })}
+                      style={{ width:10, height:ARROW, background:'rgba(96,165,250,0.1)', border:'0.5px solid rgba(96,165,250,0.25)', borderTop:'none', color:'#60a5fa', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', flexShrink:0, padding:0 }}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.25)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.1)'}>
+                      <ChevronDown size={7}/>
+                    </button>
+                  </div>
+                )
+              })()}
             </div>
           </Card>
 
