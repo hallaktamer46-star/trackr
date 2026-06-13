@@ -261,10 +261,10 @@ export default function Home() {
   ]
 
   return (
-    <div style={{ fontFamily:SANS, maxWidth:1280, margin:'0 auto', display:'flex', gap:20, alignItems:'flex-start', paddingTop:4 }}>
+    <div style={{ fontFamily:SANS, maxWidth:1280, margin:'0 auto', paddingTop:4 }}>
 
-      {/* ── Left sidebar ── */}
-      <aside style={{ width:148, flexShrink:0 }}>
+      {/* ── Left sidebar removed — now global via Layout ── */}
+      <aside style={{ display:'none' }}>
         {/* Drop a thought */}
         <button onClick={() => setQuickPostOpen(true)}
           style={{ display:'flex', alignItems:'center', gap:7, width:'100%', padding:'8px 10px', margin:'8px 0 4px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.12)', borderRadius:6, cursor:'pointer', transition:'all 0.15s', textAlign:'left' }}
@@ -309,7 +309,7 @@ export default function Home() {
       </aside>
 
       {/* ── Main dashboard ── */}
-      <div style={{ flex:1, minWidth:0, display:'flex', flexDirection:'column', gap:12 }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
 
       {/* ══ Header row ══ */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>

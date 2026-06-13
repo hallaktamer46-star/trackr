@@ -1,7 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Sparkles, Rocket, Building2, Telescope, Map } from 'lucide-react'
+import { Home, Sparkles, Rocket, Building2, Telescope, Map, Menu } from 'lucide-react'
 import ProfileDropdown from './ProfileDropdown'
 import { cn } from '../../lib/cn'
+import { useSidebar } from '../../contexts/SidebarContext'
 
 // Custom pulse / activity icon — bespoke, not from any icon library
 function ActivityIcon({ size = 17, style }) {
@@ -29,13 +30,23 @@ const nav = [
 
 export default function Header() {
   const navigate = useNavigate()
+  const { open, toggle } = useSidebar()
 
   return (
     <header className="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 sticky top-0 z-30 flex items-center">
       <div className="w-full max-w-screen-xl mx-auto px-4 flex items-center justify-between gap-4">
 
-        {/* Logo */}
+        {/* Menu toggle + Logo */}
         <div className="flex items-center gap-2.5 shrink-0">
+          <button
+            onClick={toggle}
+            title={open ? 'Close sidebar' : 'Open sidebar'}
+            style={{ display:'flex', alignItems:'center', justifyContent:'center', width:28, height:28, background: open ? 'rgba(96,165,250,0.1)' : 'transparent', border:'none', cursor:'pointer', color: open ? '#60a5fa' : 'rgba(148,163,184,0.6)', transition:'all 0.15s', flexShrink:0 }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(96,165,250,0.1)'; e.currentTarget.style.color='#60a5fa' }}
+            onMouseLeave={e => { e.currentTarget.style.background=open?'rgba(96,165,250,0.1)':'transparent'; e.currentTarget.style.color=open?'#60a5fa':'rgba(148,163,184,0.6)' }}
+          >
+            <Menu size={16}/>
+          </button>
           <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="34" height="34" rx="9" fill="#0c1220"/>
             <polyline

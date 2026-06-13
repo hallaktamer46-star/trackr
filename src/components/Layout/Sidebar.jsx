@@ -1,87 +1,155 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, LayoutGrid, BarChart3, Sparkles, Briefcase, X, Newspaper, Brain, Layers, MessageSquare } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
-import { useApplications } from '../../contexts/ApplicationContext'
-import { cn } from '../../lib/cn'
+import { NavLink } from 'react-router-dom'
+import { useSidebar } from '../../contexts/SidebarContext'
+import {
+  Home, LayoutDashboard, Sparkles, Telescope, Rocket, Building2,
+  Briefcase, CalendarDays, BarChart3, Clock, BookOpen, Map, Newspaper,
+  LayoutList, Flame, Brain, Users, PenLine, FileText, Mail,
+  GraduationCap, ChevronLeft, DollarSign,
+} from 'lucide-react'
 
-const nav = [
-  { to: '/',         label: 'Home',           icon: Home,       end: true },
-  { to: '/board',    label: 'Board',           icon: LayoutGrid            },
-  { to: '/stats',    label: 'Stats',           icon: BarChart3             },
-  { to: '/ai/cv',    label: 'AI Tools',        icon: Sparkles              },
-  { to: '/jobs',     label: 'Jobs',            icon: Briefcase             },
-  { to: '/blog',     label: 'Community',       icon: Newspaper             },
-  { to: '/clarity',  label: 'Mental Clarity',  icon: Brain                 },
-  { to: '/life',     label: 'Life Plan',       icon: Layers                },
-  { to: '/debrief',  label: 'Daily Debrief',   icon: MessageSquare         },
+const MONO = '"Geist Mono", monospace'
+const SANS = 'Geist, Inter, sans-serif'
+export const SIDEBAR_W = 230
+
+const SECTIONS = [
+  {
+    label: 'MAIN',
+    items: [
+      { to: '/',        icon: Home,            label: 'Home',           end: true },
+      { to: '/board',   icon: LayoutDashboard, label: 'Dashboard'               },
+      { to: '/ai',      icon: Sparkles,        label: 'AI Tools'                },
+      { to: '/growth',  icon: Telescope,       label: 'Growth Lab'              },
+      { to: '/startup', icon: Rocket,          label: 'Startup Studio'          },
+      { to: '/pitch',   icon: Building2,       label: 'Pitch Lab'               },
+    ],
+  },
+  {
+    label: 'TOOLS',
+    items: [
+      { to: '/jobs',        icon: Briefcase,    label: 'Jobs'        },
+      { to: '/calendar',    icon: CalendarDays, label: 'Calendar'    },
+      { to: '/stats',       icon: BarChart3,    label: 'Stats'       },
+      { to: '/time-report', icon: Clock,        label: 'Time Report' },
+      { to: '/blog',        icon: Newspaper,    label: 'Community'   },
+      { to: '/roadmap',     icon: Map,          label: 'Roadmap'     },
+      { to: '/library',     icon: BookOpen,     label: 'Library'     },
+    ],
+  },
+  {
+    label: 'CV HUB',
+    items: [
+      { to: '/cv/builder',      icon: PenLine,  label: 'CV Builder',   tag: 'PRO',  accent: '#a3c9ff' },
+      { to: '/cv/reviewer',     icon: FileText, label: 'CV Reviewer',  tag: 'FREE', accent: '#4edea3' },
+      { to: '/cv/cover-letter', icon: Mail,     label: 'Cover Letter', tag: 'PRO',  accent: '#ffb689' },
+    ],
+  },
+  {
+    label: 'PERSONAL',
+    items: [
+      { to: '/life',       icon: LayoutList, label: 'Life Plan'      },
+      { to: '/debrief',    icon: Flame,      label: 'Daily Debrief'  },
+      { to: '/clarity',    icon: Brain,      label: 'Mental Clarity' },
+      { to: '/roundtable', icon: Users,      label: 'Round Table'    },
+    ],
+  },
+  {
+    label: 'MORE',
+    items: [
+      { to: '/plans',  icon: DollarSign,    label: 'Pricing'  },
+      { label: 'Market', icon: BarChart3,   soon: true        },
+      { label: 'Skills', icon: GraduationCap, soon: true      },
+    ],
+  },
 ]
 
-export default function Sidebar({ open, onClose }) {
-  const { signOut } = useAuth()
-  const { isPaidUser } = useApplications()
-  const navigate = useNavigate()
+function NavItem({ to, icon: Icon, label, end, soon, tag, accent }) {
+  if (soon) {
+    return (
+      <div style={{ display:'flex', alignItems:'center', gap:9, padding:'6px 14px', opacity:0.28, cursor:'default' }}>
+        <Icon size={13} style={{ color:'#3a5070', flexShrink:0 }}/>
+        <span style={{ fontFamily:SANS, fontSize:13, color:'#3a5070', flex:1 }}>{label}</span>
+        <span style={{ fontFamily:MONO, fontSize:7, color:'#1e3050', letterSpacing:'0.08em' }}>SOON</span>
+      </div>
+    )
+  }
+  return (
+    <NavLink to={to} end={end} style={{ textDecoration:'none', display:'block' }}>
+      {({ isActive }) => (
+        <div
+          style={{
+            display:'flex', alignItems:'center', gap:9, padding:'6px 14px',
+            background: isActive ? `${accent||'#60a5fa'}0f` : 'transparent',
+            borderLeft: `2px solid ${isActive ? (accent||'#60a5fa') : 'transparent'}`,
+            transition:'background 0.12s',
+            cursor:'pointer',
+          }}
+          onMouseEnter={e => { if (!isActive) e.currentTarget.style.background='rgba(96,165,250,0.05)' }}
+          onMouseLeave={e => { if (!isActive) e.currentTarget.style.background='transparent' }}
+        >
+          <Icon size={13} style={{ color: isActive ? (accent||'#60a5fa') : 'rgba(80,120,180,0.6)', flexShrink:0 }}/>
+          <span style={{ fontFamily:SANS, fontSize:13, fontWeight:isActive?600:400, color:isActive?'#e2e2e8':'rgba(150,185,230,0.7)', flex:1, letterSpacing:'-0.01em' }}>
+            {label}
+          </span>
+          {tag && (
+            <span style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:accent, background:`${accent}12`, border:`0.5px solid ${accent}28`, padding:'1px 4px', letterSpacing:'0.06em', flexShrink:0 }}>
+              {tag}
+            </span>
+          )}
+        </div>
+      )}
+    </NavLink>
+  )
+}
 
-  const handleSignOut = async () => { await signOut(); navigate('/auth') }
+export default function Sidebar() {
+  const { open, toggle } = useSidebar()
 
   return (
-    <aside className={cn(
-      'fixed inset-y-0 left-0 z-30 w-64 bg-slate-900 border-r border-slate-800 flex flex-col transition-transform duration-200',
-      'lg:translate-x-0',
-      open ? 'translate-x-0' : '-translate-x-full'
-    )}>
+    <div style={{
+      position: 'fixed',
+      top: 56,
+      left: 0,
+      bottom: 0,
+      width: SIDEBAR_W,
+      background: '#080b12',
+      borderRight: '1px solid rgba(48,54,61,0.7)',
+      zIndex: 20,
+      transform: `translateX(${open ? 0 : -SIDEBAR_W}px)`,
+      transition: 'transform 0.22s cubic-bezier(0.22,1,0.36,1)',
+      display: 'flex',
+      flexDirection: 'column',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none',
+    }}>
 
-      {/* Logo */}
-      <div className="flex items-center justify-between h-16 px-5 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-sky-500 rounded-lg shadow-[0_0_15px_rgba(14,165,233,0.5)] grid place-items-center">
-            <div className="w-4 h-4 border-2 border-white rounded-sm" />
-          </div>
-          <span className="font-extrabold text-xl tracking-tighter font-mono text-white">TRACKR</span>
-        </div>
-        <button className="lg:hidden text-slate-500 hover:text-slate-300" onClick={onClose}>
-          <X size={20} />
+      {/* Close */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'8px 10px 6px', borderBottom:'1px solid rgba(48,54,61,0.4)', flexShrink:0 }}>
+        <button onClick={toggle}
+          style={{ display:'flex', alignItems:'center', gap:4, background:'none', border:'none', cursor:'pointer', color:'rgba(60,100,160,0.4)', padding:'3px 6px', fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', transition:'color 0.15s' }}
+          onMouseEnter={e => e.currentTarget.style.color='#60a5fa'}
+          onMouseLeave={e => e.currentTarget.style.color='rgba(60,100,160,0.4)'}>
+          <ChevronLeft size={11}/> Close
         </button>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {nav.map(({ to, label, icon: Icon, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            onClick={onClose}
-            className={({ isActive }) => cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-              isActive
-                ? 'bg-slate-800 text-white'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-            )}
-          >
-            {({ isActive }) => (
-              <>
-                <span className={cn(
-                  'w-1.5 h-1.5 rounded-full transition-all',
-                  isActive ? 'bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.8)]' : 'bg-transparent'
-                )} />
-                <Icon size={16} className="opacity-70" />
-                {label}
-              </>
-            )}
-          </NavLink>
+      {/* Nav sections */}
+      <div style={{ flex:1, paddingBottom:16 }}>
+        {SECTIONS.map(({ label, items }) => (
+          <div key={label}>
+            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, color:'rgba(40,70,120,0.55)', letterSpacing:'0.1em', textTransform:'uppercase', padding:'12px 14px 3px' }}>
+              {label}
+            </p>
+            {items.map(item => <NavItem key={item.to || item.label} {...item} />)}
+          </div>
         ))}
-      </nav>
-
-      {/* Plan indicator */}
-      <div className="px-5 py-4 border-t border-slate-800 flex items-center justify-between">
-        <span className="font-extrabold text-sm tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
-          <span className={isPaidUser ? 'text-sky-400' : 'text-slate-300'}>
-            {isPaidUser ? 'PRO' : 'FREE'}
-          </span>
-          <span className="text-slate-600 font-normal text-xs ml-1">PLAN</span>
-        </span>
-        <span className="text-[10px] font-mono text-slate-700">v1.0.0</span>
       </div>
-    </aside>
+
+      {/* Footer */}
+      <div style={{ padding:'10px 14px', borderTop:'1px solid rgba(48,54,61,0.4)', flexShrink:0 }}>
+        <p style={{ fontFamily:MONO, fontSize:8, color:'rgba(30,50,80,0.5)', letterSpacing:'0.06em' }}>Trackr © 2026</p>
+      </div>
+    </div>
   )
 }

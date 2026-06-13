@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header'
+import Sidebar, { SIDEBAR_W } from './Sidebar'
 import Onboarding from '../Onboarding'
 import UpgradeCelebration from '../UpgradeCelebration'
 import EngageWidget from '../EngageWidget'
 import { useAuth } from '../../contexts/AuthContext'
 import { isSupabaseConfigured } from '../../lib/supabase'
+import { SidebarProvider, useSidebar } from '../../contexts/SidebarContext'
 
-export default function Layout({ children }) {
+function LayoutInner({ children }) {
   const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const { open } = useSidebar()
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [upgradePlan, setUpgradePlan] = useState(null)
 
@@ -20,30 +23,40 @@ export default function Layout({ children }) {
     if (!m.first_name) setShowOnboarding(true)
   }, [user])
 
-  // Detect ?checkout=success&plan= after Stripe redirect
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     if (params.get('checkout') === 'success') {
       const plan = params.get('plan') || 'pro'
       setUpgradePlan(plan)
-      // Clean URL without re-rendering the whole page
       navigate('/', { replace: true })
     }
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div style={{ minHeight: '100vh', background: '#0d1117' }}>
       <Header />
-      <main className="max-w-screen-xl mx-auto p-3 md:p-6">
-        {children}
+      <Sidebar />
+      <main style={{
+        marginLeft: open ? SIDEBAR_W : 0,
+        transition: 'margin-left 0.22s cubic-bezier(0.22,1,0.36,1)',
+        padding: '20px 24px',
+        minHeight: 'calc(100vh - 56px)',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          {children}
+        </div>
       </main>
-      {showOnboarding && (
-        <Onboarding onComplete={() => setShowOnboarding(false)} />
-      )}
-      {upgradePlan && (
-        <UpgradeCelebration plan={upgradePlan} onClose={() => setUpgradePlan(null)} />
-      )}
+      {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
+      {upgradePlan && <UpgradeCelebration plan={upgradePlan} onClose={() => setUpgradePlan(null)} />}
       <EngageWidget />
     </div>
+  )
+}
+
+export default function Layout({ children }) {
+  return (
+    <SidebarProvider>
+      <LayoutInner>{children}</LayoutInner>
+    </SidebarProvider>
   )
 }
