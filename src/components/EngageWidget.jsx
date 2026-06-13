@@ -51,6 +51,7 @@ export default function EngageWidget() {
   const [editingTask, setEditingTask] = useState(null)
   const [wDragIdx,  setWDragIdx]  = useState(null)
   const [wDragOver, setWDragOver] = useState(null)
+  const [wDragItemH, setWDragItemH] = useState(36)
 
   const [lastCompleted, setLastCompleted] = useState(null)
   const undoTimer = useRef(null)
@@ -312,6 +313,18 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
     const [item] = arr.splice(fromIdx, 1)
     arr.splice(toIdx, 0, item)
     setTasks([...arr, ...rest])
+  }
+
+  function getWidgetItemTransform(idx) {
+    if (wDragIdx === null || wDragOver === null || wDragIdx === wDragOver) return 0
+    if (idx === wDragIdx) return 0
+    const h = wDragItemH + 1
+    if (wDragIdx < wDragOver) {
+      if (idx > wDragIdx && idx <= wDragOver) return -h
+    } else {
+      if (idx >= wDragOver && idx < wDragIdx) return h
+    }
+    return 0
   }
 
   function handleTaskSave({ id, title, due, note, priority }) {
@@ -609,18 +622,34 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                   {pending.map((t, idx) => (
                     <div key={t.id}
                       draggable={true}
-                      onDragStart={e => { setWDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
+                      onDragStart={e => {
+                        const el = e.currentTarget
+                        const rect = el.getBoundingClientRect()
+                        setWDragItemH(rect.height)
+                        setWDragIdx(idx)
+                        e.dataTransfer.effectAllowed = 'move'
+                        const clone = el.cloneNode(true)
+                        Object.assign(clone.style, {
+                          position: 'fixed', top: rect.top + 'px', left: rect.left + 'px',
+                          width: rect.width + 'px', opacity: '1', pointerEvents: 'none',
+                          zIndex: '99999', margin: '0', transform: 'none',
+                        })
+                        document.body.appendChild(clone)
+                        e.dataTransfer.setDragImage(clone, e.clientX - rect.left, e.clientY - rect.top)
+                        requestAnimationFrame(() => { if (document.body.contains(clone)) document.body.removeChild(clone) })
+                      }}
                       onDragEnd={() => { setWDragIdx(null); setWDragOver(null) }}
-                      onClick={() => openEdit(t)}
+                      onClick={() => { if (wDragIdx === null) openEdit(t) }}
                       onDragOver={e => { e.preventDefault(); setWDragOver(idx) }}
                       onDrop={e => { e.preventDefault(); reorderWidgetTasks(wDragIdx, idx); setWDragIdx(null); setWDragOver(null) }}
                       style={{
                         display:'flex', alignItems:'center', gap:6, padding:'7px 10px',
-                        borderTop: wDragOver === idx && wDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.55)' : '1.5px solid transparent',
-                        background: wDragIdx === idx ? 'rgba(96,165,250,0.1)' : 'transparent',
-                        outline: wDragIdx === idx ? '1px solid rgba(96,165,250,0.35)' : 'none',
+                        borderTop: wDragOver === idx && wDragIdx !== null && wDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.55)' : '1.5px solid transparent',
+                        background: wDragIdx === idx ? 'transparent' : 'transparent',
                         cursor: wDragIdx === idx ? 'grabbing' : 'grab',
-                        transition:'background 0.1s',
+                        opacity: wDragIdx === idx ? 0 : 1,
+                        transform: `translateY(${getWidgetItemTransform(idx)}px)`,
+                        transition: wDragIdx !== null ? 'transform 0.15s ease' : 'background 0.1s',
                       }}
                       onMouseEnter={e => { if (wDragIdx === null) e.currentTarget.style.background='rgba(96,165,250,0.05)' }}
                       onMouseLeave={e => { if (wDragIdx === null) e.currentTarget.style.background='transparent' }}>

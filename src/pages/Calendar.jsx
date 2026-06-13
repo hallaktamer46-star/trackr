@@ -234,6 +234,7 @@ export default function Calendar() {
   const [calTaskModal, setCalTaskModal] = useState({ open: false, task: null })
   const [calDragIdx,  setCalDragIdx]  = useState(null)
   const [calDragOver, setCalDragOver] = useState(null)
+  const [calDragItemH, setCalDragItemH] = useState(40)
   const taskListRef = useRef(null)
   const [taskListScrollable, setTaskListScrollable] = useState(false)
   const [taskScrollTop, setTaskScrollTop] = useState(0)
@@ -279,7 +280,7 @@ export default function Calendar() {
     el.addEventListener('scroll', update)
     window.addEventListener('resize', update)
     return () => { el.removeEventListener('scroll', update); window.removeEventListener('resize', update) }
-  }, [pendingTasks])
+  }, [tasks])
 
   useEffect(() => {
     const onMove = e => {
@@ -306,6 +307,18 @@ export default function Calendar() {
     const [item] = arr.splice(fromIdx, 1)
     arr.splice(toIdx, 0, item)
     setTasks([...arr, ...done])
+  }
+
+  function getCalItemTransform(idx) {
+    if (calDragIdx === null || calDragOver === null || calDragIdx === calDragOver) return 0
+    if (idx === calDragIdx) return 0
+    const h = calDragItemH + 4
+    if (calDragIdx < calDragOver) {
+      if (idx > calDragIdx && idx <= calDragOver) return -h
+    } else {
+      if (idx >= calDragOver && idx < calDragIdx) return h
+    }
+    return 0
   }
 
   const handleCalTaskSave = ({ id, title, due, note, priority }) => {
@@ -466,26 +479,39 @@ export default function Calendar() {
                   <div
                     key={t.id}
                     draggable={true}
-                    onDragStart={e => { setCalDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
+                    onDragStart={e => {
+                      const el = e.currentTarget
+                      const rect = el.getBoundingClientRect()
+                      setCalDragItemH(rect.height)
+                      setCalDragIdx(idx)
+                      e.dataTransfer.effectAllowed = 'move'
+                      const clone = el.cloneNode(true)
+                      Object.assign(clone.style, {
+                        position: 'fixed', top: rect.top + 'px', left: rect.left + 'px',
+                        width: rect.width + 'px', opacity: '1', pointerEvents: 'none',
+                        zIndex: '99999', margin: '0', transform: 'none',
+                      })
+                      document.body.appendChild(clone)
+                      e.dataTransfer.setDragImage(clone, e.clientX - rect.left, e.clientY - rect.top)
+                      requestAnimationFrame(() => { if (document.body.contains(clone)) document.body.removeChild(clone) })
+                    }}
                     onDragEnd={() => { setCalDragIdx(null); setCalDragOver(null) }}
-                    onClick={() => setCalTaskModal({ open: true, task: t })}
+                    onClick={() => { if (calDragIdx === null) setCalTaskModal({ open: true, task: t }) }}
                     onDragOver={e => { e.preventDefault(); setCalDragOver(idx) }}
                     onDrop={e => { e.preventDefault(); reorderPendingTasks(calDragIdx, idx); setCalDragIdx(null); setCalDragOver(null) }}
                     style={{
                       display:'flex', alignItems:'center', gap:8, padding:'8px 10px',
-                      border: calDragIdx === idx
-                        ? '1px solid rgba(96,165,250,0.6)'
-                        : calDragOver === idx && calDragIdx !== null
+                      border: calDragOver === idx && calDragIdx !== null && calDragIdx !== idx
                         ? '1px solid rgba(96,165,250,0.55)'
                         : '1px solid rgba(96,165,250,0.15)',
-                      background: calDragIdx === idx
-                        ? 'rgba(96,165,250,0.1)'
-                        : calDragOver === idx && calDragIdx !== null
+                      background: calDragOver === idx && calDragIdx !== null && calDragIdx !== idx
                         ? 'rgba(96,165,250,0.06)'
                         : 'rgba(96,165,250,0.02)',
                       cursor: calDragIdx === idx ? 'grabbing' : 'grab',
                       userSelect: 'none',
-                      transition: 'border-color 0.1s, background 0.1s',
+                      opacity: calDragIdx === idx ? 0 : 1,
+                      transform: `translateY(${getCalItemTransform(idx)}px)`,
+                      transition: calDragIdx !== null ? 'transform 0.15s ease' : 'border-color 0.1s, background 0.1s',
                     }}
                     onMouseEnter={e => { if (calDragIdx === null) { e.currentTarget.style.background='rgba(96,165,250,0.06)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.28)' } }}
                     onMouseLeave={e => { if (calDragIdx === null) { e.currentTarget.style.background='rgba(96,165,250,0.02)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.15)' } }}
