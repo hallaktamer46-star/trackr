@@ -57,35 +57,22 @@ export default function ProfileDropdown() {
         onMouseEnter={e => { const a = e.currentTarget.querySelector('.avatar-ring'); if (a) a.style.boxShadow = '0 0 0 2px rgba(96,165,250,0.55), 0 4px 14px rgba(0,0,0,0.25)' }}
         onMouseLeave={e => { const a = e.currentTarget.querySelector('.avatar-ring'); if (a) a.style.boxShadow = '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)' }}
       >
-        {m.avatar_url || m.picture ? (
-          <img
-            src={m.avatar_url || m.picture}
-            alt={initials}
-            className="avatar-ring"
-            style={{
-              width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', display: 'block',
-              boxShadow: '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)',
-              transition: 'box-shadow 0.2s',
-            }}
-          />
-        ) : (
-          <div
-            className="avatar-ring"
-            style={{
-              width: 34, height: 34, borderRadius: '50%',
-              background: 'linear-gradient(160deg, #1e2d4a 0%, #111827 100%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 0 1.5px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.2)',
-              transition: 'box-shadow 0.2s',
-              overflow: 'hidden',
-            }}
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="8" r="3.5" fill="rgba(255,255,255,0.75)"/>
-              <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" fill="rgba(255,255,255,0.75)"/>
-            </svg>
-          </div>
-        )}
+        <div
+          className="avatar-ring"
+          style={{
+            width: 34, height: 34, borderRadius: '50%',
+            background: 'linear-gradient(160deg, #1a2744 0%, #0f172a 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.08)',
+            transition: 'box-shadow 0.2s',
+            overflow: 'hidden',
+          }}
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="8" r="3.8" fill="rgba(255,255,255,0.6)"/>
+            <path d="M3.5 21c0-4.694 3.806-8 8.5-8s8.5 3.306 8.5 8" fill="rgba(255,255,255,0.6)"/>
+          </svg>
+        </div>
       </button>
 
       {open && (

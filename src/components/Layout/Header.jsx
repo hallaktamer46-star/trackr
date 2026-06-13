@@ -35,27 +35,19 @@ export default function Header() {
       <div className="w-full max-w-screen-xl mx-auto px-4 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <div className="flex items-center gap-2 shrink-0">
-          <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="tBg" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#1a0533"/>
-                <stop offset="100%" stopColor="#0d0020"/>
-              </linearGradient>
-            </defs>
-            <rect width="100" height="100" rx="18" fill="url(#tBg)"/>
-            <text
-              x="50" y="79"
-              textAnchor="middle"
-              fontFamily="Georgia, 'Times New Roman', serif"
-              fontSize="80"
-              fontWeight="bold"
-              fill="white"
-              letterSpacing="-2"
-            >T</text>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="34" height="34" rx="9" fill="#0c1220"/>
+            <polyline
+              points="4,17 8,17 10.5,10 14,24 17,12 20,20 23,20 26,17 30,17"
+              stroke="#38bdf8"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
-          <span className="hidden sm:block text-slate-900 dark:text-white" style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: 15, fontWeight: 700, letterSpacing: '-0.02em' }}>
-            TRACKR
+          <span className="hidden sm:block text-slate-900 dark:text-white" style={{ fontFamily: 'Inter, -apple-system, sans-serif', fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>
+            Trackr
           </span>
         </div>
 
