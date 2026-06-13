@@ -260,6 +260,9 @@ export default function Calendar() {
     ...applications.filter(a => a.status === 'interview' && a.reminder_date).map(a => a.reminder_date),
   ].filter(Boolean), [tasks, sessions, applications])
 
+  const pendingTasks = tasks.filter(t => !t.done)
+  const doneTasks    = tasks.filter(t => t.done)
+
   /* ── Helpers ── */
   useEffect(() => {
     const el = taskListRef.current
@@ -331,9 +334,6 @@ export default function Calendar() {
   const dayTasks    = tasks.filter(t => t.due === selectedDate && !t.done)
   const daySessions = sessions.filter(s => s.date === selectedDate)
   const dayInterviews = applications.filter(a => a.status === 'interview' && a.reminder_date === selectedDate)
-
-  const pendingTasks = tasks.filter(t => !t.done)
-  const doneTasks    = tasks.filter(t => t.done)
 
   return (
     <div style={{ fontFamily: SANS, maxWidth: 1100, margin: '0 auto' }}>
