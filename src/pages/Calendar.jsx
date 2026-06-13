@@ -5,7 +5,7 @@ import {
   CheckSquare, Target, CalendarDays, Zap, Plus, X, Check,
   ChevronLeft, ChevronRight, Trash2, ExternalLink, Link2,
   Clock, Flag, Star, Circle, PlayCircle, Coffee, BookOpen,
-  BarChart3, Edit3, CalendarIcon, MoreVertical, ChevronDown
+  BarChart3, CalendarIcon, ChevronDown, GripVertical
 } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
   isToday, addMonths, subMonths, parseISO, isFuture, isPast, startOfDay } from 'date-fns'
@@ -17,7 +17,7 @@ const SURFACE = 'rgba(13,18,32,0.97)'
 const BG = '#060b14'
 const BORDER = 'rgba(255,255,255,0.07)'
 
-const PRIORITY_COLOR = { high: '#ffb4ab', medium: '#ffb689', low: '#4edea3' }
+const PRIORITY_COLOR = { high: '#f87171', medium: '#60a5fa', low: '#4edea3' }
 const PRIORITY_LABEL = { high: 'High', medium: 'Medium', low: 'Low' }
 
 const GOAL_QUOTES = [
@@ -230,9 +230,10 @@ export default function Calendar() {
   const [sessions, setSessions] = useLocalStorage('trackr_sessions', [])
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
 
-  /* task modal */
+  /* task modal + drag */
   const [calTaskModal, setCalTaskModal] = useState({ open: false, task: null })
-  const [expandedTaskId, setExpandedTaskId] = useState(null)
+  const [calDragIdx,  setCalDragIdx]  = useState(null)
+  const [calDragOver, setCalDragOver] = useState(null)
   /* goal form */
   const [goalForm, setGoalForm] = useState({ open: false, title: '', target: '', unit: 'applications', period: 'week' })
   const [motivation, setMotivation] = useState({ goalId: null, text: '' })
@@ -258,6 +259,16 @@ export default function Calendar() {
   ].filter(Boolean), [tasks, sessions, applications])
 
   /* ── Helpers ── */
+  function reorderPendingTasks(fromIdx, toIdx) {
+    if (fromIdx === null || fromIdx === toIdx) return
+    const pending = tasks.filter(t => !t.done)
+    const done    = tasks.filter(t => t.done)
+    const arr = [...pending]
+    const [item] = arr.splice(fromIdx, 1)
+    arr.splice(toIdx, 0, item)
+    setTasks([...arr, ...done])
+  }
+
   const handleCalTaskSave = ({ id, title, due, note, priority }) => {
     if (!id) {
       setTasks(t => [...t, { id: Date.now().toString(), title, due, priority, note, done: false, createdAt: new Date().toISOString() }])
@@ -309,11 +320,8 @@ export default function Calendar() {
   const daySessions = sessions.filter(s => s.date === selectedDate)
   const dayInterviews = applications.filter(a => a.status === 'interview' && a.reminder_date === selectedDate)
 
-  const pendingTasks = tasks.filter(t => !t.done).sort((a,b) => {
-    const order = { high:0, medium:1, low:2 }
-    return order[a.priority] - order[b.priority]
-  })
-  const doneTasks = tasks.filter(t => t.done)
+  const pendingTasks = tasks.filter(t => !t.done)
+  const doneTasks    = tasks.filter(t => t.done)
 
   return (
     <div style={{ fontFamily: SANS, maxWidth: 1100, margin: '0 auto' }}>
@@ -413,60 +421,58 @@ export default function Calendar() {
             />
 
             {/* Task list */}
-            <div style={{ display:'flex', flexDirection:'column', maxHeight:340, overflowY:'auto', background:'rgba(0,0,0,0.35)', border:`0.5px solid ${BORDER}` }}>
+            <div style={{ display:'flex', flexDirection:'column', maxHeight:340, overflowY:'auto' }}>
               {pendingTasks.length === 0 && (
                 <p style={{ fontFamily:MONO, fontSize:9, color:'rgba(160,200,255,0.3)', padding:'12px 10px' }}>No pending tasks — add one above.</p>
               )}
-              {pendingTasks.map(t => (
-                <div key={t.id}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', transition:'background 0.1s', borderBottom:`0.5px solid rgba(163,201,255,0.05)` }}
-                    onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.04)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                    <button onClick={() => toggleTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority], display:'flex', flexShrink:0, padding:0 }}>
-                      <Circle size={14}/>
-                    </button>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <p style={{ fontSize:12, color:'#c0c7d5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{t.title}</p>
-                      <p style={{ fontFamily:MONO, fontSize:8, color: isPast(startOfDay(parseISO(t.due))) && !isToday(parseISO(t.due)) ? '#ffb4ab' : '#3a4455', marginTop:1 }}>
-                        {isToday(parseISO(t.due)) ? 'Today' : format(parseISO(t.due), 'MMM d')}
-                      </p>
-                    </div>
-                    <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                      <button onClick={() => { setExpandedTaskId(id => id === t.id ? null : t.id) }}
-                        style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
-                        onMouseEnter={e=>e.currentTarget.style.color='#a3c9ff'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
-                        <MoreVertical size={11}/>
-                      </button>
-                      <button onClick={() => setCalTaskModal({ open: true, task: t })}
-                        style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
-                        onMouseEnter={e=>e.currentTarget.style.color='#a3c9ff'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
-                        <Edit3 size={11}/>
-                      </button>
-                      <button onClick={() => deleteTask(t.id)} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.3)', display:'flex', padding:0, transition:'color 0.15s' }}
-                        onMouseEnter={e=>e.currentTarget.style.color='#ffb4ab'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.3)'}>
-                        <Trash2 size={11}/>
-                      </button>
-                    </div>
+              {pendingTasks.map((t, idx) => (
+                <div
+                  key={t.id}
+                  onClick={() => setCalTaskModal({ open: true, task: t })}
+                  onDragOver={e => { e.preventDefault(); setCalDragOver(idx) }}
+                  onDrop={e => { e.preventDefault(); reorderPendingTasks(calDragIdx, idx); setCalDragIdx(null); setCalDragOver(null) }}
+                  style={{
+                    display:'flex', alignItems:'center', gap:8, padding:'8px 10px',
+                    borderBottom:`0.5px solid rgba(163,201,255,0.05)`,
+                    borderTop: calDragOver === idx && calDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.5)' : '1.5px solid transparent',
+                    cursor: 'pointer',
+                    opacity: calDragIdx === idx ? 0.35 : 1,
+                    transition:'background 0.1s, opacity 0.1s',
+                  }}
+                  onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.04)'}
+                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}
+                >
+                  {/* Drag handle */}
+                  <div
+                    draggable={true}
+                    onDragStart={e => { setCalDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
+                    onDragEnd={() => { setCalDragIdx(null); setCalDragOver(null) }}
+                    onClick={e => e.stopPropagation()}
+                    style={{ cursor:'grab', color:'rgba(163,201,255,0.18)', display:'flex', flexShrink:0, padding:'0 1px' }}
+                    onMouseEnter={e=>e.currentTarget.style.color='rgba(163,201,255,0.45)'}
+                    onMouseLeave={e=>e.currentTarget.style.color='rgba(163,201,255,0.18)'}
+                  >
+                    <GripVertical size={12}/>
                   </div>
-                  {expandedTaskId === t.id && (
-                    <div style={{ padding:'8px 10px 10px 32px', background:'rgba(0,0,0,0.4)', borderBottom:`0.5px solid rgba(163,201,255,0.08)` }}>
-                      <div style={{ display:'flex', gap:16 }}>
-                        <div>
-                          <p style={{ fontFamily:MONO, fontSize:8, color:'#3a4455', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3 }}>Priority</p>
-                          <p style={{ fontSize:11, color: PRIORITY_COLOR[t.priority||'medium'], fontWeight:600 }}>{PRIORITY_LABEL[t.priority||'medium']}</p>
-                        </div>
-                        <div>
-                          <p style={{ fontFamily:MONO, fontSize:8, color:'#3a4455', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3 }}>Due</p>
-                          <p style={{ fontFamily:MONO, fontSize:11, color:'#8a919f' }}>{format(parseISO(t.due), 'MMM d, yyyy')}</p>
-                        </div>
-                        {t.note && (
-                          <div style={{ flex:1 }}>
-                            <p style={{ fontFamily:MONO, fontSize:8, color:'#3a4455', textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:3 }}>Note</p>
-                            <p style={{ fontSize:11, color:'#8a919f', lineHeight:1.4 }}>{t.note}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+
+                  {/* Complete toggle */}
+                  <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color: PRIORITY_COLOR[t.priority||'medium'], display:'flex', flexShrink:0, padding:0 }}>
+                    <Circle size={14}/>
+                  </button>
+
+                  {/* Title + date */}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <p title={t.title} style={{ fontSize:12, color:'#c0c7d5', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{t.title}</p>
+                    <p style={{ fontFamily:MONO, fontSize:8, marginTop:1, color: isPast(startOfDay(parseISO(t.due))) && !isToday(parseISO(t.due)) ? '#a78bfa' : '#3a4455' }}>
+                      {isToday(parseISO(t.due)) ? 'Today' : format(parseISO(t.due), 'MMM d')}
+                    </p>
+                  </div>
+
+                  {/* Delete */}
+                  <button onClick={e => { e.stopPropagation(); deleteTask(t.id) }} style={{ background:'none', border:'none', cursor:'pointer', color:'rgba(160,200,255,0.18)', display:'flex', padding:0, flexShrink:0, transition:'color 0.15s' }}
+                    onMouseEnter={e=>e.currentTarget.style.color='#f87171'} onMouseLeave={e=>e.currentTarget.style.color='rgba(160,200,255,0.18)'}>
+                    <Trash2 size={11}/>
+                  </button>
                 </div>
               ))}
               {doneTasks.length > 0 && (

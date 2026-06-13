@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Power, Play, Plus, X, Check, Circle, CheckCircle2 } from 'lucide-react'
+import { Power, Play, Plus, X, Check, Circle, CheckCircle2, GripVertical } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import SetShiftModal from './SetShiftModal'
@@ -49,6 +49,8 @@ export default function EngageWidget() {
 
   const [tasks, setTasks]             = useState(loadTasks)
   const [editingTask, setEditingTask] = useState(null)
+  const [wDragIdx,  setWDragIdx]  = useState(null)
+  const [wDragOver, setWDragOver] = useState(null)
 
   const [lastCompleted, setLastCompleted] = useState(null)
   const undoTimer = useRef(null)
@@ -300,6 +302,16 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
 
   function openEdit(t) {
     setEditingTask(t)
+  }
+
+  function reorderWidgetTasks(fromIdx, toIdx) {
+    if (fromIdx === null || fromIdx === toIdx) return
+    const p = tasks.filter(t => !t.done && t.due <= todayStr)
+    const rest = tasks.filter(t => t.done || t.due > todayStr)
+    const arr = [...p]
+    const [item] = arr.splice(fromIdx, 1)
+    arr.splice(toIdx, 0, item)
+    setTasks([...arr, ...rest])
   }
 
   function handleTaskSave({ id, title, due, note, priority }) {
@@ -585,25 +597,47 @@ const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, 
                     <p style={{padding:'10px 14px',fontSize:11,color:'#2a4898',fontStyle:'italic'}}>No tasks yet — add one above.</p>
                   )}
 
-                  {pending.map(t => (
+                  {pending.map((t, idx) => (
                     <div key={t.id}
-                      style={{display:'flex',alignItems:'center',gap:8,padding:'7px 12px',transition:'background 0.12s'}}
+                      onClick={() => openEdit(t)}
+                      onDragOver={e => { e.preventDefault(); setWDragOver(idx) }}
+                      onDrop={e => { e.preventDefault(); reorderWidgetTasks(wDragIdx, idx); setWDragIdx(null); setWDragOver(null) }}
+                      style={{
+                        display:'flex', alignItems:'center', gap:6, padding:'7px 10px',
+                        borderTop: wDragOver === idx && wDragIdx !== idx ? '1.5px solid rgba(96,165,250,0.5)' : '1.5px solid transparent',
+                        opacity: wDragIdx === idx ? 0.35 : 1,
+                        cursor:'pointer', transition:'background 0.12s, opacity 0.1s',
+                      }}
                       onMouseEnter={e => e.currentTarget.style.background='rgba(96,165,250,0.05)'}
                       onMouseLeave={e => e.currentTarget.style.background='transparent'}>
-                      <button onClick={() => toggleTask(t.id)}
+
+                      {/* Drag handle */}
+                      <div
+                        draggable={true}
+                        onDragStart={e => { setWDragIdx(idx); e.dataTransfer.effectAllowed='move' }}
+                        onDragEnd={() => { setWDragIdx(null); setWDragOver(null) }}
+                        onClick={e => e.stopPropagation()}
+                        style={{ cursor:'grab', color:'rgba(96,165,250,0.18)', display:'flex', flexShrink:0 }}
+                        onMouseEnter={e=>e.currentTarget.style.color='rgba(96,165,250,0.45)'}
+                        onMouseLeave={e=>e.currentTarget.style.color='rgba(96,165,250,0.18)'}
+                      >
+                        <GripVertical size={11}/>
+                      </div>
+
+                      <button onClick={e => { e.stopPropagation(); toggleTask(t.id) }}
                         style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#2a4898',display:'flex',transition:'color 0.15s'}}
                         onMouseEnter={e => e.currentTarget.style.color='#4edea3'}
                         onMouseLeave={e => e.currentTarget.style.color='#2a4898'}>
                         <Circle size={13}/>
                       </button>
-                      <span onClick={() => openEdit(t)}
+
+                      <span
                         title={t.title}
-                        style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',cursor:'pointer',transition:'color 0.15s'}}
-                        onMouseEnter={e => e.currentTarget.style.color='#a3c9ff'}
-                        onMouseLeave={e => e.currentTarget.style.color='#c8dcff'}>
+                        style={{flex:1,fontSize:12,fontWeight:500,color:'#c8dcff',lineHeight:1.35,minWidth:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
                         {t.title}
                       </span>
-                      <button onClick={() => removeTask(t.id)}
+
+                      <button onClick={e => { e.stopPropagation(); removeTask(t.id) }}
                         style={{background:'none',border:'none',padding:0,cursor:'pointer',flexShrink:0,color:'#1e3870',display:'flex',transition:'color 0.15s'}}
                         onMouseEnter={e => e.currentTarget.style.color='#ff6b6b'}
                         onMouseLeave={e => e.currentTarget.style.color='#1e3870'}>
