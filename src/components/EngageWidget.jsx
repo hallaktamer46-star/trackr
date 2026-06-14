@@ -73,6 +73,19 @@ export default function EngageWidget() {
   const timer     = useRef(null)
   const widgetRef = useRef(null)
 
+  // Computed values needed in useEffect dependency arrays — must be declared before useEffect calls
+  const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, color:'#60a5fa' }))]
+  const cur = allStatuses.find(s => s.key === status)
+  const T = (() => {
+    const now = Date.now(), t = {}
+    for (const e of log) { const s = Math.floor(((e.end||now)-e.start)/1000); t[e.status]=(t[e.status]||0)+s }
+    return t
+  })()
+  const curSecs   = log.length && !log[log.length-1]?.end ? Math.floor((Date.now()-log[log.length-1].start)/1000) : 0
+  const shiftSecs = shiftStart
+    ? Math.floor((Date.now()-shiftStart)/1000)
+    : log.reduce((acc,e) => acc + (e.end && e.start ? Math.floor((e.end-e.start)/1000) : 0), 0)
+
   useEffect(() => {
     const h = (e) => { if (widgetRef.current && !widgetRef.current.contains(e.target)) setTab(null) }
     document.addEventListener('mousedown', h)
@@ -173,19 +186,6 @@ export default function EngageWidget() {
     return () => clearInterval(timer.current)
   }, [status])
 
-const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, color:'#60a5fa' }))]
-  const cur = allStatuses.find(s => s.key === status)
-
-  const totals = () => {
-    const now = Date.now(), t = {}
-    for (const e of log) { const s = Math.floor(((e.end||now)-e.start)/1000); t[e.status]=(t[e.status]||0)+s }
-    return t
-  }
-  const T         = totals()
-  const curSecs   = log.length && !log[log.length-1]?.end ? Math.floor((Date.now()-log[log.length-1].start)/1000) : 0
-  const shiftSecs = shiftStart
-    ? Math.floor((Date.now()-shiftStart)/1000)
-    : log.reduce((acc,e) => acc + (e.end && e.start ? Math.floor((e.end-e.start)/1000) : 0), 0)
 
   const pending   = tasks.filter(t => !t.done && t.due <= todayStr)
   const doneTasks = tasks.filter(t => t.done)
