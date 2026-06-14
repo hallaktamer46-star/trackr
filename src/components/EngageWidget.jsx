@@ -647,22 +647,22 @@ export default function EngageWidget() {
 
                 {/* Header */}
                 <div style={{
-                  display:'grid', gridTemplateColumns:'1fr auto 1fr',
-                  alignItems:'center',
+                  display:'flex', alignItems:'center', justifyContent:'space-between',
                   padding:'10px 14px 8px',
                   borderBottom:`1px solid ${DIVIDER}`,
                   flexShrink: 0,
                 }}>
                   <button onClick={() => { navigate('/calendar'); setTab(null) }}
-                    style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase',background:'none',border:'none',cursor:'pointer',padding:0,textAlign:'left',transition:'color 0.15s'}}
+                    style={{display:'flex',alignItems:'center',gap:6,fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase',background:'none',border:'none',cursor:'pointer',padding:0,transition:'color 0.15s'}}
                     onMouseEnter={e=>{ e.currentTarget.style.color='#60a5fa' }}
                     onMouseLeave={e=>{ e.currentTarget.style.color='#5090d8' }}>
                     Tasks
+                    {pending.length > 0 && (
+                      <span style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#60a5fa',letterSpacing:'0.1em'}}>
+                        {pending.length}
+                      </span>
+                    )}
                   </button>
-                  <span style={{fontFamily:NUM,fontSize:18,fontWeight:900,color:'#60a5fa',lineHeight:1,textAlign:'center'}}>
-                    {pending.length || ''}
-                  </span>
-                  <div style={{display:'flex',justifyContent:'flex-end'}}>
                   <button
                     onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
                     style={{
@@ -676,7 +676,6 @@ export default function EngageWidget() {
                     onMouseLeave={e=>{ e.currentTarget.style.borderColor='rgba(60,100,200,0.2)'; e.currentTarget.style.color='#3a6090' }}>
                     <Plus size={9}/> Add
                   </button>
-                  </div>
                 </div>
 
                 {/* Task list */}
