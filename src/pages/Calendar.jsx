@@ -226,6 +226,15 @@ export default function Calendar() {
 
   /* ── State ── */
   const [tasks,    setTasks]    = useLocalStorage('trackr_tasks',    [])
+
+  // Sync tasks with EngageWidget — listen for external saves and reload
+  useEffect(() => {
+    const handler = () => {
+      try { const s = localStorage.getItem('trackr_tasks'); if (s) setTasks(JSON.parse(s)) } catch {}
+    }
+    window.addEventListener('trackr-tasks-updated', handler)
+    return () => window.removeEventListener('trackr-tasks-updated', handler)
+  }, [setTasks])
   const [goals,    setGoals]    = useLocalStorage('trackr_goals',    [])
   const [sessions, setSessions] = useLocalStorage('trackr_sessions', [])
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
@@ -308,7 +317,7 @@ export default function Calendar() {
     const arr = [...pending]
     const [item] = arr.splice(fromIdx, 1)
     arr.splice(toIdx, 0, item)
-    setTasks([...arr, ...done])
+    syncTasks([...arr, ...done])
   }
 
   function getCalItemTransform(idx) {
@@ -323,16 +332,25 @@ export default function Calendar() {
     return 0
   }
 
+  function syncTasks(updater) {
+    setTasks(prev => {
+      const updated = typeof updater === 'function' ? updater(prev) : updater
+      try { localStorage.setItem('trackr_tasks', JSON.stringify(updated)) } catch {}
+      window.dispatchEvent(new Event('trackr-tasks-updated'))
+      return updated
+    })
+  }
+
   const handleCalTaskSave = ({ id, title, due, note, priority }) => {
     if (!id) {
-      setTasks(t => [...t, { id: Date.now().toString(), title, due, priority, note, done: false, createdAt: new Date().toISOString() }])
+      syncTasks(t => [...t, { id: Date.now().toString(), title, due, priority, note, done: false, createdAt: new Date().toISOString() }])
     } else {
-      setTasks(t => t.map(x => x.id === id ? { ...x, title, due, priority, note } : x))
+      syncTasks(t => t.map(x => x.id === id ? { ...x, title, due, priority, note } : x))
     }
     setCalTaskModal({ open: false, task: null })
   }
-  const toggleTask = id => setTasks(t => t.map(x => x.id === id ? { ...x, done: !x.done, completedAt: x.done ? null : new Date().toISOString() } : x))
-  const deleteTask = id => setTasks(t => t.filter(x => x.id !== id))
+  const toggleTask = id => syncTasks(t => t.map(x => x.id === id ? { ...x, done: !x.done, completedAt: x.done ? null : new Date().toISOString() } : x))
+  const deleteTask = id => syncTasks(t => t.filter(x => x.id !== id))
 
   const addGoal = () => {
     if (!goalForm.title.trim() || !goalForm.target) return
