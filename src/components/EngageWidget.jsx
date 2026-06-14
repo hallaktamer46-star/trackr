@@ -26,12 +26,50 @@ function fmt(s) {
   return `${sec}s`
 }
 
-const KEY       = 'trackr_engage_v2'
-const TASKS_KEY = 'trackr_tasks'
+const KEY        = 'trackr_engage_v2'
+const TASKS_KEY  = 'trackr_tasks'
+const CHECKIN_KEY = 'trackr_checkin_pending'
 const load      = () => { try { return JSON.parse(localStorage.getItem(KEY)) } catch { return null } }
 const save      = v  => { try { localStorage.setItem(KEY, JSON.stringify(v)) } catch {} }
 const loadTasks = () => { try { return JSON.parse(localStorage.getItem(TASKS_KEY)) || [] } catch { return [] } }
 const saveTasks = v  => { try { localStorage.setItem(TASKS_KEY, JSON.stringify(v)) } catch {} }
+
+// Run synchronously before React state loads — if check-in deadline passed while app was closed,
+// trim the log and save the ended shift to history, then clear the active session from storage.
+function recoverMissedClockOut() {
+  try {
+    const raw = localStorage.getItem(CHECKIN_KEY)
+    if (!raw) return
+    const { deadline, cutoffTime } = JSON.parse(raw)
+    if (Date.now() < deadline) return // still within grace period
+    const shiftData = JSON.parse(localStorage.getItem(KEY))
+    if (!shiftData?.shiftStart) { localStorage.removeItem(CHECKIN_KEY); return }
+    const rawLog = shiftData.log || []
+    const trimmed = rawLog.reduce((acc, e) => {
+      if (e.start >= cutoffTime) return acc
+      acc.push(!e.end || e.end > cutoffTime ? { ...e, end: cutoffTime } : e)
+      return acc
+    }, [])
+    const finalTotals = {}
+    for (const e of trimmed) {
+      if (e.end && e.start) {
+        const s = Math.floor((e.end - e.start) / 1000)
+        finalTotals[e.status] = (finalTotals[e.status] || 0) + s
+      }
+    }
+    const totalSecs = Math.floor((cutoffTime - shiftData.shiftStart) / 1000)
+    const recordDate = shiftData.sessionDate || shiftData.date
+    const hist = JSON.parse(localStorage.getItem('trackr_history') || '[]')
+    const idx = hist.findIndex(h => h.date === recordDate)
+    const record = { date: recordDate, total: totalSecs, statuses: finalTotals, shiftStart: shiftData.shiftStart, shiftEnd: cutoffTime }
+    if (idx >= 0) hist[idx] = record; else hist.push(record)
+    hist.sort((a, b) => new Date(b.date) - new Date(a.date))
+    localStorage.setItem('trackr_history', JSON.stringify(hist.slice(0, 60)))
+    // Mark shift as ended in storage so the load effect sees it as inactive
+    localStorage.setItem(KEY, JSON.stringify({ ...shiftData, status: null, shiftStart: null, sessionDate: null, log: trimmed }))
+    localStorage.removeItem(CHECKIN_KEY)
+  } catch {}
+}
 
 export default function EngageWidget() {
   const today    = new Date().toDateString()
@@ -93,13 +131,13 @@ export default function EngageWidget() {
   }, [])
 
   useEffect(() => {
+    recoverMissedClockOut() // process any missed auto-clock-out before reading state
     const s = load()
     if (!s) return
-    // If shiftStart is from a previous calendar day and session is not active → stale data, ignore it
     if (s.shiftStart && !s.status) {
       const shiftDay = new Date(s.shiftStart).toDateString()
       if (shiftDay !== today) {
-        setCustom(s.custom || [])  // keep custom statuses
+        setCustom(s.custom || [])
         return
       }
     }
@@ -111,6 +149,37 @@ export default function EngageWidget() {
       setSessionDate(s.sessionDate || s.date || today)
     }
   }, [])
+
+  // Restore pending check-in timer if deadline hasn't passed yet
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(CHECKIN_KEY)
+      if (!raw) return
+      const { deadline, cutoffTime } = JSON.parse(raw)
+      if (Date.now() >= deadline) return // already handled by recoverMissedClockOut
+      setCheckInState({ deadline, cutoffTime })
+      window.dispatchEvent(new CustomEvent('trackr-checkin-start', { detail: { deadline, cutoffTime } }))
+      clearTimeout(checkInRef.current)
+      checkInRef.current = setTimeout(() => {
+        localStorage.removeItem(CHECKIN_KEY)
+        window.dispatchEvent(new Event('trackr-checkin-clear'))
+        const log = logRef.current
+        const trimmed = log.reduce((acc, e) => {
+          if (e.start >= cutoffTime) return acc
+          acc.push(!e.end || e.end > cutoffTime ? { ...e, end: cutoffTime } : e)
+          return acc
+        }, [])
+        doEndShift(trimmed, cutoffTime, shiftStartRef.current, sessionDateRef.current)
+      }, deadline - Date.now())
+    } catch {}
+  }, []) // eslint-disable-line
+
+  // Listen for "I'm still here" confirmed from the Header notification panel
+  useEffect(() => {
+    const handler = () => confirmStillHere()
+    window.addEventListener('trackr-checkin-confirm', handler)
+    return () => window.removeEventListener('trackr-checkin-confirm', handler)
+  }, []) // eslint-disable-line
 
   useEffect(() => { save({ status, log, custom, shiftStart, sessionDate, date: today }) }, [status, log, custom, shiftStart, sessionDate])
   useEffect(() => { saveTasks(tasks) }, [tasks])
@@ -240,6 +309,8 @@ export default function EngageWidget() {
     clearTimeout(twoHourRef.current)
     clearTimeout(checkInRef.current)
     clearTimeout(shiftGoalRef.current)
+    localStorage.removeItem(CHECKIN_KEY)
+    window.dispatchEvent(new Event('trackr-checkin-clear'))
     setLog(finalLog); setStatus(null); setShiftStart(null); setSessionDate(null)
     setCheckInState(null); setLastCheckIn(null); setTab('activity')
   }
@@ -260,9 +331,14 @@ export default function EngageWidget() {
       }
     }
     const deadline = Date.now() + 30 * 60 * 1000
+    const pending = { deadline, cutoffTime }
+    localStorage.setItem(CHECKIN_KEY, JSON.stringify(pending))
     setCheckInState({ deadline, cutoffTime })
+    window.dispatchEvent(new CustomEvent('trackr-checkin-start', { detail: pending }))
     clearTimeout(checkInRef.current)
     checkInRef.current = setTimeout(() => {
+      localStorage.removeItem(CHECKIN_KEY)
+      window.dispatchEvent(new Event('trackr-checkin-clear'))
       const cur = logRef.current
       const trimmed = cur.reduce((acc, e) => {
         if (e.start >= cutoffTime) return acc
@@ -275,6 +351,8 @@ export default function EngageWidget() {
 
   function confirmStillHere() {
     clearTimeout(checkInRef.current)
+    localStorage.removeItem(CHECKIN_KEY)
+    window.dispatchEvent(new Event('trackr-checkin-clear'))
     setCheckInState(null)
     setLastCheckIn(Date.now())
   }
@@ -489,25 +567,6 @@ export default function EngageWidget() {
                       )}
                       <span style={{fontFamily:NUM,fontSize:12,fontWeight:700,color:cur.color}}>{fmt(curSecs)}</span>
                     </div>
-                  </div>
-                )}
-
-                {/* 2h check-in banner */}
-                {checkInState && (
-                  <div style={{padding:'10px 14px',background:'rgba(255,107,107,0.08)',borderBottom:`1px solid rgba(255,107,107,0.2)`}}>
-                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
-                      <span style={{fontFamily:NUM,fontSize:9,color:'#ff6b6b',letterSpacing:'0.08em',fontWeight:800}}>STILL WORKING?</span>
-                      <span style={{fontFamily:NUM,fontSize:12,color:'#ff6b6b',fontWeight:700}}>{fmtCountdown(checkInState.deadline - Date.now())}</span>
-                    </div>
-                    <p style={{fontSize:10,color:'rgba(255,150,150,0.6)',fontFamily:BODY,margin:'0 0 8px',lineHeight:1.4}}>
-                      No response → auto clock-out, last 30m removed
-                    </p>
-                    <button onClick={confirmStillHere}
-                      style={{width:'100%',padding:'7px',background:'rgba(78,222,163,0.12)',border:'1px solid rgba(78,222,163,0.3)',color:'#4edea3',fontSize:10,fontFamily:BODY,fontWeight:700,cursor:'pointer',letterSpacing:'0.04em',transition:'background 0.15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(78,222,163,0.2)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='rgba(78,222,163,0.12)'}>
-                      ✓ &nbsp;I'm still here
-                    </button>
                   </div>
                 )}
 
