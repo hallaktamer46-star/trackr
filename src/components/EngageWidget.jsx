@@ -421,10 +421,18 @@ export default function EngageWidget() {
 
   function handleTaskSave({ id, title, due, note, priority }) {
     if (!id) {
-      setTasks(prev => [...prev, { id: Date.now(), title, due, note, priority, done: false }])
-      window.dispatchEvent(new Event('trackr-tasks-updated'))
+      setTasks(prev => {
+        const updated = [...prev, { id: Date.now(), title, due, note, priority, done: false }]
+        saveTasks(updated) // persist before dispatching so listeners read fresh data
+        window.dispatchEvent(new Event('trackr-tasks-updated'))
+        return updated
+      })
     } else {
-      setTasks(prev => prev.map(t => t.id === id ? { ...t, title, due, note, priority } : t))
+      setTasks(prev => {
+        const updated = prev.map(t => t.id === id ? { ...t, title, due, note, priority } : t)
+        saveTasks(updated)
+        return updated
+      })
     }
     setEditingTask(null)
   }
