@@ -314,7 +314,7 @@ export default function Home() {
       {/* ══ Header row ══ */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <div>
-          <p style={{ fontFamily:MONO, fontSize:9, color:'#404753', letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:4 }}>
+          <p style={{ fontFamily:MONO, fontSize:13, fontWeight:700, color:'#ffffff', letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:6 }}>
             {new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}
           </p>
           <h1 style={{ fontSize:26, fontWeight:900, letterSpacing:'-0.03em', color:'#e2e2e8', lineHeight:1 }}>
