@@ -652,8 +652,8 @@ export default function EngageWidget() {
                   borderBottom:`1px solid ${DIVIDER}`,
                   flexShrink: 0,
                 }}>
-                  <div style={{display:'flex',alignItems:'center',gap:7}}>
-                    <button onClick={() => navigate('/calendar')}
+                  <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <button onClick={() => { navigate('/calendar'); setTab(null) }}
                       style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase',background:'none',border:'none',cursor:'pointer',padding:0,textDecoration:'none',transition:'color 0.15s'}}
                       onMouseEnter={e=>{ e.currentTarget.style.color='#60a5fa' }}
                       onMouseLeave={e=>{ e.currentTarget.style.color='#5090d8' }}>
@@ -661,13 +661,8 @@ export default function EngageWidget() {
                     </button>
                     {pending.length > 0 && (
                       <span style={{
-                        fontFamily:NUM, fontSize:9, fontWeight:900,
+                        fontFamily:NUM, fontSize:13, fontWeight:900,
                         color:'#60a5fa',
-                        background:'rgba(96,165,250,0.14)',
-                        border:'1px solid rgba(96,165,250,0.35)',
-                        boxShadow:'0 0 8px rgba(96,165,250,0.22), inset 0 1px 0 rgba(163,201,255,0.15)',
-                        display:'inline-flex', alignItems:'center', justifyContent:'center',
-                        minWidth:18, height:18, padding:'0 5px',
                         lineHeight:1,
                       }}>
                         {pending.length}
