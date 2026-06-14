@@ -47,19 +47,6 @@ export default function Header() {
           >
             <Menu size={16}/>
           </button>
-          <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="34" height="34" rx="9" fill="#0c1220"/>
-            <polyline
-              points="4,17 8,17 10.5,10 14,24 17,12 20,20 23,20 26,17 30,17"
-              stroke="#38bdf8"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="hidden sm:block text-slate-900 dark:text-white" style={{ fontFamily: 'Inter, -apple-system, sans-serif', fontSize: 14, fontWeight: 700, letterSpacing: '-0.01em' }}>
-            Trackr
-          </span>
         </div>
 
         {/* Nav links */}
