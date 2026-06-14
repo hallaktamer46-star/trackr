@@ -29,9 +29,9 @@ const SECTIONS = [
     key: 'cv',
     label: 'CV HUB',
     items: [
-      { to: '/cv/builder',      icon: PenLine,  label: 'CV Builder',   tag: 'PRO',  accent: '#a3c9ff' },
-      { to: '/cv/reviewer',     icon: FileText, label: 'CV Reviewer',  tag: 'FREE', accent: '#4edea3' },
-      { to: '/cv/cover-letter', icon: Mail,     label: 'Cover Letter', tag: 'PRO',  accent: '#ffb689' },
+      { to: '/cv/builder',      icon: PenLine,  label: 'CV Builder',   accent: '#a3c9ff' },
+      { to: '/cv/reviewer',     icon: FileText, label: 'CV Reviewer',  accent: '#4edea3' },
+      { to: '/cv/cover-letter', icon: Mail,     label: 'Cover Letter', accent: '#ffb689' },
     ],
   },
   {
