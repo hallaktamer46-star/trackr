@@ -97,7 +97,7 @@ function CategoryTile({ cat, selected, onToggle }) {
       </div>
 
       <span style={{
-        fontFamily: 'Geist Mono, monospace',
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
         fontSize: 9.5,
         fontWeight: 700,
         letterSpacing: '0.06em',
@@ -237,7 +237,7 @@ function ActionStep({ step, color, index }) {
         boxShadow: `0 0 16px ${color}40`,
       }}>
         <span style={{
-          fontFamily: 'Geist Mono, monospace',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
           fontSize: 13,
           fontWeight: 800,
           color: '#000',
@@ -266,7 +266,7 @@ function ActionStep({ step, color, index }) {
           {step.action}
         </div>
         <div style={{
-          fontFamily: 'Geist Mono, monospace',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
           fontSize: 11,
           color: color + 'aa',
           lineHeight: 1.4,
@@ -433,7 +433,7 @@ export default function MentalClarity() {
           }}>
             <Brain size={14} style={{ color: '#00d4ff' }} />
             <span style={{
-              fontFamily: 'Geist Mono, monospace',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
               fontSize: 10,
               fontWeight: 700,
               color: '#00d4ff',
@@ -482,7 +482,7 @@ export default function MentalClarity() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 800, color: '#000' }}>1</span>
+                  <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 800, color: '#000' }}>1</span>
                 </div>
                 <span style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 600, color: '#8899b4', letterSpacing: '-0.01em' }}>
                   What's weighing on you? <span style={{ color: '#4a5568', fontWeight: 400 }}>(pick all that apply)</span>
@@ -514,7 +514,7 @@ export default function MentalClarity() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  <span style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 800, color: '#fff' }}>2</span>
+                  <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 800, color: '#fff' }}>2</span>
                 </div>
                 <span style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 600, color: '#8899b4', letterSpacing: '-0.01em' }}>
                   Now dump it all out — hold mic to speak, or type
@@ -568,7 +568,7 @@ export default function MentalClarity() {
                       onPointerUp={stopRecording}
                     />
                     <span style={{
-                      fontFamily: 'Geist Mono, monospace',
+                      fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                       fontSize: 9,
                       color: recording ? '#ff6b6b' : transcribing ? '#fbbf24' : '#2d3748',
                       letterSpacing: '0.06em',
@@ -584,7 +584,7 @@ export default function MentalClarity() {
                 {micError && (
                   <div style={{
                     marginTop: 8,
-                    fontFamily: 'Geist Mono, monospace',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 11,
                     color: '#ff6b6b',
                   }}>
@@ -595,7 +595,7 @@ export default function MentalClarity() {
                 {/* char counter */}
                 <div style={{
                   position: 'absolute', bottom: 8, right: 16,
-                  fontFamily: 'Geist Mono, monospace',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                   fontSize: 10,
                   color: text.length > 50 ? '#3d4d5e' : '#252d38',
                   transition: 'color 0.3s',
@@ -611,7 +611,7 @@ export default function MentalClarity() {
                 padding: '10px 14px',
                 background: 'rgba(255,107,107,0.08)',
                 border: '1px solid rgba(255,107,107,0.3)',
-                fontFamily: 'Geist Mono, monospace',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                 fontSize: 12,
                 color: '#ff6b6b',
               }}>
@@ -692,7 +692,7 @@ export default function MentalClarity() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <Sparkles size={14} style={{ color: '#a78bfa' }} />
                 <span style={{
-                  fontFamily: 'Geist Mono, monospace',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                   fontSize: 9,
                   fontWeight: 700,
                   color: '#a78bfa',
@@ -732,7 +732,7 @@ export default function MentalClarity() {
                 }}>
                   <CheckCircle2 size={13} style={{ color: '#4edea3' }} />
                   <span style={{
-                    fontFamily: 'Geist Mono, monospace',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 9,
                     fontWeight: 700,
                     color: '#4edea3',
@@ -760,7 +760,7 @@ export default function MentalClarity() {
                 }}>
                   <XCircle size={13} style={{ color: '#ff6b6b' }} />
                   <span style={{
-                    fontFamily: 'Geist Mono, monospace',
+                    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                     fontSize: 9,
                     fontWeight: 700,
                     color: '#ff6b6b',
@@ -789,7 +789,7 @@ export default function MentalClarity() {
                   background: 'linear-gradient(90deg, rgba(48,54,61,0.9), transparent)',
                 }} />
                 <span style={{
-                  fontFamily: 'Geist Mono, monospace',
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                   fontSize: 9,
                   fontWeight: 700,
                   color: '#60718a',
@@ -828,7 +828,7 @@ export default function MentalClarity() {
             >
               <RotateCcw size={14} style={{ color: '#60718a' }} />
               <span style={{
-                fontFamily: 'Geist Mono, monospace',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
                 fontSize: 11,
                 fontWeight: 600,
                 color: '#60718a',

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import SetShiftModal from './SetShiftModal'
 import TaskModal from './TaskModal'
 
-const NUM  = 'Geist Mono, monospace'
+const NUM  = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const BODY = 'Geist, Inter, -apple-system, sans-serif'
 
 const STATUSES = [

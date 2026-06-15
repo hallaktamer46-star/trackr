@@ -3,7 +3,7 @@ import { Send, Loader2, RotateCcw, Flag, Mic } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 
 // ── design tokens ─────────────────────────────────────────────────
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 const LABEL = {

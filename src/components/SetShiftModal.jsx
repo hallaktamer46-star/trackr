@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const MONO = '"Geist Mono", monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Inter, -apple-system, sans-serif'
 
 const DURATION_PRESETS = [4, 6, 8, 10]

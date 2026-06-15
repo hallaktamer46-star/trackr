@@ -6,7 +6,7 @@ import { cn } from '../../lib/cn'
 import { useSidebar } from '../../contexts/SidebarContext'
 
 const CHECKIN_KEY = 'trackr_checkin_pending'
-const MONO = '"Geist Mono", monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 
 function fmtCountdown(ms) {
   if (!ms || ms <= 0) return '0:00'
@@ -139,7 +139,7 @@ export default function Header() {
               cursor: 'pointer',
               color: 'rgba(148,163,184,0.7)',
               transition: 'color 0.15s, background 0.15s',
-              fontFamily: '"Geist Mono", monospace',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.12em',

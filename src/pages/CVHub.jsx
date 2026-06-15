@@ -23,7 +23,7 @@ export default function CVHub() {
 
       {/* Header */}
       <div className="mb-7">
-        <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 4 }}>
+        <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#4edea3', textTransform: 'uppercase', marginBottom: 4 }}>
           Trackr
         </p>
         <h1 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', lineHeight: 1.15 }}>
@@ -71,7 +71,7 @@ export default function CVHub() {
                   {t.label}
                 </p>
                 <p style={{
-                  fontFamily: 'Geist Mono, monospace', fontSize: 9,
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 9,
                   color: isActive ? t.accent + 'cc' : '#404753', letterSpacing: '0.02em',
                 }}>
                   {t.desc}

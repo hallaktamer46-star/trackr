@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Plus, Trash2, Loader2, Trophy, AlertTriangle, Lightbulb, ChevronDown, RotateCcw } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 const LABEL = {

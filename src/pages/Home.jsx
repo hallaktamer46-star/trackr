@@ -22,7 +22,7 @@ import { useApplications } from '../contexts/ApplicationContext'
 import ApplicationModal from '../components/Modals/ApplicationModal'
 import QuickPostModal from '../components/QuickPostModal'
 
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 const IMP_COLORS = { 1:'#4edea3', 2:'#a3c9ff', 3:'#fbbf24', 4:'#ffb689', 5:'#ffb4ab' }
 

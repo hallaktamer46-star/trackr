@@ -13,7 +13,7 @@
   --color-brand-700: #0369a1;
 }
 
-* { box-sizing: border-box; font-feature-settings: "zero" 0; }
+* { box-sizing: border-box; }
 
 .surface-glass {
   background: rgba(22, 27, 34, 0.85);

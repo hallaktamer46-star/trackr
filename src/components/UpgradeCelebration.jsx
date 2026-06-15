@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { X, Rocket, Crown, Zap, Check, Sparkles, ArrowRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 const PLAN_CONFIG = {

@@ -9,7 +9,7 @@ function loadSessions() { try { return JSON.parse(localStorage.getItem(SESSIONS_
 function saveSessions(s) { localStorage.setItem(SESSIONS_KEY, JSON.stringify(s.slice(0, 20))) }
 
 const SANS = 'Geist, Inter, sans-serif'
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 
 // Parse bullet text → array of clean strings
 function parseBullets(text) {

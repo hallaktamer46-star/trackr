@@ -11,7 +11,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
   isToday, addMonths, subMonths, parseISO, isFuture, isPast, startOfDay } from 'date-fns'
 import { useApplications } from '../contexts/ApplicationContext'
 
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 const SURFACE = 'rgba(13,18,32,0.97)'
 const BG = '#060b14'

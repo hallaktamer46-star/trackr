@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { apiFetch } from '../lib/api'
 
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 /* ─── localStorage session persistence ──────────────────────────── */
@@ -86,7 +86,7 @@ const GLOBAL_CSS = `
   }
   .ss-pill {
     padding: 8px 18px; border-radius: 99px; cursor: pointer;
-    font-family: Geist Mono, monospace; font-size: 11px; font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 0.04em; border: 1.5px solid rgba(255,255,255,0.1);
     background: rgba(255,255,255,0.04); color: #93c5fd;
     transition: all 0.18s ease;
@@ -100,7 +100,7 @@ const GLOBAL_CSS = `
   }
   .ss-gen-btn {
     width: 100%; padding: 16px 0; border: none; border-radius: 16px;
-    cursor: pointer; font-family: Geist Mono, monospace;
+    cursor: pointer; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 13px; font-weight: 800; letter-spacing: 0.1em;
     text-transform: uppercase; color: white;
     background: linear-gradient(135deg, var(--sc,#a78bfa), #6d6bfa);
@@ -116,7 +116,7 @@ const GLOBAL_CSS = `
     display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
     border-radius: 12px; border: 1.5px solid var(--sc, #a78bfa);
     background: var(--sc-bg, rgba(167,139,250,0.1)); color: var(--sc, #a78bfa);
-    font-family: Geist Mono, monospace; font-size: 11px; font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 700;
     letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s;
   }
   .ss-next-btn:hover { background: var(--sc-bg2, rgba(167,139,250,0.2)); transform: translateX(3px); }
@@ -973,7 +973,7 @@ function ProductionPanel({ data, onUpdate, onNext, loading, setLoading, setError
 
           <ResultSection title="Outreach Template" color="#34d399">
             <div style={{ position: 'relative' }}>
-              <pre style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.75, whiteSpace: 'pre-wrap', fontFamily: 'Geist Mono, monospace', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px', margin: 0 }}>
+              <pre style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.75, whiteSpace: 'pre-wrap', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, padding: '12px 14px', margin: 0 }}>
                 {result.outreach_template}
               </pre>
               <button onClick={copyTemplate} style={{ position: 'absolute', top: 8, right: 8, display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: copied ? 'rgba(52,211,153,0.15)' : 'rgba(255,255,255,0.06)', border: `1px solid ${copied ? 'rgba(52,211,153,0.4)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 6, color: copied ? '#34d399' : '#94a3b8', fontSize: 11, cursor: 'pointer', fontFamily: MONO }}>

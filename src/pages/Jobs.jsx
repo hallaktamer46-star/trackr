@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 
-const MONO = 'Geist Mono, monospace'
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 const BG      = '#0d1117'
@@ -599,9 +599,9 @@ function SectionHeader({ label, color, count, icon: Icon }) {
   return (
     <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
       {Icon && <Icon size={9} style={{ color }}/>}
-      <span style={{ fontFamily:'Geist Mono, monospace', fontSize:9, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color }}>{label}</span>
+      <span style={{ fontFamily:'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize:9, fontWeight:700, letterSpacing:'0.15em', textTransform:'uppercase', color }}>{label}</span>
       <div style={{ flex:1, height:'0.5px', background:`linear-gradient(90deg, ${color}40, transparent)` }}/>
-      <span style={{ fontFamily:'Geist Mono, monospace', fontSize:9, color:'#404753' }}>{count}</span>
+      <span style={{ fontFamily:'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize:9, color:'#404753' }}>{count}</span>
     </div>
   )
 }
@@ -617,7 +617,7 @@ function FDD({ label, options, value, onChange }) {
   const isActive = value && value !== options[0]
   return (
     <div ref={ref} style={{ position:'relative' }}>
-      <button onClick={()=>setOpen(v=>!v)} style={{ display:'flex', alignItems:'center', gap:6, padding:'5px 12px', background:isActive?'rgba(163,201,255,0.1)':'rgba(255,255,255,0.02)', border:`0.5px solid ${isActive?'rgba(163,201,255,0.35)':BORDER}`, cursor:'pointer', color:isActive?'#a3c9ff':'#5a6478', fontFamily:'Geist Mono, monospace', fontSize:9, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', transition:'all 0.15s' }}>
+      <button onClick={()=>setOpen(v=>!v)} style={{ display:'flex', alignItems:'center', gap:6, padding:'5px 12px', background:isActive?'rgba(163,201,255,0.1)':'rgba(255,255,255,0.02)', border:`0.5px solid ${isActive?'rgba(163,201,255,0.35)':BORDER}`, cursor:'pointer', color:isActive?'#a3c9ff':'#5a6478', fontFamily:'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize:9, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', transition:'all 0.15s' }}>
         {isActive ? value : label} <ChevronDown size={9} style={{ transform:open?'rotate(180deg)':'none', transition:'transform 0.15s' }}/>
       </button>
       {open && (

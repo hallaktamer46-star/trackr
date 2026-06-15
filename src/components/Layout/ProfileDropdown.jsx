@@ -85,15 +85,15 @@ export default function ProfileDropdown() {
                 Signed in as
               </p>
               {isApexUser ? (
-                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'linear-gradient(135deg, rgba(78,222,163,0.15), rgba(163,201,255,0.15))', border:'0.5px solid rgba(78,222,163,0.4)', color:'#4edea3', letterSpacing:'0.06em' }}>
+                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'linear-gradient(135deg, rgba(78,222,163,0.15), rgba(163,201,255,0.15))', border:'0.5px solid rgba(78,222,163,0.4)', color:'#4edea3', letterSpacing:'0.06em' }}>
                   <Rocket size={9} /> APEX
                 </span>
               ) : isPaidUser ? (
-                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'rgba(163,201,255,0.12)', border:'0.5px solid rgba(163,201,255,0.35)', color:'#a3c9ff', letterSpacing:'0.06em' }}>
+                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'rgba(163,201,255,0.12)', border:'0.5px solid rgba(163,201,255,0.35)', color:'#a3c9ff', letterSpacing:'0.06em' }}>
                   <Crown size={9} /> PRO
                 </span>
               ) : (
-                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'Geist Mono, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'rgba(138,145,159,0.1)', border:'0.5px solid rgba(138,145,159,0.25)', color:'#8a919f', letterSpacing:'0.06em' }}>
+                <span style={{ display:'flex', alignItems:'center', gap:4, fontFamily:'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize:10, fontWeight:700, padding:'2px 8px', background:'rgba(138,145,159,0.1)', border:'0.5px solid rgba(138,145,159,0.25)', color:'#8a919f', letterSpacing:'0.06em' }}>
                   FREE
                 </span>
               )}

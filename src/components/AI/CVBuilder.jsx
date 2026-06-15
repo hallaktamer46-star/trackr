@@ -5,7 +5,7 @@ import { apiFetch } from '../../lib/api'
 // ─── design tokens ───────────────────────────────────────────────
 const S = {
   label: {
-    fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600,
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 9, fontWeight: 600,
     letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase',
     display: 'block', marginBottom: 6,
   },
@@ -67,7 +67,7 @@ function TagInput({ label, tags, onChange }) {
           <span key={t} style={{
             display: 'flex', alignItems: 'center', gap: 5,
             background: 'rgba(20,60,110,0.6)', border: '0.5px solid rgba(163,201,255,0.2)',
-            color: '#a3c9ff', fontSize: 11, fontFamily: 'Geist Mono, monospace',
+            color: '#a3c9ff', fontSize: 11, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
             padding: '3px 10px',
           }}>
             {t}
@@ -155,7 +155,7 @@ function StepExperience({ list, setList }) {
             <Field      label="Location"    value={exp.location} onChange={v => update(i, 'location', v)} placeholder="City, Country (optional)" />
           </div>
           <label style={S.label}>Key Achievements / Responsibilities</label>
-          <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, color: '#404753', marginBottom: 8 }}>
+          <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 9, color: '#404753', marginBottom: 8 }}>
             Write rough notes — AI will polish them into strong bullet points
           </p>
           {exp.bullets.map((b, bi) => (
@@ -176,7 +176,7 @@ function StepExperience({ list, setList }) {
           ))}
           <button onClick={() => addBullet(i)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#404753', fontSize: 11, fontFamily: 'Geist Mono, monospace',
+            color: '#404753', fontSize: 11, fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
             display: 'flex', alignItems: 'center', gap: 4, marginTop: 4,
           }}>
             <Plus size={11} /> Add bullet
@@ -186,7 +186,7 @@ function StepExperience({ list, setList }) {
       <button onClick={() => setList([...list, emptyExp()])} style={{
         width: '100%', padding: '10px 0',
         background: 'rgba(255,182,137,0.05)', border: '0.5px dashed rgba(255,182,137,0.3)',
-        color: '#ffb689', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 600,
+        color: '#ffb689', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 600,
         letterSpacing: '0.06em', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
       }}>
         <Plus size={12} /> Add Another Position
@@ -232,7 +232,7 @@ function StepEducation({ list, setList }) {
       <button onClick={() => setList([...list, emptyEdu()])} style={{
         width: '100%', padding: '10px 0',
         background: 'rgba(78,222,163,0.05)', border: '0.5px dashed rgba(78,222,163,0.3)',
-        color: '#4edea3', fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 600,
+        color: '#4edea3', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 600,
         letterSpacing: '0.06em', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
       }}>
         <Plus size={12} /> Add Another Qualification
@@ -291,7 +291,7 @@ function CVPreview({ cv, onReset }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div>
           <p style={{ ...S.label, color: '#4edea3', marginBottom: 4 }}>Your CV is ready</p>
-          <p style={{ fontSize: 11, color: '#8a919f', fontFamily: 'Geist Mono, monospace' }}>
+          <p style={{ fontSize: 11, color: '#8a919f', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>
             ATS-optimised · Reverse chronological · Action-verb bullets
           </p>
         </div>
@@ -302,7 +302,7 @@ function CVPreview({ cv, onReset }) {
             border: `0.5px solid ${copied ? 'rgba(78,222,163,0.4)' : 'rgba(163,201,255,0.25)'}`,
             color: copied ? '#4edea3' : '#a3c9ff',
             padding: '8px 14px', cursor: 'pointer',
-            fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em',
           }}>
             {copied ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy CV</>}
           </button>
@@ -310,7 +310,7 @@ function CVPreview({ cv, onReset }) {
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'rgba(138,145,159,0.06)', border: '0.5px solid rgba(138,145,159,0.2)',
             color: '#8a919f', padding: '8px 14px', cursor: 'pointer',
-            fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em',
           }}>
             Edit Info
           </button>
@@ -321,7 +321,7 @@ function CVPreview({ cv, onReset }) {
       <div style={{
         background: '#0d1117', border: '0.5px solid rgba(48,54,61,0.9)',
         padding: '32px 36px',
-        fontFamily: 'Geist Mono, monospace',
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
         fontSize: 12.5,
         lineHeight: 1.75,
         color: '#c0c7d5',
@@ -331,7 +331,7 @@ function CVPreview({ cv, onReset }) {
         {cv}
       </div>
 
-      <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, color: '#404753', marginTop: 12, textAlign: 'center' }}>
+      <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, color: '#404753', marginTop: 12, textAlign: 'center' }}>
         Tip: Copy and paste into Google Docs or Word to add your own formatting and export as PDF
       </p>
     </div>
@@ -406,7 +406,7 @@ export default function CVBuilder() {
             >
               <Icon size={13} style={{ color: active ? '#a3c9ff' : done ? '#4edea3' : '#404753' }} />
               <span style={{
-                fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
                 color: active ? '#a3c9ff' : done ? '#4edea3' : '#404753',
                 textTransform: 'uppercase',
               }}>
@@ -424,7 +424,7 @@ export default function CVBuilder() {
       </div>
 
       {error && (
-        <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 11, color: '#ffb4ab', marginTop: 12 }}>{error}</p>
+        <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, color: '#ffb4ab', marginTop: 12 }}>{error}</p>
       )}
 
       {/* Nav buttons */}
@@ -437,7 +437,7 @@ export default function CVBuilder() {
             background: 'rgba(138,145,159,0.06)', border: '0.5px solid rgba(138,145,159,0.2)',
             color: '#8a919f', padding: '10px 18px', cursor: step === 0 ? 'default' : 'pointer',
             opacity: step === 0 ? 0.3 : 1,
-            fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em',
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 600, letterSpacing: '0.05em',
           }}
         >
           <ChevronLeft size={13} /> Back
@@ -450,7 +450,7 @@ export default function CVBuilder() {
               display: 'flex', alignItems: 'center', gap: 6,
               background: '#1493ff', border: 'none',
               color: '#fff', padding: '10px 22px', cursor: 'pointer',
-              fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
               textTransform: 'uppercase',
             }}
           >
@@ -465,7 +465,7 @@ export default function CVBuilder() {
               background: loading ? 'rgba(78,222,163,0.15)' : '#4edea3',
               border: 'none', color: '#0d1117',
               padding: '10px 24px', cursor: loading ? 'default' : 'pointer',
-              fontFamily: 'Geist Mono, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
               textTransform: 'uppercase', opacity: loading ? 0.7 : 1,
             }}
           >

@@ -50,7 +50,7 @@ export default function Onboarding({ onComplete }) {
 
         {step === 1 && (
           <div>
-            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
+            <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
               Step 1 of 2
             </p>
             <h2 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 6 }}>
@@ -62,7 +62,7 @@ export default function Onboarding({ onComplete }) {
 
             <div className="space-y-3">
               <div>
-                <label style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                <label style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
                   First name
                 </label>
                 <input
@@ -79,7 +79,7 @@ export default function Onboarding({ onComplete }) {
                 />
               </div>
               <div>
-                <label style={{ fontFamily: 'Geist Mono, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
+                <label style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 9, fontWeight: 600, letterSpacing: '0.1em', color: '#8a919f', textTransform: 'uppercase', display: 'block', marginBottom: 6 }}>
                   Last name <span style={{ color: '#404753' }}>(optional)</span>
                 </label>
                 <input
@@ -109,7 +109,7 @@ export default function Onboarding({ onComplete }) {
 
         {step === 2 && (
           <div>
-            <p style={{ fontFamily: 'Geist Mono, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
+            <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
               Step 2 of 2
             </p>
             <h2 style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.03em', color: '#e2e2e8', marginBottom: 6 }}>
