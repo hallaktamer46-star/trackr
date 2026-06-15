@@ -88,7 +88,7 @@ function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
           </span>
         )}
       </div>
-      <p style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1, marginBottom:4 }}>{value}</p>
+      <p style={{ fontFamily:SANS, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1, marginBottom:4 }}>{value}</p>
       <p style={{ fontFamily:MONO, fontSize:9, color:'#3a4455', marginBottom:10 }}>{sub}</p>
 
       {/* Dot grid — neutral squares, filled vs dim */}
