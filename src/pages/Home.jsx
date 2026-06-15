@@ -70,20 +70,18 @@ function KPICard({ label, value, sub, icon: Icon, gradient, trend, trendUp }) {
   )
 }
 
-/* ─── Mini stat card — vibrant tinted ─── */
+/* ─── Mini stat card ─── */
 function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
   const dotCount = total != null ? Math.min(total, 24) : 0
   const filledDots = total != null && pct != null ? Math.round((pct / 100) * dotCount) : 0
   return (
     <div style={{
-      background:`linear-gradient(135deg, ${color}10 0%, ${color}03 100%)`,
-      border:`0.5px solid ${color}28`,
+      background: '#161b22',
+      border: '0.5px solid rgba(48,54,61,0.9)',
       padding:'15px 16px', flex:1,
-      position:'relative', overflow:'hidden',
     }}>
-      <div style={{ position:'absolute', bottom:-18, right:-18, width:70, height:70, borderRadius:'50%', background:`${color}08`, pointerEvents:'none' }}/>
       <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:6 }}>
-        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:`${color}65`, textTransform:'uppercase' }}>{label}</p>
+        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase' }}>{label}</p>
         {pct != null && (
           <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:up?'#4edea3':'#ffb4ab', background:up?'rgba(78,222,163,0.12)':'rgba(255,180,171,0.12)', border:`0.5px solid ${up?'rgba(78,222,163,0.3)':'rgba(255,180,171,0.3)'}`, padding:'2px 6px' }}>
             {up?<TrendingUp size={8}/>:<TrendingDown size={8}/>} {pct}%
@@ -91,18 +89,16 @@ function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
         )}
       </div>
       <p style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1, marginBottom:4 }}>{value}</p>
-      <p style={{ fontFamily:MONO, fontSize:9, color:`${color}50`, marginBottom:10 }}>{sub}</p>
+      <p style={{ fontFamily:MONO, fontSize:9, color:'#3a4455', marginBottom:10 }}>{sub}</p>
 
-      {/* Dot grid for task-type data */}
+      {/* Dot grid — neutral squares, filled vs dim */}
       {dotCount > 0 && (
         <div style={{ display:'flex', flexWrap:'wrap', gap:3 }}>
           {Array.from({ length: dotCount }, (_, i) => (
             <div key={i} style={{
               width: 7, height: 7,
               borderRadius: 2,
-              background: i < filledDots ? color : `${color}18`,
-              boxShadow: i < filledDots ? `0 0 5px ${color}70` : 'none',
-              transition: `background 0.3s ease ${i * 18}ms, box-shadow 0.3s ease ${i * 18}ms`,
+              background: i < filledDots ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.06)',
             }}/>
           ))}
         </div>
