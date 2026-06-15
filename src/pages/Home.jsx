@@ -70,24 +70,35 @@ function KPICard({ label, value, sub, icon: Icon, gradient, trend, trendUp }) {
   )
 }
 
-/* ─── Mini area chart card ─── */
+/* ─── Mini stat card — vibrant tinted ─── */
 function MiniStatCard({ label, value, sub, color, data, pct, up }) {
   return (
-    <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', padding:'14px 16px', flex:1 }}>
-      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:10 }}>
+    <div style={{
+      background:`linear-gradient(135deg, ${color}12 0%, ${color}04 100%)`,
+      border:`0.5px solid ${color}30`,
+      padding:'15px 16px', flex:1,
+      position:'relative', overflow:'hidden',
+    }}>
+      <div style={{ position:'absolute', top:-22, right:-22, width:74, height:74, borderRadius:'50%', background:`${color}10`, pointerEvents:'none' }}/>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:8 }}>
         <div>
-          <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase', marginBottom:4 }}>{label}</p>
+          <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:`${color}70`, textTransform:'uppercase', marginBottom:4 }}>{label}</p>
           <p style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1 }}>{value}</p>
         </div>
         {pct != null && (
-          <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color: up?'#4edea3':'#ffb4ab', background: up?'rgba(78,222,163,0.1)':'rgba(255,180,171,0.1)', border:`0.5px solid ${up?'rgba(78,222,163,0.25)':'rgba(255,180,171,0.25)'}`, padding:'3px 7px' }}>
+          <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:up?'#4edea3':'#ffb4ab', background:up?'rgba(78,222,163,0.12)':'rgba(255,180,171,0.12)', border:`0.5px solid ${up?'rgba(78,222,163,0.3)':'rgba(255,180,171,0.3)'}`, padding:'3px 7px' }}>
             {up?<TrendingUp size={9}/>:<TrendingDown size={9}/>} {pct}%
           </span>
         )}
       </div>
-      <p style={{ fontFamily:MONO, fontSize:9, color:'#3a4455', marginBottom:8 }}>{sub}</p>
-      {data && data.length > 0 && (
-        <ResponsiveContainer width="100%" height={48}>
+      <p style={{ fontFamily:MONO, fontSize:9, color:`${color}55`, marginBottom: pct != null || (data && data.length) ? 10 : 0 }}>{sub}</p>
+      {pct != null && (
+        <div style={{ height:3, background:`${color}18`, borderRadius:999 }}>
+          <div style={{ height:'100%', width:`${Math.min(pct,100)}%`, background:color, borderRadius:999, boxShadow:`0 0 8px ${color}60`, transition:'width 1s cubic-bezier(0.22,1,0.36,1)' }}/>
+        </div>
+      )}
+      {pct == null && data && data.length > 0 && (
+        <ResponsiveContainer width="100%" height={42}>
           <AreaChart data={data} margin={{top:0,right:0,left:0,bottom:0}}>
             <defs>
               <linearGradient id={`ag${color.replace('#','')}`} x1="0" y1="0" x2="0" y2="1">
@@ -103,26 +114,35 @@ function MiniStatCard({ label, value, sub, color, data, pct, up }) {
   )
 }
 
-/* ─── Donut chart card ─── */
-function DonutCard({ label, value, total, color, sub }) {
-  const pct = total > 0 ? Math.round((value/total)*100) : 0
-  const data = [{ v: value }, { v: Math.max(0, total - value) }]
+/* ─── Progress ring — single clean arc, animated on mount ─── */
+function ProgressRing({ label, value, total, color, sub }) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0
+  const r = 26, circ = 2 * Math.PI * r
+  const [filled, setFilled] = useState(0)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setFilled((pct / 100) * circ))
+    return () => cancelAnimationFrame(id)
+  }, [pct, circ])
   return (
-    <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'12px 8px' }}>
-      <div style={{ position:'relative', width:72, height:72 }}>
-        <PieChart width={72} height={72}>
-          <Pie data={data} cx={31} cy={31} innerRadius={22} outerRadius={32} startAngle={90} endAngle={-270} dataKey="v" strokeWidth={0}>
-            <Cell fill={color}/>
-            <Cell fill="rgba(255,255,255,0.05)"/>
-          </Pie>
-        </PieChart>
+    <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'14px 8px' }}>
+      <div style={{ position:'relative', width:68, height:68 }}>
+        <svg width={68} height={68} viewBox="0 0 68 68">
+          <g transform="rotate(-90 34 34)">
+            <circle cx={34} cy={34} r={r} fill="none" stroke={`${color}18`} strokeWidth={5}/>
+            <circle cx={34} cy={34} r={r} fill="none" stroke={color} strokeWidth={5}
+              strokeLinecap="round"
+              strokeDasharray={`${filled} ${circ}`}
+              style={{ filter:`drop-shadow(0 0 4px ${color}80)`, transition:'stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1)' }}
+            />
+          </g>
+        </svg>
         <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <span style={{ fontFamily:MONO, fontSize:12, fontWeight:800, color }}>{pct}%</span>
+          <span style={{ fontFamily:MONO, fontSize:12, fontWeight:900, color }}>{pct}%</span>
         </div>
       </div>
-      <p style={{ fontFamily:MONO, fontSize:10, fontWeight:800, color:'#e2e2e8', marginTop:6, letterSpacing:'-0.02em' }}>{value.toLocaleString()}</p>
-      <p style={{ fontFamily:MONO, fontSize:7, color:'#5a6478', textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'center', marginTop:2 }}>{label}</p>
-      {sub && <p style={{ fontFamily:MONO, fontSize:7, color:'#3a4455', marginTop:1 }}>{sub}</p>}
+      <p style={{ fontFamily:MONO, fontSize:11, fontWeight:800, color:'#e2e2e8', marginTop:8, letterSpacing:'-0.02em' }}>{value.toLocaleString()}</p>
+      <p style={{ fontFamily:MONO, fontSize:7, color:`${color}80`, textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'center', marginTop:2 }}>{label}</p>
+      {sub && <p style={{ fontFamily:MONO, fontSize:7, color:'#4a5568', marginTop:2 }}>{sub}</p>}
     </div>
   )
 }
@@ -523,9 +543,9 @@ export default function Home() {
           </div>
           <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
             <div style={{ borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
-              <DonutCard label="Goals Done" value={kpiData.goalsCompleted} total={Math.max(kpiData.activeGoals+kpiData.goalsCompleted,1)} color="#f472b6" sub={`of ${kpiData.activeGoals+kpiData.goalsCompleted} goals`}/>
+              <ProgressRing label="Goals Done" value={kpiData.goalsCompleted} total={Math.max(kpiData.activeGoals+kpiData.goalsCompleted,1)} color="#f472b6" sub={`of ${kpiData.activeGoals+kpiData.goalsCompleted} goals`}/>
             </div>
-            <DonutCard label="Tasks Done" value={kpiData.tasksCompleted} total={Math.max(kpiData.tasksCompleted+kpiData.tasksPending,1)} color="#4edea3" sub={`of ${kpiData.tasksCompleted+kpiData.tasksPending} tasks`}/>
+            <ProgressRing label="Tasks Done" value={kpiData.tasksCompleted} total={Math.max(kpiData.tasksCompleted+kpiData.tasksPending,1)} color="#4edea3" sub={`of ${kpiData.tasksCompleted+kpiData.tasksPending} tasks`}/>
           </div>
         </div>
       </div>
