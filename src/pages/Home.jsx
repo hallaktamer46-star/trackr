@@ -439,7 +439,7 @@ export default function Home() {
               : ''}.
           </h1>
         </div>
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, justifyContent:'space-between', alignSelf:'stretch' }}>
           <button
             onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
             style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'4px 8px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.1)', cursor:'pointer', color:'rgba(163,201,255,0.4)', transition:'all 0.15s' }}
