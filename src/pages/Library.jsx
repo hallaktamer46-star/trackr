@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Search, Headphones, BookOpen, Podcast, Play, X } from 'lucide-react'
 
 const SANS = '"Geist", "Inter", system-ui, -apple-system, sans-serif'
-const MONO = '"Geist Mono", "JetBrains Mono", monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const BG   = '#070a0f'
 
 const SKILLS = ['All','Sales','Negotiation','Leadership','Communication','Productivity','Money','Psychology','Career','Startups','Marketing']

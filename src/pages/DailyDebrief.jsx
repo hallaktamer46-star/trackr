@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Mic, MicOff, Send, ChevronDown, ChevronRight, Clock, Zap, Battery, AlertTriangle, ArrowRight, Eye } from 'lucide-react'
 import { apiFetch } from '../lib/api'
 
-const MONO = '"Geist Mono", "JetBrains Mono", monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = '"Geist", "Inter", system-ui, -apple-system, sans-serif'
 const KEY  = 'trackr_debrief_history'
 

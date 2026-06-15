@@ -265,7 +265,7 @@ export default function Auth() {
           border: 0.5px solid rgba(78,222,163,0.28);
           border-radius: 8px;
           color: #4edea3;
-          font-family: 'Geist Mono', monospace;
+          font-family: Consolas, Menlo, Monaco, monospace;
           font-size: 11px; font-weight: 700;
           letter-spacing: 0.09em; text-transform: uppercase;
           cursor: pointer;

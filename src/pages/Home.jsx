@@ -57,7 +57,7 @@ function KPICard({ label, value, sub, icon: Icon, gradient, trend, trendUp }) {
       <div style={{ flex:1, minWidth:0 }}>
         <p style={{ fontFamily:MONO, fontSize:8, fontWeight:600, letterSpacing:'0.08em', color:'rgba(255,255,255,0.55)', textTransform:'uppercase', marginBottom:2 }}>{label}</p>
         <div style={{ display:'flex', alignItems:'baseline', gap:6 }}>
-          <p style={{ fontFamily:MONO, fontSize:22, fontWeight:900, letterSpacing:'-0.04em', color:'#fff', lineHeight:1 }}>{value}</p>
+          <p style={{ fontFamily:SANS, fontSize:22, fontWeight:900, letterSpacing:'-0.04em', color:'#fff', lineHeight:1 }}>{value}</p>
           {trend != null && (
             <span style={{ display:'flex', alignItems:'center', gap:2, fontFamily:MONO, fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.8)', background:'rgba(255,255,255,0.15)', padding:'2px 5px', borderRadius:999 }}>
               {trendUp ? <TrendingUp size={8}/> : <TrendingDown size={8}/>} {Math.abs(trend)}%
@@ -134,8 +134,8 @@ function StatBar({ label, value, total, color, sub }) {
     <div style={{ flex:1, padding:'14px 16px', display:'flex', flexDirection:'column', justifyContent:'center', gap:3 }}>
       <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:`${color}55`, textTransform:'uppercase', letterSpacing:'0.12em' }}>{label}</p>
       <div style={{ display:'flex', alignItems:'baseline', gap:6 }}>
-        <span style={{ fontFamily:MONO, fontSize:26, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1 }}>{value}</span>
-        <span style={{ fontFamily:MONO, fontSize:9, color:`${color}45` }}>/ {total}</span>
+        <span style={{ fontFamily:SANS, fontSize:26, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1 }}>{value}</span>
+        <span style={{ fontFamily:SANS, fontSize:9, color:`${color}45` }}>/ {total}</span>
       </div>
       <div style={{ height:4, background:`${color}15`, borderRadius:2, overflow:'hidden', margin:'6px 0 4px' }}>
         <div style={{
@@ -147,7 +147,7 @@ function StatBar({ label, value, total, color, sub }) {
         }}/>
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <span style={{ fontFamily:MONO, fontSize:16, fontWeight:900, color, letterSpacing:'-0.03em' }}>{pct}%</span>
+        <span style={{ fontFamily:SANS, fontSize:16, fontWeight:900, color, letterSpacing:'-0.03em' }}>{pct}%</span>
         {sub && <span style={{ fontFamily:MONO, fontSize:7, color:'#3a4455' }}>{sub}</span>}
       </div>
     </div>

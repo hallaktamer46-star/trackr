@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Trash2, X, ChevronLeft, ChevronRight, Layers } from 'lucide-react'
 
-const MONO = '"Geist Mono", "JetBrains Mono", monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = '"Geist", "Inter", system-ui, -apple-system, sans-serif'
 
 const KEY       = 'trackr_lifeplan'

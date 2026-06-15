@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 
-const MONO    = '"Geist Mono", "JetBrains Mono", "Fira Code", monospace'
+const MONO    = 'Consolas, Menlo, Monaco, monospace'
 const DISPLAY = '"Inter", "SF Pro Display", -apple-system, sans-serif'
 
 const S = {
