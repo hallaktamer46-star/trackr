@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { useSidebar } from '../../contexts/SidebarContext'
 import {
   Home, Briefcase, Building2, User, Users, Settings, Zap,
   LayoutDashboard, Telescope, Rocket, CalendarDays, BarChart3,
-  BookOpen, Map, Newspaper, LayoutList, Flame, Brain,
+  Clock, BookOpen, Map, Newspaper, LayoutList, Flame, Brain,
   PenLine, FileText, Mail, DollarSign,
 } from 'lucide-react'
 
@@ -17,6 +18,18 @@ export const SIDEBAR_W = W + GAP
 const TOP    = 56 + GAP
 const BOTTOM = GAP
 const BG     = '#0d1b2e'
+
+function GridIcon({ size = 16, color = 'currentColor' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      {[2, 8, 14].flatMap(cx =>
+        [2, 8, 14].map(cy => (
+          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={1.4} fill={color} />
+        ))
+      )}
+    </svg>
+  )
+}
 
 const NAV_ITEMS = [
   {
@@ -67,6 +80,13 @@ const NAV_ITEMS = [
       { to: '/plans',   icon: DollarSign, label: 'Pricing'   },
     ],
   },
+  {
+    label: 'More', icon: null, to: null,
+    matches: ['/time-report'],
+    items: [
+      { to: '/time-report', icon: Clock, label: 'Time Report' },
+    ],
+  },
 ]
 
 function iconBoxStyle(isActive, hovered) {
@@ -108,10 +128,7 @@ function NavItem({ item, openFlyout, onToggle }) {
   }
 
   return (
-    <button
-      onClick={handleClick}
-      style={{ background: 'none', border: 'none', padding: 0, width: '100%', cursor: 'pointer' }}
-    >
+    <button onClick={handleClick} style={{ background: 'none', border: 'none', padding: 0, width: '100%', cursor: 'pointer' }}>
       <div
         style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '5px 0' }}
         onMouseEnter={() => setHovered(true)}
@@ -122,7 +139,10 @@ function NavItem({ item, openFlyout, onToggle }) {
           borderRadius: 9, transition: 'all 0.18s cubic-bezier(0.22,1,0.36,1)',
           ...iconBoxStyle(isActive || flyoutOpen, hovered),
         }}>
-          <item.icon size={16} color="#ffffff" />
+          {item.icon
+            ? <item.icon size={16} color="#ffffff" />
+            : <GridIcon size={15} color="#ffffff" />
+          }
         </div>
         <span style={{
           fontFamily: SANS, fontSize: 9, fontWeight: (isActive || flyoutOpen) ? 700 : 400,
@@ -169,8 +189,10 @@ function Flyout({ item, panelRef, onClose }) {
       ref={panelRef}
       style={{
         position: 'fixed',
-        top: TOP, left: W + GAP * 2, bottom: BOTTOM,
+        top: TOP,
+        left: W + GAP * 2,
         width: 220,
+        maxHeight: `calc(100vh - ${TOP}px - ${BOTTOM}px)`,
         background: BG,
         border: '1px solid rgba(255,255,255,0.07)',
         borderRadius: 14,
@@ -179,44 +201,46 @@ function Flyout({ item, panelRef, onClose }) {
         scrollbarWidth: 'none',
       }}
     >
-      <div style={{ padding: '16px 16px 10px' }}>
+      <div style={{ padding: '16px 16px 8px' }}>
         <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.14em', textTransform: 'uppercase', margin: 0 }}>
           {item.label}
         </p>
       </div>
 
-      {item.items.map(sub => (
-        <NavLink
-          key={sub.to} to={sub.to}
-          onClick={onClose}
-          style={{ textDecoration: 'none', display: 'block' }}
-        >
-          {({ isActive }) => (
-            <div
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '8px 16px',
-                background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-                borderLeft: `2px solid ${isActive ? '#ffffff' : 'transparent'}`,
-                transition: 'background 0.12s', cursor: 'pointer',
-              }}
-              onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
-              onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
-            >
-              <sub.icon size={13} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.5)'} />
-              <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)' }}>
-                {sub.label}
-              </span>
-            </div>
-          )}
-        </NavLink>
-      ))}
+      <div style={{ paddingBottom: 10 }}>
+        {item.items.map(sub => (
+          <NavLink
+            key={sub.to} to={sub.to}
+            onClick={onClose}
+            style={{ textDecoration: 'none', display: 'block' }}
+          >
+            {({ isActive }) => (
+              <div
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '9px 16px',
+                  background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
+                  borderLeft: `2px solid ${isActive ? '#ffffff' : 'transparent'}`,
+                  transition: 'background 0.12s', cursor: 'pointer',
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
+              >
+                <sub.icon size={13} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.5)'} />
+                <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)' }}>
+                  {sub.label}
+                </span>
+              </div>
+            )}
+          </NavLink>
+        ))}
+      </div>
     </div>
   )
 }
 
 export default function Sidebar() {
-  const [openFlyout, setOpenFlyout] = useState(null)
+  const { openFlyout, setOpenFlyout } = useSidebar()
   const sidebarRef = useRef(null)
   const panelRef   = useRef(null)
 
@@ -249,14 +273,12 @@ export default function Sidebar() {
           paddingTop: 8,
         }}
       >
-        {/* Main nav */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 1, flex: 1 }}>
           {NAV_ITEMS.map(item => (
             <NavItem key={item.label} item={item} openFlyout={openFlyout} onToggle={setOpenFlyout} />
           ))}
         </div>
 
-        {/* Bottom */}
         <div style={{
           width: '100%', paddingBottom: 10, paddingTop: 6, flexShrink: 0,
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,

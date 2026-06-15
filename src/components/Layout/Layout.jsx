@@ -13,7 +13,7 @@ function LayoutInner({ children }) {
   const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const { } = useSidebar()
+  const { flyoutWidth } = useSidebar()
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [upgradePlan, setUpgradePlan] = useState(null)
 
@@ -37,7 +37,8 @@ function LayoutInner({ children }) {
       <Header />
       <Sidebar />
       <main style={{
-        marginLeft: SIDEBAR_W,
+        marginLeft: SIDEBAR_W + flyoutWidth,
+        transition: 'margin-left 0.22s cubic-bezier(0.22,1,0.36,1)',
         padding: '20px 24px',
         minHeight: 'calc(100vh - 56px)',
       }}>
