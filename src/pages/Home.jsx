@@ -439,38 +439,38 @@ export default function Home() {
               : ''}.
           </h1>
         </div>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <button onClick={() => setEventModal(true)}
-            style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
-            onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
-            onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
-            <CalendarDays size={13} color="#fff" strokeWidth={2.5}/>
-            <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Add Event</span>
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
+          <button
+            onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
+            style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'4px 8px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.1)', cursor:'pointer', color:'rgba(163,201,255,0.4)', transition:'all 0.15s' }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.09)'; e.currentTarget.style.color='rgba(163,201,255,0.75)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.22)' }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.color='rgba(163,201,255,0.4)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.1)' }}
+          >
+            <Settings size={11}/>
           </button>
-          {canAddMore && (
-            <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
-              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <button onClick={() => setEventModal(true)}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
               onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
               onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
-              <Plus size={13} color="#fff" strokeWidth={2.5}/>
-              <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Track a Role</span>
+              <CalendarDays size={13} color="#fff" strokeWidth={2.5}/>
+              <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Add Event</span>
             </button>
-          )}
+            {canAddMore && (
+              <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
+                style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
+                onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
+                onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
+                <Plus size={13} color="#fff" strokeWidth={2.5}/>
+                <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Track a Role</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* ══ ROW 1: Configurable KPI cards ══ */}
       <div>
-        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:6 }}>
-          <button
-            onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
-            style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.1)', cursor:'pointer', color:'rgba(163,201,255,0.4)', fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.15s' }}
-            onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.09)'; e.currentTarget.style.color='rgba(163,201,255,0.75)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.22)' }}
-            onMouseLeave={e => { e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.color='rgba(163,201,255,0.4)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.1)' }}
-          >
-            <Settings size={9}/> Customize
-          </button>
-        </div>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
           {kpiConfig.map(id => {
             const opt = KPI_OPTIONS.find(o => o.id === id)
