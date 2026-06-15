@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { useSidebar } from '../../contexts/SidebarContext'
 import {
   Home, Briefcase, Building2, User, Users,
   Settings, Zap, X,
@@ -133,7 +132,6 @@ function BottomItem({ label, icon: Icon, to, onClick, accent }) {
 }
 
 export default function Sidebar() {
-  const { open } = useSidebar()
   const [moreOpen, setMoreOpen] = useState(false)
   const panelRef = useRef(null)
   const moreRef = useRef(null)
@@ -158,8 +156,6 @@ export default function Sidebar() {
         background: '#07090f',
         borderRight: '1px solid rgba(48,54,61,0.55)',
         zIndex: 20,
-        transform: `translateX(${open ? 0 : -SIDEBAR_W}px)`,
-        transition: 'transform 0.22s cubic-bezier(0.22,1,0.36,1)',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         paddingTop: 8,
       }}>
