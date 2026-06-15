@@ -7,7 +7,7 @@ import {
   Salad, Flag, Trash2, Check, MapPin, Edit3, ArrowUpRight, ChevronRight
 } from 'lucide-react'
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 function useLocalStorage(key, init) {

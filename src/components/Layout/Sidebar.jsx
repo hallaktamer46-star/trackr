@@ -8,7 +8,7 @@ import {
   GraduationCap, ChevronLeft, ChevronRight, DollarSign,
 } from 'lucide-react'
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 export const SIDEBAR_W = 230
 

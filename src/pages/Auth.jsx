@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 const SERIF = "Georgia, 'Times New Roman', serif"
 

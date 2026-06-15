@@ -28,7 +28,7 @@ const FREE_TOOLS  = TOOLS.filter(t => t.tier === 'free')
 const PRO_TOOLS   = TOOLS.filter(t => t.tier === 'pro')
 const APEX_TOOLS  = TOOLS.filter(t => t.tier === 'apex')
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 function TierDivider({ label, color, gradient }) {

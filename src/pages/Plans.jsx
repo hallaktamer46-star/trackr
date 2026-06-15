@@ -101,7 +101,7 @@ export default function Plans() {
 
       {/* Header */}
       <div className="text-center mb-12 pt-4">
-        <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
+        <p style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 10, fontWeight: 600, letterSpacing: '0.1em', color: '#a3c9ff', textTransform: 'uppercase', marginBottom: 8 }}>
           Pricing
         </p>
         <h1 style={{ fontSize: 36, fontWeight: 700, letterSpacing: '-0.04em', color: '#e2e2e8', lineHeight: 1.1, marginBottom: 12 }}>
@@ -113,7 +113,7 @@ export default function Plans() {
       </div>
 
       {error && (
-        <p className="text-center text-xs mb-6" style={{ color: '#ffb4ab', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' }}>{error}</p>
+        <p className="text-center text-xs mb-6" style={{ color: '#ffb4ab', fontFamily: 'Consolas, Menlo, Monaco, monospace' }}>{error}</p>
       )}
 
       {/* Plan cards */}
@@ -140,7 +140,7 @@ export default function Plans() {
               {plan.badge && (
                 <span style={{
                   position: 'absolute', top: -1, right: 24,
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 8, fontWeight: 700,
+                  fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 8, fontWeight: 700,
                   letterSpacing: '0.08em', textTransform: 'uppercase',
                   background: plan.accent, color: '#0d1117',
                   padding: '3px 8px',
@@ -158,7 +158,7 @@ export default function Plans() {
                   <Icon size={16} style={{ color: plan.accent }} />
                 </div>
                 <div>
-                  <p style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, fontWeight: 700, color: plan.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  <p style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 11, fontWeight: 700, color: plan.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     {plan.name}
                   </p>
                 </div>
@@ -166,10 +166,10 @@ export default function Plans() {
 
               {/* Price */}
               <div className="mb-2 flex items-end gap-2">
-                <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 40, fontWeight: 700, letterSpacing: '-0.05em', color: '#e2e2e8', lineHeight: 1 }}>
+                <span style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 40, fontWeight: 700, letterSpacing: '-0.05em', color: '#e2e2e8', lineHeight: 1 }}>
                   {plan.price}
                 </span>
-                <span style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 11, color: '#8a919f', marginBottom: 4 }}>
+                <span style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 11, color: '#8a919f', marginBottom: 4 }}>
                   {plan.period}
                 </span>
               </div>
@@ -202,7 +202,7 @@ export default function Plans() {
                       : plan.accent === '#a3c9ff' ? '#1493ff' : `${plan.accent}22`,
                   border: `0.5px solid ${isCurrent || plan.disabled ? 'rgba(138,145,159,0.2)' : plan.accent}`,
                   color: isCurrent || plan.disabled ? '#8a919f' : plan.key === 'apex' ? '#0d1117' : plan.key === 'pro' ? '#fff' : plan.accent,
-                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                  fontFamily: 'Consolas, Menlo, Monaco, monospace',
                   fontSize: 11,
                   fontWeight: 700,
                   letterSpacing: '0.06em',
@@ -221,7 +221,7 @@ export default function Plans() {
       </div>
 
       {/* Footer note */}
-      <p className="text-center mt-8" style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace', fontSize: 10, color: '#404753', letterSpacing: '0.05em' }}>
+      <p className="text-center mt-8" style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 10, color: '#404753', letterSpacing: '0.05em' }}>
         All plans include SSL encryption · Cancel anytime · No hidden fees
       </p>
     </div>

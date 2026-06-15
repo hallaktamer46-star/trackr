@@ -8,7 +8,7 @@ const CATEGORIES = [
   'Interview Tips', 'Salaries', 'Remote Work',
 ]
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 export default function QuickPostModal({ onClose, onPublished }) {

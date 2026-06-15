@@ -341,7 +341,7 @@ function PostModal({ post, onClose, onLike, liked }) {
 }
 
 /* ── write post modal ── */
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 function WriteModal({ onClose, onPublish, user }) {

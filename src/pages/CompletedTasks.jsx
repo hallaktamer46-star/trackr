@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { CheckCircle2, ArrowLeft, Calendar } from 'lucide-react'
 import { format, parseISO, isWithinInterval, subDays, startOfDay } from 'date-fns'
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 const BG   = '#070a0f'
 

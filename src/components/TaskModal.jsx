@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-const NUM  = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const NUM  = 'Consolas, Menlo, Monaco, monospace'
 const BODY = 'Geist, Inter, -apple-system, sans-serif'
 
 const IMP_COLORS = { 1: '#4edea3', 2: '#a3c9ff', 3: '#fbbf24', 4: '#ffb689', 5: '#ffb4ab' }

@@ -9,7 +9,7 @@ import { useApplications } from '../contexts/ApplicationContext'
 import { useNavigate } from 'react-router-dom'
 import { Lock, TrendingUp, Zap, Target, Clock, AlertTriangle, Flame, Plus } from 'lucide-react'
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 const SC = {

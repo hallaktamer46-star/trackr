@@ -3,7 +3,7 @@ import { X, Trash2, Briefcase, Building2, Link2, DollarSign, FileText, Bell, Cal
 import { STATUSES, STATUS_CONFIG } from '../../contexts/ApplicationContext'
 import { format, subDays } from 'date-fns'
 
-const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
 
 const STATUS_ACCENT = {
