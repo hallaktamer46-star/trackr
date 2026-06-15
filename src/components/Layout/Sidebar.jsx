@@ -11,10 +11,14 @@ import {
 
 const SANS = 'Geist, Inter, sans-serif'
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-export const SIDEBAR_W = 64
 
-const TOP    = 64   // gap below header (header is 56px tall)
-const BOTTOM = 10   // gap above screen bottom
+const GAP  = 8    // gap from screen edges (left, top extra, bottom)
+const W    = 64   // visual width of the bar
+export const SIDEBAR_W = W + GAP  // space reserved in layout (72px)
+
+const TOP    = 56 + GAP   // below header + gap
+const BOTTOM = GAP
+const BG     = '#0d1b2e'  // navy blue
 
 function GridIcon({ size = 16, color = 'currentColor' }) {
   return (
@@ -87,19 +91,19 @@ function NavItem({ label, icon: Icon, to, end, matches }) {
 
   return (
     <NavLink to={to} style={{ textDecoration: 'none', display: 'block', width: '100%' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 0', cursor: 'pointer' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '5px 0', cursor: 'pointer' }}>
         <div style={{
-          width: 42, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 40, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
           borderRadius: 9,
-          background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
-          border: `0.5px solid ${isActive ? 'rgba(255,255,255,0.15)' : 'transparent'}`,
+          background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+          border: `0.5px solid ${isActive ? 'rgba(255,255,255,0.18)' : 'transparent'}`,
           transition: 'all 0.14s',
         }}>
-          <Icon size={17} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.4)'} />
+          <Icon size={16} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.42)'} />
         </div>
         <span style={{
           fontFamily: SANS, fontSize: 9, fontWeight: isActive ? 600 : 400,
-          color: isActive ? '#ffffff' : 'rgba(255,255,255,0.38)',
+          color: isActive ? '#ffffff' : 'rgba(255,255,255,0.4)',
           letterSpacing: '0.01em', userSelect: 'none',
         }}>{label}</span>
       </div>
@@ -110,18 +114,18 @@ function NavItem({ label, icon: Icon, to, end, matches }) {
 function BottomItem({ label, icon: Icon, to, onClick, accent }) {
   const { pathname } = useLocation()
   const isActive = to ? (pathname === to || pathname.startsWith(to + '/')) : false
-  const col = accent || (isActive ? '#ffffff' : 'rgba(255,255,255,0.38)')
+  const col = accent || (isActive ? '#ffffff' : 'rgba(255,255,255,0.42)')
 
   const inner = (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 0', cursor: 'pointer' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '5px 0', cursor: 'pointer' }}>
       <div style={{
-        width: 42, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: 40, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
         borderRadius: 9,
-        background: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
-        border: `0.5px solid ${isActive ? 'rgba(255,255,255,0.15)' : 'transparent'}`,
+        background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+        border: `0.5px solid ${isActive ? 'rgba(255,255,255,0.18)' : 'transparent'}`,
         transition: 'all 0.14s',
       }}>
-        <Icon size={17} color={col} />
+        <Icon size={16} color={col} />
       </div>
       <span style={{
         fontFamily: SANS, fontSize: 9, fontWeight: isActive ? 600 : 400,
@@ -137,14 +141,14 @@ function BottomItem({ label, icon: Icon, to, onClick, accent }) {
 export default function Sidebar() {
   const [moreOpen, setMoreOpen] = useState(false)
   const panelRef = useRef(null)
-  const moreRef = useRef(null)
+  const moreRef  = useRef(null)
 
   useEffect(() => {
     if (!moreOpen) return
     function onDown(e) {
       if (
         panelRef.current && !panelRef.current.contains(e.target) &&
-        moreRef.current && !moreRef.current.contains(e.target)
+        moreRef.current  && !moreRef.current.contains(e.target)
       ) setMoreOpen(false)
     }
     document.addEventListener('mousedown', onDown)
@@ -153,24 +157,21 @@ export default function Sidebar() {
 
   return (
     <>
+      {/* ── Floating icon bar ── */}
       <div style={{
         position: 'fixed',
-        top: TOP, left: 0, bottom: BOTTOM,
-        width: SIDEBAR_W,
-        background: '#07090f',
-        border: '1px solid rgba(48,54,61,0.55)',
-        borderLeft: 'none',
-        borderRadius: '0 12px 12px 0',
+        top: TOP, left: GAP, bottom: BOTTOM,
+        width: W,
+        background: BG,
+        border: '1px solid rgba(255,255,255,0.07)',
+        borderRadius: 14,
         zIndex: 20,
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         paddingTop: 8,
-        overflow: 'hidden',
       }}>
-        {/* Main nav items */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 2, flex: 1 }}>
-          {MAIN_NAV.map(item => (
-            <NavItem key={item.to} {...item} />
-          ))}
+        {/* Main nav */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 1, flex: 1 }}>
+          {MAIN_NAV.map(item => <NavItem key={item.to} {...item} />)}
 
           {/* More */}
           <div ref={moreRef} style={{ width: '100%' }}>
@@ -178,19 +179,19 @@ export default function Sidebar() {
               onClick={() => setMoreOpen(v => !v)}
               style={{ background: 'none', border: 'none', padding: 0, width: '100%', cursor: 'pointer' }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '6px 0' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '5px 0' }}>
                 <div style={{
-                  width: 42, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: 40, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
                   borderRadius: 9,
-                  background: moreOpen ? 'rgba(255,255,255,0.1)' : 'transparent',
-                  border: `0.5px solid ${moreOpen ? 'rgba(255,255,255,0.15)' : 'transparent'}`,
+                  background: moreOpen ? 'rgba(255,255,255,0.12)' : 'transparent',
+                  border: `0.5px solid ${moreOpen ? 'rgba(255,255,255,0.18)' : 'transparent'}`,
                   transition: 'all 0.14s',
                 }}>
-                  <GridIcon size={16} color={moreOpen ? '#ffffff' : 'rgba(255,255,255,0.4)'} />
+                  <GridIcon size={15} color={moreOpen ? '#ffffff' : 'rgba(255,255,255,0.42)'} />
                 </div>
                 <span style={{
                   fontFamily: SANS, fontSize: 9, fontWeight: moreOpen ? 600 : 400,
-                  color: moreOpen ? '#ffffff' : 'rgba(255,255,255,0.38)',
+                  color: moreOpen ? '#ffffff' : 'rgba(255,255,255,0.4)',
                   letterSpacing: '0.01em', userSelect: 'none',
                 }}>More</span>
               </div>
@@ -200,34 +201,34 @@ export default function Sidebar() {
 
         {/* Bottom: Settings above Upgrade */}
         <div style={{
-          width: '100%', paddingBottom: 10, paddingTop: 8,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+          width: '100%', paddingBottom: 10, paddingTop: 6,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
           borderTop: '1px solid rgba(255,255,255,0.06)',
+          flexShrink: 0,
         }}>
           <BottomItem label="Settings" icon={Settings} onClick={() => {}} />
           <BottomItem label="Upgrade"  icon={Zap}      to="/plans" accent="#a78bfa" />
         </div>
       </div>
 
-      {/* More floating panel */}
+      {/* ── More floating panel ── */}
       {moreOpen && (
         <div
           ref={panelRef}
           style={{
             position: 'fixed',
-            top: TOP, left: SIDEBAR_W, bottom: BOTTOM,
+            top: TOP, left: W + GAP * 2, bottom: BOTTOM,
             width: 220,
-            background: '#07090f',
-            border: '1px solid rgba(48,54,61,0.55)',
-            borderLeft: 'none',
-            borderRadius: '0 12px 12px 0',
+            background: BG,
+            border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: 14,
             zIndex: 19,
             overflowY: 'auto',
             scrollbarWidth: 'none',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 8px' }}>
-            <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>All Tools</span>
+            <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.22)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>All Tools</span>
             <button
               onClick={() => setMoreOpen(false)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.25)', display: 'flex', padding: 2, transition: 'color 0.12s' }}
@@ -240,7 +241,7 @@ export default function Sidebar() {
 
           {MORE_SECTIONS.map(section => (
             <div key={section.label} style={{ marginBottom: 4 }}>
-              <p style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '8px 16px 4px', margin: 0 }}>
+              <p style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, color: 'rgba(255,255,255,0.18)', letterSpacing: '0.12em', textTransform: 'uppercase', padding: '8px 16px 4px', margin: 0 }}>
                 {section.label}
               </p>
               {section.items.map(item => (
@@ -254,16 +255,15 @@ export default function Sidebar() {
                       style={{
                         display: 'flex', alignItems: 'center', gap: 9,
                         padding: '7px 16px',
-                        background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                        background: isActive ? 'rgba(255,255,255,0.07)' : 'transparent',
                         borderLeft: `2px solid ${isActive ? 'rgba(255,255,255,0.4)' : 'transparent'}`,
-                        transition: 'background 0.12s',
-                        cursor: 'pointer',
+                        transition: 'background 0.12s', cursor: 'pointer',
                       }}
                       onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
                       onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
                     >
-                      <item.icon size={12} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.4)'} />
-                      <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? '#ffffff' : 'rgba(255,255,255,0.5)' }}>
+                      <item.icon size={12} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.42)'} />
+                      <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: isActive ? 600 : 400, color: isActive ? '#ffffff' : 'rgba(255,255,255,0.52)' }}>
                         {item.label}
                       </span>
                     </div>
