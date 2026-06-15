@@ -76,7 +76,7 @@ function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
   const filledDots = total != null && pct != null ? Math.round((pct / 100) * dotCount) : 0
   return (
     <div style={{
-      background: '#161b22',
+      background: '#07090f',
       border: '0.5px solid rgba(48,54,61,0.9)',
       padding:'15px 16px', flex:1,
     }}>
@@ -485,7 +485,7 @@ export default function Home() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 200px 200px', gap:12 }}>
 
         {/* Left: Hours worked chart */}
-        <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', padding:'18px 20px' }}>
+        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', padding:'18px 20px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
             <div>
               <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#5a6478', textTransform:'uppercase', marginBottom:3 }}>Activity</p>
@@ -545,7 +545,7 @@ export default function Home() {
         </div>
 
         {/* Right: Goals & tasks donuts */}
-        <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', display:'flex', flexDirection:'column' }}>
+        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', display:'flex', flexDirection:'column' }}>
           <div style={{ padding:'12px 14px 8px', borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
             <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase' }}>Progress</p>
           </div>
@@ -562,7 +562,7 @@ export default function Home() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:12 }}>
 
         {/* Left: Recent applications table */}
-        <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', overflow:'hidden' }}>
+        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', overflow:'hidden' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
               <Activity size={13} style={{ color:'#a3c9ff' }}/>
@@ -612,7 +612,7 @@ export default function Home() {
         </div>
 
         {/* Right: Updates feed */}
-        <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', borderBottom:'0.5px solid rgba(48,54,61,0.9)', flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:7 }}>
               <Bell size={12} style={{ color:'#a3c9ff' }}/>
