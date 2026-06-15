@@ -137,6 +137,16 @@ const ChartTip = ({ active, payload, label }) => {
     </div>
   )
 }
+const HoursTip = ({ active, payload, label }) => {
+  if (!active||!payload?.length) return null
+  const h = Math.floor(payload[0].value), m = Math.round((payload[0].value - h)*60)
+  return (
+    <div style={{ background:'#0d1117', border:'0.5px solid rgba(167,139,250,0.25)', padding:'6px 10px' }}>
+      <p style={{ color:'#5a6478', fontFamily:MONO, fontSize:9, marginBottom:2 }}>{label}</p>
+      <p style={{ color:'#a78bfa', fontFamily:MONO, fontSize:12, fontWeight:700 }}>{h>0?`${h}h ${m}m`:`${m}m`}</p>
+    </div>
+  )
+}
 
 /* ─── Custom KPI options ─── */
 const DEFAULT_KPIS = ['total_apps', 'interviews', 'hours_today', 'tasks_today']
@@ -302,8 +312,16 @@ export default function Home() {
       goalsCompleted: goals.filter(g => g.done || g.completed).length,
       todaySessCount: todaySess.length,
       totalSessions:  sessions.length,
+      weeklyHoursChart: Array.from({length:7}, (_,i) => {
+        const date = startOfDay(subDays(new Date(), 6-i))
+        const dateStr = format(date, 'yyyy-MM-dd')
+        const record = history.find(r => r.date === dateStr)
+        return { day: format(date, 'EEE'), hours: record ? +(record.total/3600).toFixed(1) : 0 }
+      }),
     }
   }, [applications, tasks, goals, sessions, todaySess, todayStr, stats, thisWeek, lastWeek, responseRate, offerRate])
+
+  const maxHours     = Math.max(...(kpiData.weeklyHoursChart||[]).map(d=>d.hours), 0.1)
 
   function saveKpiConfig(config) {
     localStorage.setItem('trackr_kpi_config', JSON.stringify(config))
@@ -436,41 +454,41 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ ROW 2: Big chart | Mini stats | Donuts ══ */}
+      {/* ══ ROW 2: Big chart | Mini stats | Goals ══ */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 200px 200px', gap:12 }}>
 
-        {/* Left: Activity chart */}
+        {/* Left: Hours worked chart */}
         <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', padding:'18px 20px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
             <div>
               <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#5a6478', textTransform:'uppercase', marginBottom:3 }}>Activity</p>
-              <p style={{ fontSize:15, fontWeight:700, color:'#e2e2e8', letterSpacing:'-0.01em' }}>Weekly Applications</p>
+              <p style={{ fontSize:15, fontWeight:700, color:'#e2e2e8', letterSpacing:'-0.01em' }}>Hours Worked</p>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              {thisWeek !== lastWeek && (
-                <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, color:thisWeek>lastWeek?'#4edea3':'#ffb4ab', background:thisWeek>lastWeek?'rgba(78,222,163,0.1)':'rgba(255,180,171,0.1)', border:`0.5px solid ${thisWeek>lastWeek?'rgba(78,222,163,0.25)':'rgba(255,180,171,0.25)'}`, padding:'3px 8px' }}>
-                  {thisWeek>lastWeek?'↑':'↓'} {Math.abs(thisWeek-lastWeek)} vs last week
-                </span>
-              )}
-              <span style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.05em', background:'linear-gradient(135deg,#fff,#a3c9ff)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{thisWeek}</span>
+              <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, color:'#a78bfa', background:'rgba(167,139,250,0.1)', border:'0.5px solid rgba(167,139,250,0.25)', padding:'3px 8px' }}>
+                {Math.floor(kpiData.weekTotalSecs/3600)}h this week
+              </span>
+              <span style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.05em', background:'linear-gradient(135deg,#fff,#a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                {(() => { const h=Math.floor(kpiData.todayTotalSecs/3600),m=Math.floor((kpiData.todayTotalSecs%3600)/60); return h>0?`${h}h`:`${m}m` })()}
+              </span>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={weeklyData} barSize={28} margin={{top:4,right:0,left:-28,bottom:0}}>
+            <BarChart data={kpiData.weeklyHoursChart} barSize={28} margin={{top:4,right:0,left:-18,bottom:0}}>
               <XAxis dataKey="day" tick={{fontFamily:MONO,fontSize:8,fill:'#3a4455',fontWeight:600}} axisLine={false} tickLine={false}/>
-              <YAxis allowDecimals={false} tick={{fontFamily:MONO,fontSize:8,fill:'#3a4455'}} axisLine={false} tickLine={false}/>
-              <Tooltip content={<ChartTip/>} cursor={{fill:'rgba(163,201,255,0.04)'}}/>
-              <Bar dataKey="count" radius={[4,4,0,0]}>
-                {weeklyData.map((e,i)=>(
+              <YAxis allowDecimals={true} tick={{fontFamily:MONO,fontSize:8,fill:'#3a4455'}} axisLine={false} tickLine={false} tickFormatter={v=>`${v}h`}/>
+              <Tooltip content={<HoursTip/>} cursor={{fill:'rgba(167,139,250,0.04)'}}/>
+              <Bar dataKey="hours" radius={[4,4,0,0]}>
+                {kpiData.weeklyHoursChart.map((e,i)=>(
                   <Cell key={i}
-                    fill={e.count>0&&e.count===maxCount?'url(#peak)':e.count>0?'rgba(163,201,255,0.2)':'rgba(255,255,255,0.03)'}
-                    stroke={e.count>0&&e.count===maxCount?'rgba(163,201,255,0.5)':'none'} strokeWidth={1}/>
+                    fill={e.hours>0&&e.hours===maxHours?'url(#peakH)':e.hours>0?'rgba(167,139,250,0.22)':'rgba(255,255,255,0.03)'}
+                    stroke={e.hours>0&&e.hours===maxHours?'rgba(167,139,250,0.5)':'none'} strokeWidth={1}/>
                 ))}
               </Bar>
               <defs>
-                <linearGradient id="peak" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#a3c9ff" stopOpacity={0.95}/>
-                  <stop offset="100%" stopColor="#a3c9ff" stopOpacity={0.3}/>
+                <linearGradient id="peakH" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.95}/>
+                  <stop offset="100%" stopColor="#a78bfa" stopOpacity={0.3}/>
                 </linearGradient>
               </defs>
             </BarChart>
@@ -480,27 +498,34 @@ export default function Home() {
         {/* Middle: 2 stacked mini stat cards */}
         <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
           <MiniStatCard
-            label="Response Rate" value={`${responseRate}%`}
-            sub="Applied → Interview" color="#ffb689"
-            data={interviewTrend} pct={responseRate} up={responseRate>=15}
+            label="Hours Today"
+            value={(() => { const h=Math.floor(kpiData.todayTotalSecs/3600),m=Math.floor((kpiData.todayTotalSecs%3600)/60); return h>0?`${h}h ${m}m`:`${m}m` })()}
+            sub={kpiData.currentStatus ? `Active: ${kpiData.currentStatus}` : 'Not clocked in'}
+            color="#a78bfa"
+            data={kpiData.weeklyHoursChart.map(d=>({v:d.hours}))}
+            pct={null} up={true}
           />
           <MiniStatCard
-            label="Total Tracked" value={stats.total}
-            sub={`${stats.rejected} rejected`} color="#a3c9ff"
-            data={weeklyTrend} pct={thisWeek>0?Math.round((thisWeek/(lastWeek||1))*100)-100:null} up={thisWeek>=lastWeek}
+            label="Tasks Done"
+            value={kpiData.tasksCompleted}
+            sub={`${kpiData.tasksPending} still pending`}
+            color="#4edea3"
+            data={null}
+            pct={kpiData.tasksCompleted+kpiData.tasksPending>0?Math.round((kpiData.tasksCompleted/(kpiData.tasksCompleted+kpiData.tasksPending))*100):null}
+            up={true}
           />
         </div>
 
-        {/* Right: Donut charts */}
+        {/* Right: Goals & tasks donuts */}
         <div style={{ background:'#161b22', border:'0.5px solid rgba(48,54,61,0.9)', display:'flex', flexDirection:'column' }}>
           <div style={{ padding:'12px 14px 8px', borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
-            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase' }}>Pipeline</p>
+            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase' }}>Progress</p>
           </div>
-          <div style={{ flex:1, display:'flex', flexDirection:'column', divideY:'0.5px solid rgba(48,54,61,0.9)' }}>
+          <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
             <div style={{ borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
-              <DonutCard label="Interview Rate" value={stats.interview} total={Math.max(stats.applied,1)} color="#ffb689" sub={`of ${stats.applied} applied`}/>
+              <DonutCard label="Goals Done" value={kpiData.goalsCompleted} total={Math.max(kpiData.activeGoals+kpiData.goalsCompleted,1)} color="#f472b6" sub={`of ${kpiData.activeGoals+kpiData.goalsCompleted} goals`}/>
             </div>
-            <DonutCard label="Offer Rate" value={stats.offer} total={Math.max(stats.interview,1)} color="#4edea3" sub={`of ${stats.interview} interviews`}/>
+            <DonutCard label="Tasks Done" value={kpiData.tasksCompleted} total={Math.max(kpiData.tasksCompleted+kpiData.tasksPending,1)} color="#4edea3" sub={`of ${kpiData.tasksCompleted+kpiData.tasksPending} tasks`}/>
           </div>
         </div>
       </div>
