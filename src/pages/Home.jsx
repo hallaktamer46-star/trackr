@@ -495,7 +495,7 @@ export default function Home() {
               <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, color:'#a78bfa', background:'rgba(167,139,250,0.1)', border:'0.5px solid rgba(167,139,250,0.25)', padding:'3px 8px' }}>
                 {Math.floor(kpiData.weekTotalSecs/3600)}h this week
               </span>
-              <span style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.05em', background:'linear-gradient(135deg,#fff,#a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+              <span style={{ fontFamily:SANS, fontSize:28, fontWeight:900, letterSpacing:'-0.05em', background:'linear-gradient(135deg,#fff,#a78bfa)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
                 {(() => { const h=Math.floor(kpiData.todayTotalSecs/3600),m=Math.floor((kpiData.todayTotalSecs%3600)/60); return h>0?`${h}h`:`${m}m` })()}
               </span>
             </div>
