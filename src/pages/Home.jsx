@@ -71,33 +71,45 @@ function KPICard({ label, value, sub, icon: Icon, gradient, trend, trendUp }) {
 }
 
 /* ─── Mini stat card — vibrant tinted ─── */
-function MiniStatCard({ label, value, sub, color, data, pct, up }) {
+function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
+  const dotCount = total != null ? Math.min(total, 24) : 0
+  const filledDots = total != null && pct != null ? Math.round((pct / 100) * dotCount) : 0
   return (
     <div style={{
-      background:`linear-gradient(135deg, ${color}12 0%, ${color}04 100%)`,
-      border:`0.5px solid ${color}30`,
+      background:`linear-gradient(135deg, ${color}10 0%, ${color}03 100%)`,
+      border:`0.5px solid ${color}28`,
       padding:'15px 16px', flex:1,
       position:'relative', overflow:'hidden',
     }}>
-      <div style={{ position:'absolute', top:-22, right:-22, width:74, height:74, borderRadius:'50%', background:`${color}10`, pointerEvents:'none' }}/>
-      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:8 }}>
-        <div>
-          <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:`${color}70`, textTransform:'uppercase', marginBottom:4 }}>{label}</p>
-          <p style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1 }}>{value}</p>
-        </div>
+      <div style={{ position:'absolute', bottom:-18, right:-18, width:70, height:70, borderRadius:'50%', background:`${color}08`, pointerEvents:'none' }}/>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:6 }}>
+        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:`${color}65`, textTransform:'uppercase' }}>{label}</p>
         {pct != null && (
-          <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:up?'#4edea3':'#ffb4ab', background:up?'rgba(78,222,163,0.12)':'rgba(255,180,171,0.12)', border:`0.5px solid ${up?'rgba(78,222,163,0.3)':'rgba(255,180,171,0.3)'}`, padding:'3px 7px' }}>
-            {up?<TrendingUp size={9}/>:<TrendingDown size={9}/>} {pct}%
+          <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:up?'#4edea3':'#ffb4ab', background:up?'rgba(78,222,163,0.12)':'rgba(255,180,171,0.12)', border:`0.5px solid ${up?'rgba(78,222,163,0.3)':'rgba(255,180,171,0.3)'}`, padding:'2px 6px' }}>
+            {up?<TrendingUp size={8}/>:<TrendingDown size={8}/>} {pct}%
           </span>
         )}
       </div>
-      <p style={{ fontFamily:MONO, fontSize:9, color:`${color}55`, marginBottom: pct != null || (data && data.length) ? 10 : 0 }}>{sub}</p>
-      {pct != null && (
-        <div style={{ height:3, background:`${color}18`, borderRadius:999 }}>
-          <div style={{ height:'100%', width:`${Math.min(pct,100)}%`, background:color, borderRadius:999, boxShadow:`0 0 8px ${color}60`, transition:'width 1s cubic-bezier(0.22,1,0.36,1)' }}/>
+      <p style={{ fontFamily:MONO, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1, marginBottom:4 }}>{value}</p>
+      <p style={{ fontFamily:MONO, fontSize:9, color:`${color}50`, marginBottom:10 }}>{sub}</p>
+
+      {/* Dot grid for task-type data */}
+      {dotCount > 0 && (
+        <div style={{ display:'flex', flexWrap:'wrap', gap:3 }}>
+          {Array.from({ length: dotCount }, (_, i) => (
+            <div key={i} style={{
+              width: 7, height: 7,
+              borderRadius: 2,
+              background: i < filledDots ? color : `${color}18`,
+              boxShadow: i < filledDots ? `0 0 5px ${color}70` : 'none',
+              transition: `background 0.3s ease ${i * 18}ms, box-shadow 0.3s ease ${i * 18}ms`,
+            }}/>
+          ))}
         </div>
       )}
-      {pct == null && data && data.length > 0 && (
+
+      {/* Sparkline for time-type data */}
+      {dotCount === 0 && data && data.length > 0 && (
         <ResponsiveContainer width="100%" height={42}>
           <AreaChart data={data} margin={{top:0,right:0,left:0,bottom:0}}>
             <defs>
@@ -114,35 +126,34 @@ function MiniStatCard({ label, value, sub, color, data, pct, up }) {
   )
 }
 
-/* ─── Progress ring — single clean arc, animated on mount ─── */
-function ProgressRing({ label, value, total, color, sub }) {
+/* ─── Stat bar — bold number + animated glow fill, no circles ─── */
+function StatBar({ label, value, total, color, sub }) {
   const pct = total > 0 ? Math.round((value / total) * 100) : 0
-  const r = 26, circ = 2 * Math.PI * r
-  const [filled, setFilled] = useState(0)
+  const [w, setW] = useState(0)
   useEffect(() => {
-    const id = requestAnimationFrame(() => setFilled((pct / 100) * circ))
+    const id = requestAnimationFrame(() => setW(pct))
     return () => cancelAnimationFrame(id)
-  }, [pct, circ])
+  }, [pct])
   return (
-    <div style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'14px 8px' }}>
-      <div style={{ position:'relative', width:68, height:68 }}>
-        <svg width={68} height={68} viewBox="0 0 68 68">
-          <g transform="rotate(-90 34 34)">
-            <circle cx={34} cy={34} r={r} fill="none" stroke={`${color}18`} strokeWidth={5}/>
-            <circle cx={34} cy={34} r={r} fill="none" stroke={color} strokeWidth={5}
-              strokeLinecap="round"
-              strokeDasharray={`${filled} ${circ}`}
-              style={{ filter:`drop-shadow(0 0 4px ${color}80)`, transition:'stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1)' }}
-            />
-          </g>
-        </svg>
-        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <span style={{ fontFamily:MONO, fontSize:12, fontWeight:900, color }}>{pct}%</span>
-        </div>
+    <div style={{ flex:1, padding:'14px 16px', display:'flex', flexDirection:'column', justifyContent:'center', gap:3 }}>
+      <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:`${color}55`, textTransform:'uppercase', letterSpacing:'0.12em' }}>{label}</p>
+      <div style={{ display:'flex', alignItems:'baseline', gap:6 }}>
+        <span style={{ fontFamily:MONO, fontSize:26, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1 }}>{value}</span>
+        <span style={{ fontFamily:MONO, fontSize:9, color:`${color}45` }}>/ {total}</span>
       </div>
-      <p style={{ fontFamily:MONO, fontSize:11, fontWeight:800, color:'#e2e2e8', marginTop:8, letterSpacing:'-0.02em' }}>{value.toLocaleString()}</p>
-      <p style={{ fontFamily:MONO, fontSize:7, color:`${color}80`, textTransform:'uppercase', letterSpacing:'0.08em', textAlign:'center', marginTop:2 }}>{label}</p>
-      {sub && <p style={{ fontFamily:MONO, fontSize:7, color:'#4a5568', marginTop:2 }}>{sub}</p>}
+      <div style={{ height:4, background:`${color}15`, borderRadius:2, overflow:'hidden', margin:'6px 0 4px' }}>
+        <div style={{
+          height:'100%', width:`${w}%`,
+          background:`linear-gradient(90deg, ${color}70, ${color})`,
+          boxShadow:`0 0 10px ${color}80`,
+          borderRadius:2,
+          transition:'width 0.9s cubic-bezier(0.22,1,0.36,1)',
+        }}/>
+      </div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <span style={{ fontFamily:MONO, fontSize:16, fontWeight:900, color, letterSpacing:'-0.03em' }}>{pct}%</span>
+        {sub && <span style={{ fontFamily:MONO, fontSize:7, color:'#3a4455' }}>{sub}</span>}
+      </div>
     </div>
   )
 }
@@ -532,6 +543,7 @@ export default function Home() {
             color="#4edea3"
             data={null}
             pct={kpiData.tasksCompleted+kpiData.tasksPending>0?Math.round((kpiData.tasksCompleted/(kpiData.tasksCompleted+kpiData.tasksPending))*100):null}
+            total={kpiData.tasksCompleted+kpiData.tasksPending}
             up={true}
           />
         </div>
@@ -543,9 +555,9 @@ export default function Home() {
           </div>
           <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
             <div style={{ borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
-              <ProgressRing label="Goals Done" value={kpiData.goalsCompleted} total={Math.max(kpiData.activeGoals+kpiData.goalsCompleted,1)} color="#f472b6" sub={`of ${kpiData.activeGoals+kpiData.goalsCompleted} goals`}/>
+              <StatBar label="Goals Done" value={kpiData.goalsCompleted} total={Math.max(kpiData.activeGoals+kpiData.goalsCompleted,1)} color="#f472b6" sub={`of ${kpiData.activeGoals+kpiData.goalsCompleted} goals`}/>
             </div>
-            <ProgressRing label="Tasks Done" value={kpiData.tasksCompleted} total={Math.max(kpiData.tasksCompleted+kpiData.tasksPending,1)} color="#4edea3" sub={`of ${kpiData.tasksCompleted+kpiData.tasksPending} tasks`}/>
+            <StatBar label="Tasks Done" value={kpiData.tasksCompleted} total={Math.max(kpiData.tasksCompleted+kpiData.tasksPending,1)} color="#4edea3" sub={`of ${kpiData.tasksCompleted+kpiData.tasksPending} tasks`}/>
           </div>
         </div>
       </div>
