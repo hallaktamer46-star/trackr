@@ -7,7 +7,7 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail, Brain, Users, LayoutList, Flame, X
+  FileText, Mail, Brain, Users, LayoutList, Flame, X, Settings
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import {
@@ -138,6 +138,36 @@ const ChartTip = ({ active, payload, label }) => {
   )
 }
 
+/* ─── Custom KPI options ─── */
+const DEFAULT_KPIS = ['total_apps', 'interviews', 'hours_today', 'tasks_today']
+const KPI_CATEGORY_ORDER = ['Jobs', 'Time', 'Tasks', 'Personal']
+const KPI_OPTIONS = [
+  { id:'total_apps',    label:'Total Applications', category:'Jobs',     icon:Briefcase,   gradient:'linear-gradient(135deg,#1a6bff,#6366f1)',
+    compute: d => ({ value:d.stats.total,     sub:`${d.thisWeek} added this week`,       trend:d.thisWeek>0?Math.round((d.thisWeek/(d.lastWeek||1))*100)-100:null, trendUp:d.thisWeek>=d.lastWeek }) },
+  { id:'applied',       label:'Applied',            category:'Jobs',     icon:Target,      gradient:'linear-gradient(135deg,#0ea5e9,#38bdf8)',
+    compute: d => ({ value:d.stats.applied,   sub:`${d.stats.wishlist} in wishlist`,     trend:d.stats.total>0?Math.round((d.stats.applied/d.stats.total)*100):null, trendUp:true }) },
+  { id:'interviews',    label:'Interviews',          category:'Jobs',     icon:CalendarDays,gradient:'linear-gradient(135deg,#f59e0b,#fb923c)',
+    compute: d => ({ value:d.stats.interview, sub:`${d.responseRate}% response rate`,    trend:d.responseRate, trendUp:d.responseRate>=15 }) },
+  { id:'offers',        label:'Offers',              category:'Jobs',     icon:DollarSign,  gradient:'linear-gradient(135deg,#10b981,#4edea3)',
+    compute: d => ({ value:d.stats.offer,     sub:`${d.offerRate}% interview-to-offer`,  trend:d.offerRate,    trendUp:d.offerRate>=30 }) },
+  { id:'response_rate', label:'Response Rate',       category:'Jobs',     icon:TrendingUp,  gradient:'linear-gradient(135deg,#6366f1,#8b5cf6)',
+    compute: d => ({ value:`${d.responseRate}%`, sub:`${d.stats.applied} applied`,       trend:null }) },
+  { id:'hours_today',   label:'Hours Today',         category:'Time',     icon:Clock,       gradient:'linear-gradient(135deg,#7c3aed,#a78bfa)',
+    compute: d => { const h=Math.floor(d.todayTotalSecs/3600),m=Math.floor((d.todayTotalSecs%3600)/60); return { value:h>0?`${h}h ${m}m`:`${m}m`, sub:d.currentStatus?`Active: ${d.currentStatus}`:'Not clocked in', trend:null } }},
+  { id:'hours_week',    label:'Hours This Week',     category:'Time',     icon:Activity,    gradient:'linear-gradient(135deg,#0284c7,#38bdf8)',
+    compute: d => { const h=Math.floor(d.weekTotalSecs/3600); return { value:`${h}h`, sub:`${d.weekDays} day${d.weekDays!==1?'s':''} logged`, trend:null } }},
+  { id:'avg_daily',     label:'Avg Daily Hours',     category:'Time',     icon:BarChart3,   gradient:'linear-gradient(135deg,#0f766e,#2dd4bf)',
+    compute: d => { const h=Math.floor(d.avgDailySecs/3600),m=Math.floor((d.avgDailySecs%3600)/60); return { value:h>0?`${h}h ${m}m`:`${m}m`, sub:'7-day average', trend:null } }},
+  { id:'tasks_today',   label:'Tasks Due Today',     category:'Tasks',    icon:CheckCircle2,gradient:'linear-gradient(135deg,#16a34a,#4edea3)',
+    compute: d => ({ value:d.tasksDueToday,   sub:`${d.tasksPending} total pending`,    trend:null }) },
+  { id:'tasks_done',    label:'Completed Tasks',     category:'Tasks',    icon:Zap,         gradient:'linear-gradient(135deg,#ca8a04,#fbbf24)',
+    compute: d => ({ value:d.tasksCompleted,  sub:`${d.tasksPending} still pending`,    trend:null }) },
+  { id:'active_goals',  label:'Active Goals',        category:'Personal', icon:Target,      gradient:'linear-gradient(135deg,#be185d,#f472b6)',
+    compute: d => ({ value:d.activeGoals,     sub:`${d.goalsCompleted} completed`,      trend:null }) },
+  { id:'sessions_today',label:"Today's Sessions",    category:'Personal', icon:BookOpen,    gradient:'linear-gradient(135deg,#92400e,#fb923c)',
+    compute: d => ({ value:d.todaySessCount,  sub:`${d.totalSessions} total logged`,    trend:null }) },
+]
+
 /* ══════════════════════════════════════════════════════════════ */
 export default function Home() {
   const { applications, addApplication, updateApplication, deleteApplication, canAddMore } = useApplications()
@@ -148,6 +178,12 @@ export default function Home() {
   const [quickPostOpen, setQuickPostOpen] = useState(false)
   const [eventModal, setEventModal] = useState(false)
   const [eventForm, setEventForm] = useState({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
+  const [kpiConfig, setKpiConfig] = useState(() => {
+    try { const s = JSON.parse(localStorage.getItem('trackr_kpi_config')); if (Array.isArray(s) && s.length === 4) return s } catch {}
+    return DEFAULT_KPIS
+  })
+  const [kpiCustomizeOpen, setKpiCustomizeOpen] = useState(false)
+  const [kpiDraft, setKpiDraft] = useState([])
   function saveEvent() {
     if (!eventForm.title.trim()) return
     const impToPriority = n => n <= 2 ? 'low' : n === 3 ? 'medium' : 'high'
@@ -239,6 +275,41 @@ export default function Home() {
   const responseRate = stats.applied > 0 ? Math.round((stats.interview/stats.applied)*100) : 0
   const offerRate    = stats.interview > 0 ? Math.round((stats.offer/stats.interview)*100) : 0
   const maxCount     = Math.max(...weeklyData.map(d=>d.count),1)
+
+  const kpiData = useMemo(() => {
+    let engageData = {}
+    let history = []
+    try { engageData = JSON.parse(localStorage.getItem('trackr_engage_v2') || '{}') } catch {}
+    try { history = JSON.parse(localStorage.getItem('trackr_history') || '[]') } catch {}
+    const todayRecord = history.find(r => r.date === todayStr) || { total: 0 }
+    const lastEntry = engageData.log?.length ? engageData.log[engageData.log.length - 1] : null
+    const currentSecs = (lastEntry && !lastEntry.end && engageData.shiftStart)
+      ? Math.floor((Date.now() - lastEntry.start) / 1000) : 0
+    const todayTotalSecs = (todayRecord.total || 0) + currentSecs
+    const weekStart = startOfDay(subDays(new Date(), 6))
+    const weekHistory = history.filter(r => new Date(r.date) >= weekStart)
+    const weekDays = weekHistory.length
+    const weekTotalSecs = weekHistory.reduce((s, r) => s + (r.total || 0), 0)
+    const avgDailySecs = weekDays > 0 ? Math.floor(weekTotalSecs / weekDays) : 0
+    return {
+      stats, thisWeek, lastWeek, responseRate, offerRate,
+      todayTotalSecs, weekTotalSecs, weekDays, avgDailySecs,
+      currentStatus: engageData.status || null,
+      tasksDueToday: tasks.filter(t => !t.done && t.due === todayStr).length,
+      tasksPending:  tasks.filter(t => !t.done).length,
+      tasksCompleted: tasks.filter(t => t.done).length,
+      activeGoals:   goals.filter(g => !g.done && !g.completed).length,
+      goalsCompleted: goals.filter(g => g.done || g.completed).length,
+      todaySessCount: todaySess.length,
+      totalSessions:  sessions.length,
+    }
+  }, [applications, tasks, goals, sessions, todaySess, todayStr, stats, thisWeek, lastWeek, responseRate, offerRate])
+
+  function saveKpiConfig(config) {
+    localStorage.setItem('trackr_kpi_config', JSON.stringify(config))
+    setKpiConfig(config)
+    setKpiCustomizeOpen(false)
+  }
 
   const SIDEBAR_LINKS = [
     { label:'Jobs',         icon:Briefcase,    action:()=>navigate('/jobs') },
@@ -343,12 +414,26 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ══ ROW 1: 4 KPI cards ══ */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
-        <KPICard label="Total Applications" value={stats.total}     sub={`${thisWeek} added this week`}              icon={Briefcase}  gradient="linear-gradient(135deg,#1a6bff,#6366f1)"   trend={thisWeek>0?Math.round((thisWeek/(lastWeek||1))*100)-100:null} trendUp={thisWeek>=lastWeek}/>
-        <KPICard label="Applied"            value={stats.applied}   sub={`${stats.wishlist} in wishlist`}             icon={Target}     gradient="linear-gradient(135deg,#0ea5e9,#38bdf8)"   trend={stats.total>0?Math.round((stats.applied/stats.total)*100):null} trendUp/>
-        <KPICard label="Interviews"         value={stats.interview} sub={`${responseRate}% response rate`}            icon={CalendarDays} gradient="linear-gradient(135deg,#f59e0b,#fb923c)" trend={responseRate} trendUp={responseRate>=15}/>
-        <KPICard label="Offers"             value={stats.offer}     sub={`${offerRate}% interview-to-offer`}          icon={DollarSign} gradient="linear-gradient(135deg,#10b981,#4edea3)"   trend={offerRate} trendUp={offerRate>=30}/>
+      {/* ══ ROW 1: Configurable KPI cards ══ */}
+      <div>
+        <div style={{ display:'flex', justifyContent:'flex-end', marginBottom:6 }}>
+          <button
+            onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
+            style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.1)', cursor:'pointer', color:'rgba(163,201,255,0.4)', fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.15s' }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.09)'; e.currentTarget.style.color='rgba(163,201,255,0.75)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.22)' }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.color='rgba(163,201,255,0.4)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.1)' }}
+          >
+            <Settings size={9}/> Customize
+          </button>
+        </div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:12 }}>
+          {kpiConfig.map(id => {
+            const opt = KPI_OPTIONS.find(o => o.id === id)
+            if (!opt) return null
+            const d = opt.compute(kpiData)
+            return <KPICard key={id} label={opt.label} value={d.value} sub={d.sub} icon={opt.icon} gradient={opt.gradient} trend={d.trend} trendUp={d.trendUp}/>
+          })}
+        </div>
       </div>
 
       {/* ══ ROW 2: Big chart | Mini stats | Donuts ══ */}
@@ -599,6 +684,100 @@ export default function Home() {
               style={{ padding:'12px 0', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', color:'#fff', fontFamily:MONO, fontSize:11, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer' }}>
               Save Event
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ══ KPI Customize Modal ══ */}
+      {kpiCustomizeOpen && (
+        <div
+          style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.82)', zIndex:99990, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}
+          onClick={() => setKpiCustomizeOpen(false)}
+        >
+          <div
+            style={{ width:'100%', maxWidth:520, background:'#0a0e1c', border:'0.5px solid rgba(163,201,255,0.15)', padding:'28px 28px 22px', display:'flex', flexDirection:'column', gap:0 }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:22 }}>
+              <div>
+                <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:'rgba(163,201,255,0.3)', letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:4 }}>Dashboard</p>
+                <h2 style={{ fontFamily:MONO, fontSize:15, fontWeight:900, color:'#e2e2e8', letterSpacing:'-0.02em', margin:0 }}>Customize KPIs</h2>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:kpiDraft.length===4?'#4edea3':'#ffb689', background:kpiDraft.length===4?'rgba(78,222,163,0.1)':'rgba(255,182,137,0.1)', border:`0.5px solid ${kpiDraft.length===4?'rgba(78,222,163,0.3)':'rgba(255,182,137,0.3)'}`, padding:'4px 10px' }}>
+                  {kpiDraft.length} / 4
+                </span>
+                <button onClick={() => setKpiCustomizeOpen(false)} style={{ background:'none', border:'none', color:'#3a4455', cursor:'pointer', display:'flex', padding:4, transition:'color 0.12s' }}
+                  onMouseEnter={e => e.currentTarget.style.color='#8a919f'} onMouseLeave={e => e.currentTarget.style.color='#3a4455'}>
+                  <X size={16}/>
+                </button>
+              </div>
+            </div>
+
+            {/* Categories */}
+            <div style={{ display:'flex', flexDirection:'column', gap:16, marginBottom:20 }}>
+              {KPI_CATEGORY_ORDER.map(cat => {
+                const catOpts = KPI_OPTIONS.filter(o => o.category === cat)
+                return (
+                  <div key={cat}>
+                    <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:'rgba(163,201,255,0.22)', letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:7 }}>{cat}</p>
+                    <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:6 }}>
+                      {catOpts.map(opt => {
+                        const selected = kpiDraft.includes(opt.id)
+                        const disabled = !selected && kpiDraft.length >= 4
+                        const Icon = opt.icon
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => {
+                              if (selected) setKpiDraft(d => d.filter(id => id !== opt.id))
+                              else if (kpiDraft.length < 4) setKpiDraft(d => [...d, opt.id])
+                            }}
+                            style={{
+                              display:'flex', flexDirection:'column', alignItems:'flex-start',
+                              padding:'10px 12px', gap:7, textAlign:'left',
+                              background: selected ? 'rgba(163,201,255,0.08)' : 'rgba(255,255,255,0.02)',
+                              border: selected ? '0.5px solid rgba(163,201,255,0.38)' : '0.5px solid rgba(163,201,255,0.07)',
+                              cursor: disabled ? 'default' : 'pointer',
+                              opacity: disabled ? 0.3 : 1,
+                              transition:'all 0.12s',
+                            }}
+                            onMouseEnter={e => { if (!disabled && !selected) { e.currentTarget.style.background='rgba(163,201,255,0.05)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.18)' } }}
+                            onMouseLeave={e => { if (!selected) { e.currentTarget.style.background='rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.07)' } }}
+                          >
+                            <div style={{ width:22, height:22, borderRadius:'50%', background:opt.gradient, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                              <Icon size={10} color="#fff"/>
+                            </div>
+                            <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, color:selected?'#a3c9ff':'#4a5568', lineHeight:1.35 }}>{opt.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Footer */}
+            <div style={{ display:'flex', gap:8 }}>
+              <button
+                onClick={() => setKpiCustomizeOpen(false)}
+                style={{ flex:1, padding:'10px 0', background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(163,201,255,0.09)', color:'#4a5568', fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', transition:'all 0.12s' }}
+                onMouseEnter={e => { e.currentTarget.style.color='#8a919f'; e.currentTarget.style.borderColor='rgba(163,201,255,0.18)' }}
+                onMouseLeave={e => { e.currentTarget.style.color='#4a5568'; e.currentTarget.style.borderColor='rgba(163,201,255,0.09)' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => kpiDraft.length === 4 && saveKpiConfig(kpiDraft)}
+                style={{ flex:2, padding:'10px 0', background:kpiDraft.length===4?'rgba(78,222,163,0.1)':'rgba(255,255,255,0.02)', border:`0.5px solid ${kpiDraft.length===4?'rgba(78,222,163,0.38)':'rgba(163,201,255,0.07)'}`, color:kpiDraft.length===4?'#4edea3':'#2a3040', fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:kpiDraft.length===4?'pointer':'default', transition:'all 0.12s' }}
+                onMouseEnter={e => { if (kpiDraft.length===4) e.currentTarget.style.background='rgba(78,222,163,0.17)' }}
+                onMouseLeave={e => { if (kpiDraft.length===4) e.currentTarget.style.background='rgba(78,222,163,0.1)' }}
+              >
+                {kpiDraft.length < 4 ? `Pick ${4-kpiDraft.length} more` : 'Save changes'}
+              </button>
+            </div>
           </div>
         </div>
       )}
