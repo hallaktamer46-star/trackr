@@ -42,7 +42,7 @@ const PILLARS = [
     key: 'personal',
     label: 'Your Life',
     tagline: 'Stay grounded while you grow.',
-    description: 'Daily reflection, mental clarity, and life planning — because your career is only part of who you are. Build the whole picture.',
+    description: 'Daily reflection, mental clarity, and life planning. Your career is only part of who you are. Build the whole picture.',
     color: '#a3c9ff',
     glow: 'rgba(163,201,255,0.15)',
     tools: ['Life Plan', 'Daily Debrief', 'Mental Clarity', 'Round Table', 'Calendar'],
@@ -186,13 +186,13 @@ export default function Auth() {
             style={{ fontFamily: SANS, fontSize: 14, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '7px 16px', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'color 0.15s', letterSpacing: '-0.01em', lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
             onMouseLeave={e => e.currentTarget.style.color = CANDY}
-          >Log in →</button>
+          >Log in</button>
           <button
             onClick={() => { setMode('signup'); setShowForm(true) }}
             style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: '#050810', background: '#ffffff', border: 'none', padding: '8px 22px', borderRadius: 999, cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em', lineHeight: 1, transition: 'background 0.15s, transform 0.15s' }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.88)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
             onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.transform = 'none' }}
-          >Sign up →</button>
+          >Sign up</button>
         </div>
       </div>
 
@@ -211,7 +211,7 @@ export default function Auth() {
           </h1>
 
           <p style={{ fontSize: 17, color: 'rgba(192,199,213,0.52)', lineHeight: 1.85, maxWidth: 520, margin: '0 auto 52px', fontFamily: SANS, fontWeight: 400 }}>
-            One platform for your ambition. Track your career, build your business, and design the life you want — all in one place.
+            One platform for your ambition. Track your career, build your business, and design the life you want. All in one place.
           </p>
 
           <button
@@ -220,7 +220,7 @@ export default function Auth() {
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 48px rgba(78,222,163,0.32)' }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 40px rgba(78,222,163,0.2)' }}
           >
-            Get started free →
+            Get started free
           </button>
         </div>
       </div>
@@ -237,7 +237,7 @@ export default function Auth() {
               Built for more than just jobs.
             </h2>
             <p style={{ fontFamily: SANS, fontSize: 16, color: 'rgba(192,199,213,0.45)', maxWidth: 480, margin: '0 auto', lineHeight: 1.75 }}>
-              Three pillars. One platform. Everything you need to grow — professionally, personally, and beyond.
+              Three pillars. One platform. Everything you need to grow: professionally, personally, and beyond.
             </p>
           </div>
 
