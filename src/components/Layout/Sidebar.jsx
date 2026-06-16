@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useSidebar } from '../../contexts/SidebarContext'
 import {
-  Home, Briefcase, Building2, User, Users, Settings, Zap,
+  Home, Briefcase, Building2, User, Users, Settings, Activity,
   LayoutDashboard, Telescope, Rocket, CalendarDays, BarChart3,
   Clock, BookOpen, Map, Newspaper, LayoutList, Flame, Brain,
   PenLine, FileText, Mail, DollarSign,
@@ -285,7 +285,7 @@ export default function Sidebar() {
           borderTop: '1px solid rgba(255,255,255,0.06)',
         }}>
           <BottomItem label="Settings" icon={Settings} onClick={() => {}} />
-          <BottomItem label="Upgrade"  icon={Zap}      to="/plans" accent="#a78bfa" />
+          <BottomItem label="Report"   icon={Activity}  to="/time-report" />
         </div>
       </div>
 

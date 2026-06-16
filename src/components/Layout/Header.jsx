@@ -69,10 +69,7 @@ export default function Header() {
     <header className="h-14 border-b border-slate-800 bg-slate-950 sticky top-0 z-30 flex items-center">
       <div className="w-full px-4 flex items-center justify-between gap-4">
 
-        {/* Logo / brand */}
-        <div style={{ fontFamily: MONO, fontSize: 11, fontWeight: 800, color: 'rgba(163,201,255,0.6)', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
-          Trackr
-        </div>
+        <div />
 
         {/* Right actions */}
         <div className="flex items-center gap-2">

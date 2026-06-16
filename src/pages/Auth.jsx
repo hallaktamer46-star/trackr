@@ -1,10 +1,128 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
 const SANS = 'Geist, Inter, sans-serif'
-const SERIF = "Georgia, 'Times New Roman', serif"
+const CANDY = '#38bdf8'
+
+const PILLARS = [
+  {
+    key: 'hired',
+    label: 'Getting Hired',
+    tagline: 'From first application to signed offer.',
+    description: 'Track every role, perfect your materials, and move through the pipeline with clarity. Know exactly where you stand at every stage.',
+    color: '#4edea3',
+    glow: 'rgba(78,222,163,0.15)',
+    tools: ['Job Tracker', 'Job Toolkit', 'CV Builder', 'CV Reviewer', 'Cover Letter', 'Stats'],
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M6 26V12l10-8 10 8v14" stroke="#4edea3" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        <rect x="12" y="18" width="8" height="8" stroke="#4edea3" strokeWidth="1.6" strokeLinejoin="round"/>
+        <path d="M10 16h2M20 16h2" stroke="#4edea3" strokeWidth="1.4" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'business',
+    label: 'Your Business',
+    tagline: 'Build, validate, and pitch your ideas.',
+    description: 'From early-stage concepts to investor-ready pitches. Structure your thinking, stress-test your model, and communicate your vision.',
+    color: '#a78bfa',
+    glow: 'rgba(167,139,250,0.15)',
+    tools: ['Growth Lab', 'Startup Studio', 'Pitch Lab'],
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M4 28h24M8 28V16M16 28V8M24 28V20" stroke="#a78bfa" strokeWidth="1.8" strokeLinecap="round"/>
+        <circle cx="16" cy="6" r="2" stroke="#a78bfa" strokeWidth="1.6"/>
+      </svg>
+    ),
+  },
+  {
+    key: 'personal',
+    label: 'Your Life',
+    tagline: 'Stay grounded while you grow.',
+    description: 'Daily reflection, mental clarity, and life planning — because your career is only part of who you are. Build the whole picture.',
+    color: '#a3c9ff',
+    glow: 'rgba(163,201,255,0.15)',
+    tools: ['Life Plan', 'Daily Debrief', 'Mental Clarity', 'Round Table', 'Calendar'],
+    icon: (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="10" stroke="#a3c9ff" strokeWidth="1.8"/>
+        <path d="M16 8v8l5 3" stroke="#a3c9ff" strokeWidth="1.6" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+]
+
+function FeatureCard({ pillar, index }) {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect() } },
+      { threshold: 0.15 }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        flex: '1 1 280px',
+        background: 'rgba(255,255,255,0.025)',
+        border: `1px solid ${pillar.color}22`,
+        borderRadius: 20,
+        padding: '36px 32px',
+        display: 'flex', flexDirection: 'column', gap: 20,
+        boxShadow: visible ? `0 0 60px ${pillar.glow}` : 'none',
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(40px)',
+        transition: `opacity 0.7s ease ${index * 0.15}s, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${index * 0.15}s, box-shadow 1.2s ease`,
+      }}
+    >
+      <div style={{
+        width: 56, height: 56, borderRadius: 14,
+        background: `${pillar.color}12`,
+        border: `1px solid ${pillar.color}22`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {pillar.icon}
+      </div>
+
+      <div>
+        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: pillar.color, letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 8 }}>
+          {pillar.tagline}
+        </p>
+        <h3 style={{ fontFamily: SANS, fontSize: 26, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 12 }}>
+          {pillar.label}
+        </h3>
+        <p style={{ fontFamily: SANS, fontSize: 14, color: 'rgba(192,199,213,0.55)', lineHeight: 1.75 }}>
+          {pillar.description}
+        </p>
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 'auto' }}>
+        {pillar.tools.map(tool => (
+          <span key={tool} style={{
+            fontFamily: MONO, fontSize: 9, fontWeight: 700,
+            color: pillar.color, background: `${pillar.color}0f`,
+            border: `0.5px solid ${pillar.color}28`,
+            padding: '4px 10px', borderRadius: 999,
+            letterSpacing: '0.06em',
+          }}>
+            {tool}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function Auth() {
   const { signIn, signUp } = useAuth()
@@ -34,10 +152,10 @@ export default function Auth() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', width: '100%', background: '#050810', fontFamily: SANS, overflow: 'hidden', position: 'relative' }}>
+    <div style={{ minHeight: '100vh', width: '100%', background: '#050810', fontFamily: SANS, overflowX: 'hidden', position: 'relative' }}>
 
-      {/* ── Animated background ── */}
-      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+      {/* Background */}
+      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 0 }}>
         <div className="auth-grid" />
         <div className="auth-orb auth-orb-1" />
         <div className="auth-orb auth-orb-2" />
@@ -45,76 +163,88 @@ export default function Auth() {
       </div>
 
       {/* ── Top bar ── */}
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 48px', height: 58, borderBottom: '1px solid rgba(255,255,255,0.055)' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 48px', height: 58, borderBottom: '1px solid rgba(255,255,255,0.055)', background: 'rgba(5,8,16,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
 
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, flexShrink: 0 }}>
-          <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
-            <rect width="34" height="34" fill="#0c1a2e"/>
-            <polyline points="4,17 8,17 10.5,10 14,24 17,12 20,20 23,20 26,17 30,17"
-              stroke="#00d4ff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em' }}>Trackr</span>
-        </div>
+        <div style={{ width: 120 }} />
 
         {/* Center nav */}
         <nav style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-          {[['Product', null], ['Features', null], ['Pricing', null], ['Roadmap', null]].map(([label]) => (
+          {['Product', 'Features', 'Pricing', 'Roadmap'].map(label => (
             <button key={label}
-              onClick={() => label === 'Pricing' || label === 'Product' ? null : null}
-              style={{ fontFamily: SANS, fontSize: 13, fontWeight: 400, color: 'rgba(200,210,230,0.55)', background: 'none', border: 'none', padding: '6px 16px', cursor: 'pointer', letterSpacing: '-0.01em', whiteSpace: 'nowrap', transition: 'color 0.15s' }}
+              style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '6px 16px', cursor: 'pointer', letterSpacing: '-0.01em', whiteSpace: 'nowrap', transition: 'color 0.15s' }}
               onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
-              onMouseLeave={e => e.currentTarget.style.color = 'rgba(200,210,230,0.55)'}
+              onMouseLeave={e => e.currentTarget.style.color = CANDY}
             >{label}</button>
           ))}
         </nav>
 
-        {/* Right: Log in + Sign up */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+        {/* Right */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: 120, justifyContent: 'flex-end' }}>
           <button
             onClick={() => { setMode('signin'); setShowForm(true) }}
-            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: 'rgba(200,210,230,0.65)', background: 'none', border: 'none', padding: '7px 16px', cursor: 'pointer', transition: 'color 0.15s' }}
+            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '7px 14px', cursor: 'pointer', transition: 'color 0.15s' }}
             onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
-            onMouseLeave={e => e.currentTarget.style.color = 'rgba(200,210,230,0.65)'}
+            onMouseLeave={e => e.currentTarget.style.color = CANDY}
           >Log in</button>
-          <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)', margin: '0 4px' }}/>
           <button
             onClick={() => { setMode('signup'); setShowForm(true) }}
-            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: '#050810', background: '#ffffff', border: 'none', padding: '7px 18px', cursor: 'pointer', letterSpacing: '-0.01em', transition: 'background 0.15s' }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.88)'}
-            onMouseLeave={e => e.currentTarget.style.background = '#ffffff'}
+            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: '#050810', background: '#ffffff', border: 'none', padding: '7px 18px', borderRadius: 8, cursor: 'pointer', letterSpacing: '-0.01em', transition: 'all 0.15s' }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.88)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.transform = 'none' }}
           >Sign up</button>
         </div>
       </div>
 
-      {/* ── Centered hero ── */}
-      <div style={{ position: 'relative', zIndex: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 116px)', padding: '0 32px', textAlign: 'center' }}>
+      {/* ── Hero ── */}
+      <div style={{ position: 'relative', zIndex: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 58px)', padding: '80px 32px', textAlign: 'center' }}>
         <div style={{ maxWidth: 780 }}>
+          <p style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: CANDY, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 28, opacity: 0.8 }}>
+            Career · Business · Life
+          </p>
 
           <h1 style={{ fontSize: 'clamp(54px, 6.5vw, 92px)', fontWeight: 900, lineHeight: 1.02, letterSpacing: '-0.04em', color: '#ffffff', marginBottom: 0, fontFamily: SANS }}>
             Take the next step.
           </h1>
-          <h1 style={{ fontSize: 'clamp(54px, 6.5vw, 92px)', fontWeight: 900, lineHeight: 1.02, letterSpacing: '-0.04em', marginBottom: 32, fontFamily: SANS }}>
+          <h1 style={{ fontSize: 'clamp(54px, 6.5vw, 92px)', fontWeight: 900, lineHeight: 1.02, letterSpacing: '-0.04em', marginBottom: 36, fontFamily: SANS }}>
             <span style={{ color: 'transparent', WebkitTextStroke: '1.5px rgba(255,255,255,0.22)' }}>Keep taking them.</span>
           </h1>
 
-          <p style={{ fontSize: 17, color: 'rgba(192,199,213,0.52)', lineHeight: 1.85, maxWidth: 500, margin: '0 auto 52px', fontFamily: SANS, fontWeight: 400 }}>
-            Job searching is momentum. Trackr keeps it going — every application tracked, every follow-up timed, every offer earned.
+          <p style={{ fontSize: 17, color: 'rgba(192,199,213,0.52)', lineHeight: 1.85, maxWidth: 520, margin: '0 auto 52px', fontFamily: SANS, fontWeight: 400 }}>
+            One platform for your ambition. Track your career, build your business, and design the life you want — all in one place.
           </p>
 
           <button
             onClick={() => { setMode('signup'); setShowForm(true) }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '15px 38px', background: 'linear-gradient(135deg, #4edea3 0%, #a3c9ff 100%)', border: 'none', cursor: 'pointer', fontFamily: MONO, fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#050810', transition: 'all .2s', boxShadow: '0 8px 40px rgba(78,222,163,0.2)' }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 48px rgba(78,222,163,0.32)' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '15px 42px', background: 'linear-gradient(135deg, #4edea3 0%, #a3c9ff 100%)', border: 'none', borderRadius: 12, cursor: 'pointer', fontFamily: SANS, fontSize: 15, fontWeight: 700, letterSpacing: '-0.01em', color: '#050810', transition: 'all .2s', boxShadow: '0 8px 40px rgba(78,222,163,0.2)' }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 48px rgba(78,222,163,0.32)' }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 8px 40px rgba(78,222,163,0.2)' }}
           >
-            Start tracking free →
+            Get started free →
           </button>
+        </div>
+      </div>
 
-          <p style={{ fontFamily: MONO, fontSize: 9, color: 'rgba(80,95,120,0.4)', letterSpacing: '0.05em', marginTop: 20 }}>
-            No card required · Free up to 10 applications
-          </p>
+      {/* ── Features section ── */}
+      <div style={{ position: 'relative', zIndex: 5, padding: '100px 48px 120px' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
 
+          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+            <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: CANDY, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: 16 }}>
+              What we offer
+            </p>
+            <h2 style={{ fontFamily: SANS, fontSize: 'clamp(36px,4vw,56px)', fontWeight: 900, color: '#ffffff', letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: 18 }}>
+              Built for more than just jobs.
+            </h2>
+            <p style={{ fontFamily: SANS, fontSize: 16, color: 'rgba(192,199,213,0.45)', maxWidth: 480, margin: '0 auto', lineHeight: 1.75 }}>
+              Three pillars. One platform. Everything you need to grow — professionally, personally, and beyond.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'stretch' }}>
+            {PILLARS.map((pillar, i) => (
+              <FeatureCard key={pillar.key} pillar={pillar} index={i} />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -125,11 +255,9 @@ export default function Auth() {
           onClick={() => setShowForm(false)}
         >
           <div
-            style={{ width: '100%', maxWidth: 380, background: 'rgba(10,14,28,0.95)', border: '0.5px solid rgba(255,255,255,0.08)', padding: '40px 36px', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', position: 'relative', animation: 'authFadeIn .22s ease' }}
+            style={{ width: '100%', maxWidth: 380, background: 'rgba(10,14,28,0.95)', border: '0.5px solid rgba(255,255,255,0.08)', padding: '40px 36px', borderRadius: 20, backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', position: 'relative', animation: 'authFadeIn .22s ease' }}
             onClick={e => e.stopPropagation()}
           >
-
-            {/* Close */}
             <button
               onClick={() => setShowForm(false)}
               style={{ position: 'absolute', top: 16, right: 18, background: 'none', border: 'none', color: 'rgba(163,201,255,0.3)', cursor: 'pointer', fontSize: 18, fontFamily: MONO, lineHeight: 1, padding: 4, transition: 'color .15s' }}
@@ -138,7 +266,7 @@ export default function Auth() {
             >×</button>
 
             {!isSupabaseConfigured && (
-              <div style={{ marginBottom: 18, background: 'rgba(78,222,163,0.05)', border: '0.5px solid rgba(78,222,163,0.12)', padding: '8px 12px' }}>
+              <div style={{ marginBottom: 18, background: 'rgba(78,222,163,0.05)', border: '0.5px solid rgba(78,222,163,0.12)', padding: '8px 12px', borderRadius: 8 }}>
                 <p style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(78,222,163,0.65)', letterSpacing: '0.04em' }}>
                   <strong>Demo mode</strong> — data stored locally.
                 </p>
@@ -149,10 +277,10 @@ export default function Auth() {
               {mode === 'signin' ? '// authenticate' : '// create account'}
             </p>
             <h2 style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff', marginBottom: 4, fontFamily: SANS }}>
-              {mode === 'signin' ? 'Welcome back.' : 'Start your pipeline.'}
+              {mode === 'signin' ? 'Welcome back.' : 'Start your journey.'}
             </h2>
             <p style={{ fontSize: 13, color: 'rgba(150,162,185,0.45)', marginBottom: 28, lineHeight: 1.5, fontFamily: SANS }}>
-              {mode === 'signin' ? 'Sign in to your Trackr workspace.' : 'Track applications with precision.'}
+              {mode === 'signin' ? 'Sign in to your workspace.' : 'One platform. Every ambition.'}
             </p>
 
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -165,8 +293,8 @@ export default function Auth() {
                 <input type="password" required value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" minLength={6} className="auth-field" />
               </div>
 
-              {error   && <p style={{ fontFamily: MONO, fontSize: 10, color: '#ffb4ab', background: 'rgba(255,180,171,0.07)', border: '0.5px solid rgba(255,180,171,0.18)', padding: '8px 12px', letterSpacing: '0.02em' }}>{error}</p>}
-              {success && <p style={{ fontFamily: MONO, fontSize: 10, color: '#4edea3', background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '8px 12px', letterSpacing: '0.02em' }}>{success}</p>}
+              {error   && <p style={{ fontFamily: MONO, fontSize: 10, color: '#ffb4ab', background: 'rgba(255,180,171,0.07)', border: '0.5px solid rgba(255,180,171,0.18)', padding: '8px 12px', borderRadius: 6, letterSpacing: '0.02em' }}>{error}</p>}
+              {success && <p style={{ fontFamily: MONO, fontSize: 10, color: '#4edea3', background: 'rgba(78,222,163,0.07)', border: '0.5px solid rgba(78,222,163,0.18)', padding: '8px 12px', borderRadius: 6, letterSpacing: '0.02em' }}>{success}</p>}
 
               <button type="submit" disabled={loading} className="auth-submit" style={{ marginTop: 4 }}>
                 {loading
@@ -224,87 +352,40 @@ export default function Auth() {
           background-size: 72px 72px;
         }
         .auth-orb { position: absolute; border-radius: 50%; pointer-events: none; }
-        .auth-orb-1 {
-          top: -15%; left: 10%; width: 760px; height: 760px;
-          background: radial-gradient(circle, rgba(78,222,163,0.07) 0%, transparent 65%);
-          animation: orbFloat1 9s ease-in-out infinite;
-        }
-        .auth-orb-2 {
-          bottom: -20%; right: 5%; width: 640px; height: 640px;
-          background: radial-gradient(circle, rgba(163,201,255,0.05) 0%, transparent 65%);
-          animation: orbFloat2 12s ease-in-out infinite;
-        }
-        .auth-orb-3 {
-          top: 35%; left: 45%; width: 480px; height: 480px;
-          background: radial-gradient(circle, rgba(196,181,253,0.04) 0%, transparent 65%);
-          animation: orbFloat3 15s ease-in-out infinite;
-        }
+        .auth-orb-1 { top:-15%;left:10%;width:760px;height:760px;background:radial-gradient(circle,rgba(78,222,163,0.07) 0%,transparent 65%);animation:orbFloat1 9s ease-in-out infinite; }
+        .auth-orb-2 { bottom:-20%;right:5%;width:640px;height:640px;background:radial-gradient(circle,rgba(163,201,255,0.05) 0%,transparent 65%);animation:orbFloat2 12s ease-in-out infinite; }
+        .auth-orb-3 { top:35%;left:45%;width:480px;height:480px;background:radial-gradient(circle,rgba(196,181,253,0.04) 0%,transparent 65%);animation:orbFloat3 15s ease-in-out infinite; }
 
         .auth-field {
-          width: 100%; box-sizing: border-box;
-          padding: 10px 14px;
-          background: rgba(255,255,255,0.025);
-          border: 0.5px solid rgba(255,255,255,0.07);
-          border-radius: 8px;
-          font-size: 13px;
-          font-family: 'Geist', Inter, sans-serif;
-          color: #e2e2e8;
-          outline: none;
-          transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+          width:100%;box-sizing:border-box;padding:10px 14px;
+          background:rgba(255,255,255,0.025);border:0.5px solid rgba(255,255,255,0.07);
+          border-radius:10px;font-size:13px;font-family:'Geist',Inter,sans-serif;
+          color:#e2e2e8;outline:none;transition:border-color 0.15s,background 0.15s,box-shadow 0.15s;
         }
-        .auth-field:focus {
-          border-color: rgba(78,222,163,0.35);
-          background: rgba(78,222,163,0.025);
-          box-shadow: 0 0 0 3px rgba(78,222,163,0.05);
-        }
-        .auth-field::placeholder { color: rgba(150,162,185,0.22); }
+        .auth-field:focus { border-color:rgba(78,222,163,0.35);background:rgba(78,222,163,0.025);box-shadow:0 0 0 3px rgba(78,222,163,0.05); }
+        .auth-field::placeholder { color:rgba(150,162,185,0.22); }
 
         .auth-submit {
-          width: 100%; padding: 11px 0;
-          background: linear-gradient(135deg, rgba(78,222,163,0.14), rgba(163,201,255,0.09));
-          border: 0.5px solid rgba(78,222,163,0.28);
-          border-radius: 8px;
-          color: #4edea3;
-          font-family: Consolas, Menlo, Monaco, monospace;
-          font-size: 11px; font-weight: 700;
-          letter-spacing: 0.09em; text-transform: uppercase;
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center; gap: 8px;
-          transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+          width:100%;padding:11px 0;
+          background:linear-gradient(135deg,rgba(78,222,163,0.14),rgba(163,201,255,0.09));
+          border:0.5px solid rgba(78,222,163,0.28);border-radius:10px;
+          color:#4edea3;font-family:Consolas,Menlo,Monaco,monospace;
+          font-size:11px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;
+          cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+          transition:background 0.15s,border-color 0.15s,box-shadow 0.15s,transform 0.1s;
         }
-        .auth-submit:hover:not(:disabled) {
-          background: linear-gradient(135deg, rgba(78,222,163,0.22), rgba(163,201,255,0.15));
-          border-color: rgba(78,222,163,0.45);
-          box-shadow: 0 0 24px rgba(78,222,163,0.12);
-          transform: translateY(-1px);
-        }
-        .auth-submit:active:not(:disabled) { transform: translateY(0); }
-        .auth-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+        .auth-submit:hover:not(:disabled) { background:linear-gradient(135deg,rgba(78,222,163,0.22),rgba(163,201,255,0.15));border-color:rgba(78,222,163,0.45);box-shadow:0 0 24px rgba(78,222,163,0.12);transform:translateY(-1px); }
+        .auth-submit:disabled { opacity:0.45;cursor:not-allowed; }
 
-        .auth-spinner {
-          display: inline-block; width: 11px; height: 11px;
-          border: 1.5px solid rgba(78,222,163,0.25);
-          border-top-color: #4edea3;
-          border-radius: 50%;
-          animation: authSpin 0.65s linear infinite;
-        }
+        .auth-spinner { display:inline-block;width:11px;height:11px;border:1.5px solid rgba(78,222,163,0.25);border-top-color:#4edea3;border-radius:50%;animation:authSpin 0.65s linear infinite; }
 
         .auth-google {
-          width: 100%; padding: 10px;
-          background: rgba(255,255,255,0.02);
-          border: 0.5px solid rgba(255,255,255,0.06);
-          border-radius: 8px;
-          color: rgba(192,199,213,0.6);
-          font-family: 'Geist', Inter, sans-serif;
-          font-size: 13px; font-weight: 500;
-          cursor: pointer;
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-          transition: background 0.15s, border-color 0.15s;
+          width:100%;padding:10px;
+          background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;
+          color:rgba(192,199,213,0.6);font-family:'Geist',Inter,sans-serif;font-size:13px;font-weight:500;
+          cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.15s,border-color 0.15s;
         }
-        .auth-google:hover {
-          background: rgba(255,255,255,0.045);
-          border-color: rgba(255,255,255,0.11);
-        }
+        .auth-google:hover { background:rgba(255,255,255,0.045);border-color:rgba(255,255,255,0.11); }
       `}</style>
     </div>
   )
