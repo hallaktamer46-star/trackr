@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import ProfileDropdown from './ProfileDropdown'
 
 const CHECKIN_KEY = 'trackr_checkin_pending'
@@ -12,20 +11,7 @@ function fmtCountdown(ms) {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-function ActivityIcon({ size = 17, style }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={style}>
-      <polyline
-        points="1,10 5,10 7,4 10,16 13,8 15,11 19,11"
-        stroke="currentColor" strokeWidth="1.6"
-        strokeLinecap="round" strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 export default function Header() {
-  const navigate = useNavigate()
   const [checkInData, setCheckInData] = useState(null)
   const [, setTick] = useState(0)
   const tickRef = useRef(null)
@@ -73,22 +59,6 @@ export default function Header() {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/time-report')}
-            title="Time Report"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '5px 10px', background: 'transparent', border: 'none', borderRadius: 6,
-              cursor: 'pointer', color: 'rgba(148,163,184,0.7)', transition: 'color 0.15s, background 0.15s',
-              fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#38bdf8'; e.currentTarget.style.background = 'rgba(56,189,248,0.07)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(148,163,184,0.7)'; e.currentTarget.style.background = 'transparent' }}
-          >
-            <ActivityIcon size={15} />
-            <span style={{ letterSpacing: '0.1em' }}>Report</span>
-          </button>
-
           <div style={{ position: 'relative' }}>
             <ProfileDropdown />
             {checkInData && (
