@@ -103,10 +103,10 @@ function iconBoxStyle(isActive, flyoutOpen, hovered) {
     transform: 'scale(1)',
   }
   if (hovered) return {
-    background: 'rgba(255,255,255,0.09)',
-    boxShadow: '0 0 14px rgba(255,255,255,0.13)',
-    border: '0.5px solid rgba(255,255,255,0.1)',
-    transform: 'scale(1)',
+    background: 'transparent',
+    boxShadow: '0 0 20px rgba(255,255,255,0.25)',
+    border: '0.5px solid transparent',
+    transform: 'scale(1.06)',
   }
   return {
     background: 'transparent', boxShadow: 'none',

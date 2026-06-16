@@ -480,9 +480,11 @@ export default function EngageWidget() {
         transition: 'box-shadow 0.4s',
       }}>
         <button onClick={() => openTab('engage')} style={{
-          flex:1, padding:'12px 0', border:'none',
+          flex: tab === 'engage' ? '0 0 300px' : 1,
+          padding:'12px 0', border:'none',
           background: tab==='engage' ? `${cur?.color || '#4edea3'}10` : 'transparent',
           borderBottom: tab==='engage' ? `2px solid ${cur?.color || '#4edea3'}` : '2px solid transparent',
+          borderRight: tab === 'engage' ? `1px solid ${DIVIDER}` : 'none',
           cursor:'pointer', transition:'all 0.15s',
         }}>
           {cur && tab !== 'engage' ? (
@@ -665,11 +667,6 @@ export default function EngageWidget() {
                     onMouseEnter={e=>{ e.currentTarget.style.color='#60a5fa' }}
                     onMouseLeave={e=>{ e.currentTarget.style.color='#5090d8' }}>
                     Tasks
-                    {pending.length > 0 && (
-                      <span style={{fontFamily:NUM,fontSize:9,fontWeight:800,color:'#60a5fa',letterSpacing:'0.1em'}}>
-                        {pending.length}
-                      </span>
-                    )}
                   </button>
                   <button
                     onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
