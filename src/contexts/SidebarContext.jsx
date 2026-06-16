@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const SidebarCtx = createContext(null)
 
-export const FLYOUT_W = 228  // 220px panel + 8px gap
+export const FLYOUT_W = 216  // 200px panel + 16px gap
 
 export function SidebarProvider({ children }) {
   const [open, setOpen] = useState(() => {

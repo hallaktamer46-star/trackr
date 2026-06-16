@@ -89,12 +89,18 @@ const NAV_ITEMS = [
   },
 ]
 
-function iconBoxStyle(isActive, hovered) {
+function iconBoxStyle(isActive, flyoutOpen, hovered) {
   if (isActive) return {
     background: 'rgba(255,255,255,0.16)',
     boxShadow: '0 0 22px rgba(255,255,255,0.22), inset 0 0 10px rgba(255,255,255,0.06)',
     border: '0.5px solid rgba(255,255,255,0.22)',
     transform: 'scale(1.07)',
+  }
+  if (flyoutOpen) return {
+    background: 'rgba(255,255,255,0.06)',
+    boxShadow: 'none',
+    border: '0.5px solid rgba(255,255,255,0.14)',
+    transform: 'scale(1)',
   }
   if (hovered) return {
     background: 'rgba(255,255,255,0.09)',
@@ -137,7 +143,7 @@ function NavItem({ item, openFlyout, onToggle }) {
         <div style={{
           width: 40, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
           borderRadius: 9, transition: 'all 0.18s cubic-bezier(0.22,1,0.36,1)',
-          ...iconBoxStyle(isActive || flyoutOpen, hovered),
+          ...iconBoxStyle(isActive, flyoutOpen, hovered),
         }}>
           {item.icon
             ? <item.icon size={16} color="#ffffff" />
@@ -145,7 +151,7 @@ function NavItem({ item, openFlyout, onToggle }) {
           }
         </div>
         <span style={{
-          fontFamily: SANS, fontSize: 9, fontWeight: (isActive || flyoutOpen) ? 700 : 400,
+          fontFamily: SANS, fontSize: 9, fontWeight: isActive ? 700 : flyoutOpen ? 600 : 400,
           color: '#ffffff', letterSpacing: '0.01em', userSelect: 'none',
         }}>{item.label}</span>
       </div>
@@ -192,7 +198,7 @@ function Flyout({ item, panelRef, onClose }) {
         top: TOP,
         bottom: BOTTOM,
         left: W + GAP * 2,
-        width: 228,
+        width: 200,
         background: BG,
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: 14,
@@ -204,11 +210,11 @@ function Flyout({ item, panelRef, onClose }) {
       }}
     >
       {/* Header */}
-      <div style={{ padding: '22px 20px 14px', flexShrink: 0 }}>
-        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 6px' }}>
+      <div style={{ padding: '20px 16px 12px', flexShrink: 0 }}>
+        <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: '0 0 12px', lineHeight: 1 }}>
           {item.label}
         </p>
-        <div style={{ height: '0.5px', background: 'rgba(255,255,255,0.07)' }} />
+        <div style={{ height: '0.5px', background: 'rgba(255,255,255,0.08)' }} />
       </div>
 
       {/* Nav items */}
@@ -249,14 +255,14 @@ function FlyoutItem({ sub, isActive }) {
     >
       <sub.icon
         size={14}
-        color={isActive ? '#ffffff' : hovered ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)'}
+        color={isActive ? '#ffffff' : hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.55)'}
         strokeWidth={isActive ? 2.2 : 1.8}
       />
       <span style={{
         fontFamily: SANS,
         fontSize: 13.5,
-        fontWeight: isActive ? 600 : 450,
-        color: isActive ? '#ffffff' : hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.62)',
+        fontWeight: isActive ? 650 : 430,
+        color: isActive ? '#ffffff' : hovered ? '#ffffff' : 'rgba(255,255,255,0.82)',
         letterSpacing: '-0.01em',
         lineHeight: 1,
         transition: 'color 0.14s',
