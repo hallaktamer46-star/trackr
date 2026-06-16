@@ -33,7 +33,7 @@ function LayoutInner({ children }) {
   }, [])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0d1117' }}>
+    <div style={{ minHeight: '100vh', background: '#000000' }}>
       <Header />
       <Sidebar />
       <main style={{

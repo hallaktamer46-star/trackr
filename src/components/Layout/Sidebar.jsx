@@ -17,7 +17,7 @@ export const SIDEBAR_W = W + GAP
 
 const TOP    = 56 + GAP
 const BOTTOM = GAP
-const BG     = '#0d1b2e'
+const BG     = '#020617'
 
 function GridIcon({ size = 16, color = 'currentColor' }) {
   return (
