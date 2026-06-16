@@ -163,15 +163,16 @@ export default function Auth() {
       </div>
 
       {/* ── Top bar ── */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 48px', height: 58, borderBottom: '1px solid rgba(255,255,255,0.055)', background: 'rgba(5,8,16,0.8)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', padding: '0 40px', height: 60, borderBottom: '1px solid rgba(255,255,255,0.055)', background: 'rgba(5,8,16,0.88)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}>
 
-        <div style={{ width: 120 }} />
+        {/* Left — empty (no logo) */}
+        <div />
 
-        {/* Center nav */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+        {/* Center nav — truly centered */}
+        <nav style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {['Product', 'Features', 'Pricing', 'Roadmap'].map(label => (
             <button key={label}
-              style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '6px 16px', cursor: 'pointer', letterSpacing: '-0.01em', whiteSpace: 'nowrap', transition: 'color 0.15s' }}
+              style={{ fontFamily: SANS, fontSize: 14, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '6px 18px', cursor: 'pointer', letterSpacing: '-0.01em', whiteSpace: 'nowrap', transition: 'color 0.15s', lineHeight: 1 }}
               onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
               onMouseLeave={e => e.currentTarget.style.color = CANDY}
             >{label}</button>
@@ -179,19 +180,19 @@ export default function Auth() {
         </nav>
 
         {/* Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, width: 120, justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
           <button
             onClick={() => { setMode('signin'); setShowForm(true) }}
-            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '7px 14px', cursor: 'pointer', transition: 'color 0.15s' }}
+            style={{ fontFamily: SANS, fontSize: 14, fontWeight: 500, color: CANDY, background: 'none', border: 'none', padding: '7px 16px', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'color 0.15s', letterSpacing: '-0.01em', lineHeight: 1 }}
             onMouseEnter={e => e.currentTarget.style.color = '#ffffff'}
             onMouseLeave={e => e.currentTarget.style.color = CANDY}
-          >Log in</button>
+          >Log in →</button>
           <button
             onClick={() => { setMode('signup'); setShowForm(true) }}
-            style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: '#050810', background: '#ffffff', border: 'none', padding: '7px 18px', borderRadius: 8, cursor: 'pointer', letterSpacing: '-0.01em', transition: 'all 0.15s' }}
+            style={{ fontFamily: SANS, fontSize: 14, fontWeight: 600, color: '#050810', background: '#ffffff', border: 'none', padding: '8px 22px', borderRadius: 999, cursor: 'pointer', whiteSpace: 'nowrap', letterSpacing: '-0.01em', lineHeight: 1, transition: 'background 0.15s, transform 0.15s' }}
             onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.88)'; e.currentTarget.style.transform = 'translateY(-1px)' }}
             onMouseLeave={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.transform = 'none' }}
-          >Sign up</button>
+          >Sign up →</button>
         </div>
       </div>
 
