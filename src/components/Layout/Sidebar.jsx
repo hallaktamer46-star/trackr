@@ -190,24 +190,29 @@ function Flyout({ item, panelRef, onClose }) {
       style={{
         position: 'fixed',
         top: TOP,
+        bottom: BOTTOM,
         left: W + GAP * 2,
-        width: 220,
-        maxHeight: `calc(100vh - ${TOP}px - ${BOTTOM}px)`,
+        width: 228,
         background: BG,
-        border: '1px solid rgba(255,255,255,0.07)',
+        border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: 14,
         zIndex: 19,
+        display: 'flex',
+        flexDirection: 'column',
         overflowY: 'auto',
         scrollbarWidth: 'none',
       }}
     >
-      <div style={{ padding: '16px 16px 8px' }}>
-        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.14em', textTransform: 'uppercase', margin: 0 }}>
+      {/* Header */}
+      <div style={{ padding: '22px 20px 14px', flexShrink: 0 }}>
+        <p style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.18em', textTransform: 'uppercase', margin: '0 0 6px' }}>
           {item.label}
         </p>
+        <div style={{ height: '0.5px', background: 'rgba(255,255,255,0.07)' }} />
       </div>
 
-      <div style={{ paddingBottom: 10 }}>
+      {/* Nav items */}
+      <div style={{ flex: 1, paddingBottom: 16 }}>
         {item.items.map(sub => (
           <NavLink
             key={sub.to} to={sub.to}
@@ -215,26 +220,49 @@ function Flyout({ item, panelRef, onClose }) {
             style={{ textDecoration: 'none', display: 'block' }}
           >
             {({ isActive }) => (
-              <div
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '9px 16px',
-                  background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-                  borderLeft: `2px solid ${isActive ? '#ffffff' : 'transparent'}`,
-                  transition: 'background 0.12s', cursor: 'pointer',
-                }}
-                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.04)' }}
-                onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
-              >
-                <sub.icon size={13} color={isActive ? '#ffffff' : 'rgba(255,255,255,0.5)'} />
-                <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: isActive ? 600 : 400, color: isActive ? '#ffffff' : 'rgba(255,255,255,0.65)' }}>
-                  {sub.label}
-                </span>
-              </div>
+              <FlyoutItem sub={sub} isActive={isActive} />
             )}
           </NavLink>
         ))}
       </div>
+    </div>
+  )
+}
+
+function FlyoutItem({ sub, isActive }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <div
+      style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '10px 20px',
+        margin: '2px 8px',
+        borderRadius: 9,
+        background: isActive
+          ? 'rgba(255,255,255,0.1)'
+          : hovered ? 'rgba(255,255,255,0.055)' : 'transparent',
+        transition: 'background 0.14s',
+        cursor: 'pointer',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <sub.icon
+        size={14}
+        color={isActive ? '#ffffff' : hovered ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)'}
+        strokeWidth={isActive ? 2.2 : 1.8}
+      />
+      <span style={{
+        fontFamily: SANS,
+        fontSize: 13.5,
+        fontWeight: isActive ? 600 : 450,
+        color: isActive ? '#ffffff' : hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.62)',
+        letterSpacing: '-0.01em',
+        lineHeight: 1,
+        transition: 'color 0.14s',
+      }}>
+        {sub.label}
+      </span>
     </div>
   )
 }
