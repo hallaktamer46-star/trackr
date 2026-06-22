@@ -27,7 +27,7 @@ const SANS = 'Geist, Inter, sans-serif'
 const IMP_COLORS = { 1:'#4edea3', 2:'#a3c9ff', 3:'#fbbf24', 4:'#ffb689', 5:'#ffb4ab' }
 
 const STATUS_CONFIG = {
-  wishlist:  { label: 'Wishlist',  color: '#8a919f' },
+  wishlist:  { label: 'Wishlist',  color: '#5888c8' },
   applied:   { label: 'Applied',   color: '#a3c9ff' },
   interview: { label: 'Interview', color: '#ffb689' },
   offer:     { label: 'Offer',     color: '#4edea3' },
@@ -76,12 +76,13 @@ function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
   const filledDots = total != null && pct != null ? Math.round((pct / 100) * dotCount) : 0
   return (
     <div style={{
-      background: '#07090f',
-      border: '0.5px solid rgba(48,54,61,0.9)',
+      background: 'rgba(14,22,34,0.94)',
+      backdropFilter: 'blur(10px)',
+      border: '0.5px solid rgba(0,140,255,0.12)',
       padding:'15px 16px', flex:1,
     }}>
       <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:6 }}>
-        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase' }}>{label}</p>
+        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#2a5070', textTransform:'uppercase' }}>{label}</p>
         {pct != null && (
           <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:up?'#4edea3':'#ffb4ab', background:up?'rgba(78,222,163,0.12)':'rgba(255,180,171,0.12)', border:`0.5px solid ${up?'rgba(78,222,163,0.3)':'rgba(255,180,171,0.3)'}`, padding:'2px 6px' }}>
             {up?<TrendingUp size={8}/>:<TrendingDown size={8}/>} {pct}%
@@ -89,7 +90,7 @@ function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
         )}
       </div>
       <p style={{ fontFamily:SANS, fontSize:28, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1, marginBottom:4 }}>{value}</p>
-      <p style={{ fontFamily:MONO, fontSize:9, color:'#3a4455', marginBottom:10 }}>{sub}</p>
+      <p style={{ fontFamily:MONO, fontSize:9, color:'#1a3452', marginBottom:10 }}>{sub}</p>
 
       {/* Dot grid — neutral squares, filled vs dim */}
       {dotCount > 0 && (
@@ -148,7 +149,7 @@ function StatBar({ label, value, total, color, sub }) {
       </div>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <span style={{ fontFamily:SANS, fontSize:16, fontWeight:900, color, letterSpacing:'-0.03em' }}>{pct}%</span>
-        {sub && <span style={{ fontFamily:MONO, fontSize:7, color:'#3a4455' }}>{sub}</span>}
+        {sub && <span style={{ fontFamily:MONO, fontSize:7, color:'#1a3452' }}>{sub}</span>}
       </div>
     </div>
   )
@@ -159,7 +160,7 @@ const ChartTip = ({ active, payload, label }) => {
   if (!active||!payload?.length) return null
   return (
     <div style={{ background:'#0d1117', border:'0.5px solid rgba(163,201,255,0.2)', padding:'6px 10px' }}>
-      <p style={{ color:'#5a6478', fontFamily:MONO, fontSize:9, marginBottom:2 }}>{label}</p>
+      <p style={{ color:'#2a5070', fontFamily:MONO, fontSize:9, marginBottom:2 }}>{label}</p>
       <p style={{ color:'#a3c9ff', fontFamily:MONO, fontSize:12, fontWeight:700 }}>{payload[0].value}</p>
     </div>
   )
@@ -169,7 +170,7 @@ const HoursTip = ({ active, payload, label }) => {
   const h = Math.floor(payload[0].value), m = Math.round((payload[0].value - h)*60)
   return (
     <div style={{ background:'#0d1117', border:'0.5px solid rgba(167,139,250,0.25)', padding:'6px 10px' }}>
-      <p style={{ color:'#5a6478', fontFamily:MONO, fontSize:9, marginBottom:2 }}>{label}</p>
+      <p style={{ color:'#2a5070', fontFamily:MONO, fontSize:9, marginBottom:2 }}>{label}</p>
       <p style={{ color:'#a78bfa', fontFamily:MONO, fontSize:12, fontWeight:700 }}>{h>0?`${h}h ${m}m`:`${m}m`}</p>
     </div>
   )
@@ -395,10 +396,10 @@ export default function Home() {
               style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 10px', background:'transparent', border:'0.5px solid transparent', cursor:soon?'default':'pointer', textAlign:'left', transition:'all 0.15s', opacity:soon?0.35:1 }}
               onMouseEnter={e=>{ if(!soon){ e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.08)' }}}
               onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent' }}>
-              <Icon size={13} style={{ color:'#8a919f', flexShrink:0 }}/>
+              <Icon size={13} style={{ color:'#5878b0', flexShrink:0 }}/>
               <div>
-                <p style={{ fontSize:12, fontWeight:500, color:'#8a919f', letterSpacing:'-0.01em', whiteSpace:'nowrap' }}>{label}</p>
-                {soon && <p style={{ fontFamily:MONO, fontSize:7, color:'#2a3040', letterSpacing:'0.06em', marginTop:1 }}>SOON</p>}
+                <p style={{ fontSize:12, fontWeight:500, color:'#5878b0', letterSpacing:'-0.01em', whiteSpace:'nowrap' }}>{label}</p>
+                {soon && <p style={{ fontFamily:MONO, fontSize:7, color:'#0e1e2e', letterSpacing:'0.06em', marginTop:1 }}>SOON</p>}
               </div>
             </button>
           ))}
@@ -414,7 +415,7 @@ export default function Home() {
             onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.borderColor='transparent' }}>
             <Icon size={13} style={{ color: accent, flexShrink:0 }}/>
             <div style={{ flex:1, minWidth:0 }}>
-              <p style={{ fontSize:12, fontWeight:500, color:'#8a919f', letterSpacing:'-0.01em', whiteSpace:'nowrap' }}>{label}</p>
+              <p style={{ fontSize:12, fontWeight:500, color:'#5878b0', letterSpacing:'-0.01em', whiteSpace:'nowrap' }}>{label}</p>
             </div>
             <span style={{ fontFamily:MONO, fontSize:6, fontWeight:700, color:accent, background:`${accent}12`, border:`0.5px solid ${accent}25`, padding:'1px 4px', letterSpacing:'0.06em', flexShrink:0 }}>{tag}</span>
           </button>
@@ -430,10 +431,10 @@ export default function Home() {
       {/* ══ Header row ══ */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
         <div>
-          <p style={{ fontFamily:MONO, fontSize:13, fontWeight:700, color:'#ffffff', letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:6 }}>
+          <p style={{ fontFamily:MONO, fontSize:11, fontWeight:700, color:'rgba(0,212,255,0.5)', letterSpacing:'0.14em', textTransform:'uppercase', marginBottom:6 }}>
             {new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}
           </p>
-          <h1 style={{ fontSize:26, fontWeight:900, letterSpacing:'-0.03em', color:'#e2e2e8', lineHeight:1 }}>
+          <h1 style={{ fontSize:28, fontWeight:900, letterSpacing:'-0.03em', color:'#ffffff', lineHeight:1 }}>
             {greeting}{firstName
               ? <>, <span style={{ background:'linear-gradient(135deg,#a3c9ff,#4edea3)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{firstName}</span></>
               : ''}.
@@ -450,7 +451,7 @@ export default function Home() {
           </button>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
             <button onClick={() => setEventModal(true)}
-              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
               onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
               onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
               <CalendarDays size={13} color="#fff" strokeWidth={2.5}/>
@@ -458,7 +459,7 @@ export default function Home() {
             </button>
             {canAddMore && (
               <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
-                style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', borderRadius:999, background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
+                style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
                 onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
                 onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
                 <Plus size={13} color="#fff" strokeWidth={2.5}/>
@@ -485,11 +486,11 @@ export default function Home() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 200px 200px', gap:12 }}>
 
         {/* Left: Hours worked chart */}
-        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', padding:'18px 20px' }}>
+        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', padding:'18px 20px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
             <div>
-              <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'#5a6478', textTransform:'uppercase', marginBottom:3 }}>Activity</p>
-              <p style={{ fontSize:15, fontWeight:700, color:'#e2e2e8', letterSpacing:'-0.01em' }}>Hours Worked</p>
+              <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'rgba(0,212,255,0.45)', textTransform:'uppercase', marginBottom:3 }}>Activity</p>
+              <p style={{ fontSize:15, fontWeight:700, color:'#d0e4f0', letterSpacing:'-0.01em' }}>Hours Worked</p>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
               <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, color:'#a78bfa', background:'rgba(167,139,250,0.1)', border:'0.5px solid rgba(167,139,250,0.25)', padding:'3px 8px' }}>
@@ -502,8 +503,8 @@ export default function Home() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={kpiData.weeklyHoursChart} barSize={28} margin={{top:4,right:0,left:-18,bottom:0}}>
-              <XAxis dataKey="day" tick={{fontFamily:MONO,fontSize:8,fill:'#3a4455',fontWeight:600}} axisLine={false} tickLine={false}/>
-              <YAxis allowDecimals={true} tick={{fontFamily:MONO,fontSize:8,fill:'#3a4455'}} axisLine={false} tickLine={false} tickFormatter={v=>`${v}h`}/>
+              <XAxis dataKey="day" tick={{fontFamily:MONO,fontSize:8,fill:'#1a3452',fontWeight:600}} axisLine={false} tickLine={false}/>
+              <YAxis allowDecimals={true} tick={{fontFamily:MONO,fontSize:8,fill:'#1a3452'}} axisLine={false} tickLine={false} tickFormatter={v=>`${v}h`}/>
               <Tooltip content={<HoursTip/>} cursor={{fill:'rgba(167,139,250,0.04)'}}/>
               <Bar dataKey="hours" radius={[4,4,0,0]}>
                 {kpiData.weeklyHoursChart.map((e,i)=>(
@@ -545,12 +546,12 @@ export default function Home() {
         </div>
 
         {/* Right: Goals & tasks donuts */}
-        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', display:'flex', flexDirection:'column' }}>
-          <div style={{ padding:'12px 14px 8px', borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
-            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#5a6478', textTransform:'uppercase' }}>Progress</p>
+        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', display:'flex', flexDirection:'column' }}>
+          <div style={{ padding:'12px 14px 8px', borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
+            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'rgba(0,212,255,0.45)', textTransform:'uppercase' }}>Progress</p>
           </div>
           <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
-            <div style={{ borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
+            <div style={{ borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
               <StatBar label="Goals Done" value={kpiData.goalsCompleted} total={Math.max(kpiData.activeGoals+kpiData.goalsCompleted,1)} color="#f472b6" sub={`of ${kpiData.activeGoals+kpiData.goalsCompleted} goals`}/>
             </div>
             <StatBar label="Tasks Done" value={kpiData.tasksCompleted} total={Math.max(kpiData.tasksCompleted+kpiData.tasksPending,1)} color="#4edea3" sub={`of ${kpiData.tasksCompleted+kpiData.tasksPending} tasks`}/>
@@ -562,11 +563,11 @@ export default function Home() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:12 }}>
 
         {/* Left: Recent applications table */}
-        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', overflow:'hidden' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
+        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', overflow:'hidden' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
               <Activity size={13} style={{ color:'#a3c9ff' }}/>
-              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#8a919f', textTransform:'uppercase' }}>Recent Applications</p>
+              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'rgba(0,212,255,0.55)', textTransform:'uppercase' }}>Recent Applications</p>
             </div>
             <button onClick={()=>navigate('/board')} style={{ fontFamily:MONO, fontSize:8, color:'#a3c9ff', background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:3, letterSpacing:'0.06em', textTransform:'uppercase' }}>
               View board <ArrowRight size={9}/>
@@ -574,37 +575,37 @@ export default function Home() {
           </div>
 
           {/* Table header */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 100px 90px 80px', gap:0, padding:'8px 18px', borderBottom:'0.5px solid rgba(48,54,61,0.9)' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 100px 90px 80px', gap:0, padding:'8px 18px', borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
             {['Role / Company','Status','Date',''].map((h,i)=>(
-              <p key={i} style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#3a4455', textTransform:'uppercase' }}>{h}</p>
+              <p key={i} style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#1a3452', textTransform:'uppercase' }}>{h}</p>
             ))}
           </div>
 
           {recentApps.length === 0 ? (
             <div style={{ padding:'40px 18px', textAlign:'center' }}>
-              <p style={{ fontFamily:MONO, fontSize:10, color:'#2a3040', marginBottom:8 }}>No applications tracked yet.</p>
+              <p style={{ fontFamily:MONO, fontSize:10, color:'#1a3452', marginBottom:8 }}>No applications tracked yet.</p>
               <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }} style={{ fontFamily:MONO, fontSize:9, color:'#a3c9ff', background:'none', border:'none', cursor:'pointer', letterSpacing:'0.06em', textTransform:'uppercase' }}>Add your first →</button>
             </div>
           ) : recentApps.map((app, i) => {
             const sc = STATUS_CONFIG[app.status] || STATUS_CONFIG.applied
             return (
               <div key={app.id}
-                style={{ display:'grid', gridTemplateColumns:'1fr 100px 90px 80px', gap:0, padding:'10px 18px', borderBottom:i<recentApps.length-1?'0.5px solid rgba(48,54,61,0.5)':'none', cursor:'pointer', transition:'background 0.15s' }}
+                style={{ display:'grid', gridTemplateColumns:'1fr 100px 90px 80px', gap:0, padding:'10px 18px', borderBottom:i<recentApps.length-1?'0.5px solid rgba(0,100,200,0.08)':'none', cursor:'pointer', transition:'background 0.15s' }}
                 onClick={()=>{ setEditingApp(app); setModalOpen(true) }}
                 onMouseEnter={e=>e.currentTarget.style.background='rgba(163,201,255,0.03)'}
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                 <div>
-                  <p style={{ fontSize:12, fontWeight:600, color:'#c0c7d5', lineHeight:1.2 }}>{app.job_title||'—'}</p>
-                  <p style={{ fontFamily:MONO, fontSize:9, color:'#5a6478', marginTop:2 }}>{app.company||'—'}</p>
+                  <p style={{ fontSize:12, fontWeight:600, color:'#98b8cc', lineHeight:1.2 }}>{app.job_title||'—'}</p>
+                  <p style={{ fontFamily:MONO, fontSize:9, color:'#2a5070', marginTop:2 }}>{app.company||'—'}</p>
                 </div>
                 <div style={{ display:'flex', alignItems:'center' }}>
                   <span style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', color:sc.color, background:`${sc.color}12`, border:`0.5px solid ${sc.color}30`, padding:'3px 7px' }}>{sc.label}</span>
                 </div>
                 <div style={{ display:'flex', alignItems:'center' }}>
-                  <p style={{ fontFamily:MONO, fontSize:9, color:'#3a4455' }}>{app.date_applied ? format(parseISO(app.date_applied),'MMM d') : '—'}</p>
+                  <p style={{ fontFamily:MONO, fontSize:9, color:'#1a3452' }}>{app.date_applied ? format(parseISO(app.date_applied),'MMM d') : '—'}</p>
                 </div>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end' }}>
-                  <ChevronRight size={12} style={{ color:'#2a3040' }}/>
+                  <ChevronRight size={12} style={{ color:'#0e1e2e' }}/>
                 </div>
               </div>
             )
@@ -612,11 +613,11 @@ export default function Home() {
         </div>
 
         {/* Right: Updates feed */}
-        <div style={{ background:'#07090f', border:'0.5px solid rgba(48,54,61,0.9)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', borderBottom:'0.5px solid rgba(48,54,61,0.9)', flexShrink:0 }}>
+        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', borderBottom:'0.5px solid rgba(0,120,255,0.1)', flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:7 }}>
               <Bell size={12} style={{ color:'#a3c9ff' }}/>
-              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'#8a919f', textTransform:'uppercase' }}>Updates</p>
+              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'rgba(0,212,255,0.55)', textTransform:'uppercase' }}>Updates</p>
             </div>
             {followUps.length > 0 && (
               <span style={{ fontFamily:MONO, fontSize:8, fontWeight:800, background:'#e56f03', color:'#fff', padding:'2px 6px' }}>{followUps.length}</span>
@@ -627,14 +628,14 @@ export default function Home() {
             {/* Follow-ups */}
             {followUps.slice(0,4).map(app => (
               <div key={app.id}
-                style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 16px', cursor:'pointer', borderBottom:'0.5px solid rgba(48,54,61,0.5)', transition:'background 0.15s' }}
+                style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 16px', cursor:'pointer', borderBottom:'0.5px solid rgba(0,100,200,0.08)', transition:'background 0.15s' }}
                 onClick={()=>{ setEditingApp(app); setModalOpen(true) }}
                 onMouseEnter={e=>e.currentTarget.style.background='rgba(255,182,137,0.05)'}
                 onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                 <div style={{ width:7, height:7, borderRadius:'50%', background:'#ffb689', marginTop:4, flexShrink:0 }}/>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ fontSize:12, fontWeight:600, color:'#c0c7d5', marginBottom:2 }}>Follow-up due</p>
-                  <p style={{ fontSize:11, color:'#8a919f' }}>{app.job_title} @ {app.company}</p>
+                  <p style={{ fontSize:12, fontWeight:600, color:'#98b8cc', marginBottom:2 }}>Follow-up due</p>
+                  <p style={{ fontSize:11, color:'#5878b0' }}>{app.job_title} @ {app.company}</p>
                   <p style={{ fontFamily:MONO, fontSize:9, color:'#ffb689', marginTop:3 }}>{format(parseISO(app.reminder_date),'MMM d, yyyy')}</p>
                 </div>
               </div>
@@ -643,11 +644,11 @@ export default function Home() {
             {/* Today's tasks */}
             {todayTasks.slice(0,2).map(t => (
               <div key={t.id}
-                style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 16px', borderBottom:'0.5px solid rgba(48,54,61,0.5)' }}>
+                style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 16px', borderBottom:'0.5px solid rgba(0,100,200,0.08)' }}>
                 <div style={{ width:7, height:7, borderRadius:'50%', background:'#a3c9ff', marginTop:4, flexShrink:0 }}/>
                 <div>
-                  <p style={{ fontSize:12, fontWeight:600, color:'#c0c7d5', marginBottom:2 }}>Task due today</p>
-                  <p style={{ fontSize:11, color:'#8a919f' }}>{t.title}</p>
+                  <p style={{ fontSize:12, fontWeight:600, color:'#98b8cc', marginBottom:2 }}>Task due today</p>
+                  <p style={{ fontSize:11, color:'#5878b0' }}>{t.title}</p>
                 </div>
               </div>
             ))}
@@ -655,37 +656,38 @@ export default function Home() {
             {/* Interview alerts */}
             {applications.filter(a=>a.status==='interview').slice(0,2).map(a => (
               <div key={a.id}
-                style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 16px', borderBottom:'0.5px solid rgba(48,54,61,0.5)' }}>
+                style={{ display:'flex', alignItems:'flex-start', gap:10, padding:'10px 16px', borderBottom:'0.5px solid rgba(0,100,200,0.08)' }}>
                 <div style={{ width:7, height:7, borderRadius:'50%', background:'#4edea3', marginTop:4, flexShrink:0 }}/>
                 <div>
-                  <p style={{ fontSize:12, fontWeight:600, color:'#c0c7d5', marginBottom:2 }}>Interview in progress</p>
-                  <p style={{ fontSize:11, color:'#8a919f' }}>{a.job_title} @ {a.company}</p>
+                  <p style={{ fontSize:12, fontWeight:600, color:'#98b8cc', marginBottom:2 }}>Interview in progress</p>
+                  <p style={{ fontSize:11, color:'#5878b0' }}>{a.job_title} @ {a.company}</p>
                 </div>
               </div>
             ))}
 
             {followUps.length===0 && todayTasks.length===0 && applications.filter(a=>a.status==='interview').length===0 && (
               <div style={{ padding:'32px 16px', textAlign:'center' }}>
-                <CheckCircle2 size={24} style={{ color:'#2a3040', margin:'0 auto 8px' }}/>
-                <p style={{ fontFamily:MONO, fontSize:9, color:'#2a3040', letterSpacing:'0.06em' }}>All caught up — nothing due.</p>
+                <CheckCircle2 size={24} style={{ color:'rgba(78,222,163,0.25)', margin:'0 auto 8px', filter:'drop-shadow(0 0 6px rgba(78,222,163,0.15))' }}/>
+                <p style={{ fontFamily:MONO, fontSize:9, color:'#1a3452', letterSpacing:'0.06em' }}>All caught up — nothing due.</p>
               </div>
             )}
           </div>
 
           {/* AI quick actions */}
-          <div style={{ borderTop:'0.5px solid rgba(48,54,61,0.9)', padding:'10px 12px', flexShrink:0 }}>
-            <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.1em', color:'#3a4455', textTransform:'uppercase', marginBottom:8 }}>Quick AI</p>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:5 }}>
+          <div style={{ borderTop:'0.5px solid rgba(0,120,255,0.1)', padding:'10px 12px', flexShrink:0 }}>
+            <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, letterSpacing:'0.12em', color:'rgba(0,212,255,0.3)', textTransform:'uppercase', marginBottom:8 }}>AI Tools</p>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:4 }}>
               {[
-                { label:'Interview Coach', to:'/ai/interview-coach', color:'#ffb4ab' },
-                { label:'Salary Intel',    to:'/ai/salary',          color:'#a3c9ff' },
-                { label:'Cover Letter',    to:'/ai/cover-letter',    color:'#4edea3' },
-                { label:'Offer Simulator', to:'/ai/negotiate',       color:'#4edea3' },
-              ].map(({label,to,color})=>(
+                { label:'Interview Coach', to:'/ai/interview-coach', color:'#f472b6', icon:Mic },
+                { label:'Salary Intel',    to:'/ai/salary',          color:'#a3c9ff', icon:DollarSign },
+                { label:'Cover Letter',    to:'/ai/cover-letter',    color:'#4edea3', icon:Mail },
+                { label:'Offer Simulator', to:'/ai/negotiate',       color:'#fbbf24', icon:Handshake },
+              ].map(({label,to,color,icon:Icon})=>(
                 <button key={to} onClick={()=>navigate(to)}
-                  style={{ padding:'7px 8px', background:'rgba(255,255,255,0.02)', border:`0.5px solid ${color}20`, cursor:'pointer', textAlign:'left', transition:'all 0.15s' }}
-                  onMouseEnter={e=>{ e.currentTarget.style.background=`${color}08`; e.currentTarget.style.borderColor=`${color}40` }}
-                  onMouseLeave={e=>{ e.currentTarget.style.background='rgba(255,255,255,0.02)'; e.currentTarget.style.borderColor=`${color}20` }}>
+                  style={{ padding:'9px 10px', background:`${color}06`, border:`0.5px solid ${color}22`, borderLeft:`2px solid ${color}`, cursor:'pointer', textAlign:'left', transition:'background 0.15s', display:'flex', flexDirection:'column', gap:5 }}
+                  onMouseEnter={e=>{ e.currentTarget.style.background=`${color}14` }}
+                  onMouseLeave={e=>{ e.currentTarget.style.background=`${color}06` }}>
+                  <Icon size={10} style={{ color }}/>
                   <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, color, letterSpacing:'0.04em', lineHeight:1.3 }}>{label}</p>
                 </button>
               ))}
@@ -705,18 +707,18 @@ export default function Home() {
           <div style={{ background:'#0d1420', border:'0.5px solid rgba(163,201,255,0.15)', padding:28, width:440, maxWidth:'90vw', display:'flex', flexDirection:'column', gap:16 }}
             onClick={e => e.stopPropagation()}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <h2 style={{ fontFamily:MONO, fontSize:14, fontWeight:800, color:'#e2e2e8', letterSpacing:'-0.02em', margin:0 }}>Add Event</h2>
-              <button onClick={() => setEventModal(false)} style={{ background:'none', border:'none', color:'#5a6478', cursor:'pointer', display:'flex', padding:4 }}><X size={16}/></button>
+              <h2 style={{ fontFamily:MONO, fontSize:14, fontWeight:800, color:'#d0e4f0', letterSpacing:'-0.02em', margin:0 }}>Add Event</h2>
+              <button onClick={() => setEventModal(false)} style={{ background:'none', border:'none', color:'#2a5070', cursor:'pointer', display:'flex', padding:4 }}><X size={16}/></button>
             </div>
             <input value={eventForm.title} onChange={e => setEventForm(f=>({...f,title:e.target.value}))}
               onKeyDown={e => e.key==='Enter' && saveEvent()}
               placeholder="Event title…"
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#e2e2e8', fontSize:14, fontFamily:SANS, outline:'none' }}/>
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#d0e4f0', fontSize:14, fontFamily:SANS, outline:'none' }}/>
             <input type="date" value={eventForm.date} onChange={e => setEventForm(f=>({...f,date:e.target.value}))}
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#8a919f', fontSize:13, fontFamily:MONO, outline:'none', colorScheme:'dark' }}/>
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#5878b0', fontSize:13, fontFamily:MONO, outline:'none', colorScheme:'dark' }}/>
             <textarea value={eventForm.desc} onChange={e => setEventForm(f=>({...f,desc:e.target.value}))}
               placeholder="Description (optional)…" rows={3}
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#c0c7d5', fontSize:13, fontFamily:SANS, outline:'none', resize:'none' }}/>
+              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#98b8cc', fontSize:13, fontFamily:SANS, outline:'none', resize:'none' }}/>
             <div>
               <p style={{ fontFamily:MONO, fontSize:9, color:'#404753', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:8 }}>Importance</p>
               <div style={{ display:'flex', gap:6 }}>
@@ -755,14 +757,14 @@ export default function Home() {
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:22 }}>
               <div>
                 <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:'rgba(163,201,255,0.3)', letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:4 }}>Dashboard</p>
-                <h2 style={{ fontFamily:MONO, fontSize:15, fontWeight:900, color:'#e2e2e8', letterSpacing:'-0.02em', margin:0 }}>Customize KPIs</h2>
+                <h2 style={{ fontFamily:MONO, fontSize:15, fontWeight:900, color:'#d0e4f0', letterSpacing:'-0.02em', margin:0 }}>Customize KPIs</h2>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:10 }}>
                 <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:kpiDraft.length===4?'#4edea3':'#ffb689', background:kpiDraft.length===4?'rgba(78,222,163,0.1)':'rgba(255,182,137,0.1)', border:`0.5px solid ${kpiDraft.length===4?'rgba(78,222,163,0.3)':'rgba(255,182,137,0.3)'}`, padding:'4px 10px' }}>
                   {kpiDraft.length} / 4
                 </span>
-                <button onClick={() => setKpiCustomizeOpen(false)} style={{ background:'none', border:'none', color:'#3a4455', cursor:'pointer', display:'flex', padding:4, transition:'color 0.12s' }}
-                  onMouseEnter={e => e.currentTarget.style.color='#8a919f'} onMouseLeave={e => e.currentTarget.style.color='#3a4455'}>
+                <button onClick={() => setKpiCustomizeOpen(false)} style={{ background:'none', border:'none', color:'#1a3452', cursor:'pointer', display:'flex', padding:4, transition:'color 0.12s' }}
+                  onMouseEnter={e => e.currentTarget.style.color='#5878b0'} onMouseLeave={e => e.currentTarget.style.color='#1a3452'}>
                   <X size={16}/>
                 </button>
               </div>
@@ -816,9 +818,9 @@ export default function Home() {
             <div style={{ display:'flex', gap:8 }}>
               <button
                 onClick={() => setKpiCustomizeOpen(false)}
-                style={{ flex:1, padding:'10px 0', background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(163,201,255,0.09)', color:'#4a5568', fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', transition:'all 0.12s' }}
-                onMouseEnter={e => { e.currentTarget.style.color='#8a919f'; e.currentTarget.style.borderColor='rgba(163,201,255,0.18)' }}
-                onMouseLeave={e => { e.currentTarget.style.color='#4a5568'; e.currentTarget.style.borderColor='rgba(163,201,255,0.09)' }}
+                style={{ flex:1, padding:'10px 0', background:'rgba(255,255,255,0.02)', border:'0.5px solid rgba(163,201,255,0.09)', color:'#2a4a6a', fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', cursor:'pointer', transition:'all 0.12s' }}
+                onMouseEnter={e => { e.currentTarget.style.color='#5878b0'; e.currentTarget.style.borderColor='rgba(163,201,255,0.18)' }}
+                onMouseLeave={e => { e.currentTarget.style.color='#2a4a6a'; e.currentTarget.style.borderColor='rgba(163,201,255,0.09)' }}
               >
                 Cancel
               </button>
