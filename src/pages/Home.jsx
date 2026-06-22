@@ -76,13 +76,13 @@ function MiniStatCard({ label, value, sub, color, data, pct, up, total }) {
   const filledDots = total != null && pct != null ? Math.round((pct / 100) * dotCount) : 0
   return (
     <div style={{
-      background: 'rgba(14,22,34,0.94)',
-      backdropFilter: 'blur(10px)',
-      border: '0.5px solid rgba(0,140,255,0.12)',
+      background: '#0e1b2e',
+      border: '0.5px solid rgba(0,140,255,0.15)',
+      borderTop: `2px solid ${color}`,
       padding:'15px 16px', flex:1,
     }}>
       <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:6 }}>
-        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'#2a5070', textTransform:'uppercase' }}>{label}</p>
+        <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:`${color}99`, textTransform:'uppercase' }}>{label}</p>
         {pct != null && (
           <span style={{ display:'flex', alignItems:'center', gap:3, fontFamily:MONO, fontSize:9, fontWeight:700, color:up?'#4edea3':'#ffb4ab', background:up?'rgba(78,222,163,0.12)':'rgba(255,180,171,0.12)', border:`0.5px solid ${up?'rgba(78,222,163,0.3)':'rgba(255,180,171,0.3)'}`, padding:'2px 6px' }}>
             {up?<TrendingUp size={8}/>:<TrendingDown size={8}/>} {pct}%
@@ -133,7 +133,7 @@ function StatBar({ label, value, total, color, sub }) {
   }, [pct])
   return (
     <div style={{ flex:1, padding:'14px 16px', display:'flex', flexDirection:'column', justifyContent:'center', gap:3 }}>
-      <p style={{ fontFamily:MONO, fontSize:7, fontWeight:700, color:`${color}55`, textTransform:'uppercase', letterSpacing:'0.12em' }}>{label}</p>
+      <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, color:`${color}bb`, textTransform:'uppercase', letterSpacing:'0.12em' }}>{label}</p>
       <div style={{ display:'flex', alignItems:'baseline', gap:6 }}>
         <span style={{ fontFamily:SANS, fontSize:26, fontWeight:900, letterSpacing:'-0.04em', color, lineHeight:1 }}>{value}</span>
         <span style={{ fontFamily:SANS, fontSize:9, color:`${color}45` }}>/ {total}</span>
@@ -486,11 +486,11 @@ export default function Home() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 200px 200px', gap:12 }}>
 
         {/* Left: Hours worked chart */}
-        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', padding:'18px 20px' }}>
+        <div style={{ background:'#0e1b2e', border:'0.5px solid rgba(100,120,255,0.2)', borderTop:'2px solid #a78bfa', padding:'18px 20px' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
             <div>
-              <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.12em', color:'rgba(0,212,255,0.45)', textTransform:'uppercase', marginBottom:3 }}>Activity</p>
-              <p style={{ fontSize:15, fontWeight:700, color:'#d0e4f0', letterSpacing:'-0.01em' }}>Hours Worked</p>
+              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.14em', color:'#a78bfa', textTransform:'uppercase', marginBottom:4 }}>Activity</p>
+              <p style={{ fontSize:18, fontWeight:800, color:'#ffffff', letterSpacing:'-0.02em' }}>Hours Worked</p>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
               <span style={{ fontFamily:MONO, fontSize:9, fontWeight:700, color:'#a78bfa', background:'rgba(167,139,250,0.1)', border:'0.5px solid rgba(167,139,250,0.25)', padding:'3px 8px' }}>
@@ -546,9 +546,9 @@ export default function Home() {
         </div>
 
         {/* Right: Goals & tasks donuts */}
-        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', display:'flex', flexDirection:'column' }}>
+        <div style={{ background:'#0e1b2e', border:'0.5px solid rgba(78,222,163,0.2)', borderTop:'2px solid #4edea3', display:'flex', flexDirection:'column' }}>
           <div style={{ padding:'12px 14px 8px', borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
-            <p style={{ fontFamily:MONO, fontSize:8, fontWeight:700, letterSpacing:'0.1em', color:'rgba(0,212,255,0.45)', textTransform:'uppercase' }}>Progress</p>
+            <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.14em', color:'#4edea3', textTransform:'uppercase' }}>Progress</p>
           </div>
           <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
             <div style={{ borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
@@ -563,11 +563,11 @@ export default function Home() {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 300px', gap:12 }}>
 
         {/* Left: Recent applications table */}
-        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', overflow:'hidden' }}>
+        <div style={{ background:'#0e1b2e', border:'0.5px solid rgba(163,201,255,0.2)', borderTop:'2px solid #60a5fa', overflow:'hidden' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:'0.5px solid rgba(0,120,255,0.1)' }}>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <Activity size={13} style={{ color:'#a3c9ff' }}/>
-              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'rgba(0,212,255,0.55)', textTransform:'uppercase' }}>Recent Applications</p>
+              <Activity size={13} style={{ color:'#60a5fa' }}/>
+              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.12em', color:'#60a5fa', textTransform:'uppercase' }}>Recent Applications</p>
             </div>
             <button onClick={()=>navigate('/board')} style={{ fontFamily:MONO, fontSize:8, color:'#a3c9ff', background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:3, letterSpacing:'0.06em', textTransform:'uppercase' }}>
               View board <ArrowRight size={9}/>
@@ -613,11 +613,11 @@ export default function Home() {
         </div>
 
         {/* Right: Updates feed */}
-        <div style={{ background:'rgba(14,22,34,0.94)', backdropFilter:'blur(10px)', border:'0.5px solid rgba(0,140,255,0.12)', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+        <div style={{ background:'#0e1b2e', border:'0.5px solid rgba(255,182,137,0.2)', borderTop:'2px solid #ffb689', overflow:'hidden', display:'flex', flexDirection:'column' }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', borderBottom:'0.5px solid rgba(0,120,255,0.1)', flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:7 }}>
               <Bell size={12} style={{ color:'#a3c9ff' }}/>
-              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.1em', color:'rgba(0,212,255,0.55)', textTransform:'uppercase' }}>Updates</p>
+              <p style={{ fontFamily:MONO, fontSize:9, fontWeight:700, letterSpacing:'0.12em', color:'#ffb689', textTransform:'uppercase' }}>Updates</p>
             </div>
             {followUps.length > 0 && (
               <span style={{ fontFamily:MONO, fontSize:8, fontWeight:800, background:'#e56f03', color:'#fff', padding:'2px 6px' }}>{followUps.length}</span>
