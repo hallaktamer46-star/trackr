@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import { Plus, Pencil } from 'lucide-react'
 import {
   Lightbulb, Users, BarChart2, Sparkles, DollarSign,
@@ -9,7 +9,7 @@ import {
 import { apiFetch } from '../lib/api'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 /* ─── localStorage session persistence ──────────────────────────── */
 const SESSIONS_KEY = 'trackr_studio_v1'
@@ -931,7 +931,7 @@ function ProductionPanel({ data, onUpdate, onNext, loading, setLoading, setError
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {POPULAR_COUNTRIES.map(c => (
               <button key={c} onClick={() => setCountry(c)} style={{
-                padding: '6px 14px', fontSize: 12, fontFamily: 'Geist, Inter, sans-serif', borderRadius: 8, cursor: 'pointer', transition: 'all 0.15s',
+                padding: '6px 14px', fontSize: 12, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", borderRadius: 8, cursor: 'pointer', transition: 'all 0.15s',
                 background: country === c ? `${s.color}18` : 'rgba(255,255,255,0.04)',
                 border: `1px solid ${country === c ? s.color : 'rgba(255,255,255,0.08)'}`,
                 color: country === c ? s.color : '#94a3b8', fontWeight: country === c ? 600 : 400,

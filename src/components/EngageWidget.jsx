@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+﻿import { useState, useEffect, useRef, useMemo } from 'react'
 import { Power, Play, Plus, X, Check, Circle, CheckCircle2, GripVertical } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
@@ -6,7 +6,7 @@ import SetShiftModal from './SetShiftModal'
 import TaskModal from './TaskModal'
 
 const NUM  = 'Consolas, Menlo, Monaco, monospace'
-const BODY = 'Geist, Inter, -apple-system, sans-serif'
+const BODY = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
 
 const STATUSES = [
   { key: 'not_ready', label: 'Not Ready',  color: '#ff6b6b' },

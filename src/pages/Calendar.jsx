@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+﻿import { useState, useEffect, useMemo, useRef } from 'react'
 import BackToHome from '../components/BackToHome'
 import TaskModal from '../components/TaskModal'
 import {
@@ -12,7 +12,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay,
 import { useApplications } from '../contexts/ApplicationContext'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 const SURFACE = 'rgba(13,18,32,0.97)'
 const BG = '#060b14'
 const BORDER = 'rgba(255,255,255,0.07)'

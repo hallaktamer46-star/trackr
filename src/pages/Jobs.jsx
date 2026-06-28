@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+﻿import { useState, useMemo, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BackToHome from '../components/BackToHome'
 import {
@@ -10,7 +10,7 @@ import {
 import { formatDistanceToNow, parseISO } from 'date-fns'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const BG      = '#0d1117'
 const SURFACE = '#161b22'
@@ -623,7 +623,7 @@ function FDD({ label, options, value, onChange }) {
       {open && (
         <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, zIndex:100, background:'#0a1628', border:`0.5px solid rgba(163,201,255,0.15)`, boxShadow:'0 20px 60px rgba(0,0,0,0.7)', minWidth:160 }}>
           {options.map((opt,i) => (
-            <button key={opt} onClick={()=>{onChange(opt);setOpen(false)}} style={{ width:'100%', padding:'8px 14px', border:'none', borderBottom:i<options.length-1?`0.5px solid rgba(163,201,255,0.05)`:'none', background:value===opt?'rgba(163,201,255,0.08)':'transparent', color:value===opt?'#a3c9ff':'#8a919f', fontFamily:'Geist, Inter, sans-serif', fontSize:12, cursor:'pointer', textAlign:'left', transition:'background 0.1s' }}
+            <button key={opt} onClick={()=>{onChange(opt);setOpen(false)}} style={{ width:'100%', padding:'8px 14px', border:'none', borderBottom:i<options.length-1?`0.5px solid rgba(163,201,255,0.05)`:'none', background:value===opt?'rgba(163,201,255,0.08)':'transparent', color:value===opt?'#a3c9ff':'#8a919f', fontFamily:"'Plus Jakarta Sans', system-ui, sans-serif", fontSize:12, cursor:'pointer', textAlign:'left', transition:'background 0.1s' }}
               onMouseEnter={e=>{if(value!==opt)e.currentTarget.style.background='rgba(163,201,255,0.04)'}} onMouseLeave={e=>{if(value!==opt)e.currentTarget.style.background='transparent'}}>
               {opt}
             </button>

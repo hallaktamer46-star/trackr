@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   Briefcase, BookOpen, Activity, DollarSign, Heart, Plane,
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const ICON_MAP = { Briefcase, BookOpen, Activity, DollarSign, Heart, Plane, Dumbbell, Coffee, Music, Brain, Target, Star, Sunset, Salad }
 

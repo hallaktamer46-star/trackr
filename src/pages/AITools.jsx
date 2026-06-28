@@ -1,4 +1,4 @@
-import { useParams, NavLink, useNavigate } from 'react-router-dom'
+﻿import { useParams, NavLink, useNavigate } from 'react-router-dom'
 import { Send, Lock, Crown, BookOpen, DollarSign, BarChart2, Building2, Link2, Handshake, Rocket, Mic, GitCompare, Zap, Star } from 'lucide-react'
 import FollowUpGenerator from '../components/AI/FollowUpGenerator'
 import InterviewPrep from '../components/AI/InterviewPrep'
@@ -29,7 +29,7 @@ const PRO_TOOLS   = TOOLS.filter(t => t.tier === 'pro')
 const APEX_TOOLS  = TOOLS.filter(t => t.tier === 'apex')
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function TierDivider({ label, color, gradient }) {
   return (

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { Send, Loader2, Star, ChevronDown, RotateCcw, Zap } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 import { useNavigate } from 'react-router-dom'
@@ -17,7 +17,7 @@ const INPUT = {
   background: '#0d1117',
   border: '0.5px solid rgba(48,54,61,0.9)',
   color: '#e2e2e8', fontSize: 13, outline: 'none',
-  fontFamily: 'Geist, Inter, sans-serif',
+  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
 }
 
 function ScoreRing({ score }) {
@@ -124,7 +124,7 @@ export default function NegotiationSimulator() {
   }
 
   if (phase === 'setup') return (
-    <div style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
       <div style={{ background: '#161b22', border: '0.5px solid rgba(48,54,61,0.9)', padding: 24, marginBottom: 16 }}>
         <div className="flex items-center gap-2 mb-6">
           <div style={{ width: 6, height: 6, background: '#4edea3' }} />
@@ -162,7 +162,7 @@ export default function NegotiationSimulator() {
             {EXP_LEVELS.map(l => (
               <button key={l} onClick={() => setCtx('experienceLevel', l)}
                 style={{
-                  padding: '7px 14px', fontSize: 11, fontFamily: 'Geist, Inter, sans-serif',
+                  padding: '7px 14px', fontSize: 11, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                   background: context.experienceLevel === l ? 'rgba(78,222,163,0.1)' : '#0d1117',
                   border: `0.5px solid ${context.experienceLevel === l ? '#4edea3' : 'rgba(48,54,61,0.9)'}`,
                   color: context.experienceLevel === l ? '#4edea3' : '#8a919f',
@@ -189,7 +189,7 @@ export default function NegotiationSimulator() {
   )
 
   if (phase === 'score') return (
-    <div style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
       <div style={{ background: '#161b22', border: '0.5px solid rgba(48,54,61,0.9)', padding: 24 }}>
 
         {/* Score header */}
@@ -245,11 +245,11 @@ export default function NegotiationSimulator() {
 
         <div className="flex gap-3">
           <button onClick={reset} className="flex items-center gap-2 transition-all hover:brightness-110"
-            style={{ padding: '10px 20px', background: '#0d1117', border: '0.5px solid rgba(48,54,61,0.9)', color: '#8a919f', fontSize: 12, fontFamily: 'Geist, Inter, sans-serif' }}>
+            style={{ padding: '10px 20px', background: '#0d1117', border: '0.5px solid rgba(48,54,61,0.9)', color: '#8a919f', fontSize: 12, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
             <RotateCcw size={13} /> Try again
           </button>
           <button onClick={() => setPhase('chat')} className="flex items-center gap-2 transition-all hover:brightness-110"
-            style={{ padding: '10px 20px', background: '#0d1117', border: '0.5px solid rgba(48,54,61,0.9)', color: '#a3c9ff', fontSize: 12, fontFamily: 'Geist, Inter, sans-serif' }}>
+            style={{ padding: '10px 20px', background: '#0d1117', border: '0.5px solid rgba(48,54,61,0.9)', color: '#a3c9ff', fontSize: 12, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
             <ChevronDown size={13} /> Back to chat
           </button>
         </div>
@@ -259,7 +259,7 @@ export default function NegotiationSimulator() {
 
   // Chat phase
   return (
-    <div style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
 
       {/* Context bar */}
       <div className="flex items-center justify-between mb-3" style={{ padding: '8px 14px', background: '#161b22', border: '0.5px solid rgba(48,54,61,0.9)' }}>

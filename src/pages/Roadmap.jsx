@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BackToHome from '../components/BackToHome'
 import {
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function useLocalStorage(key, init) {
   const [v, setV] = useState(() => {

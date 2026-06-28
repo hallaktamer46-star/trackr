@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Zap, Target, Shield, Flame, Brain, Wrench, Star, Compass, Loader2, RotateCcw, Sparkles, AlertTriangle, ListOrdered, Lightbulb, History, ChevronDown, ChevronUp, Trash2 } from 'lucide-react'
 import BackToHome from '../components/BackToHome'
 import { apiFetch } from '../lib/api'
@@ -8,7 +8,7 @@ const SESSIONS_KEY = 'trackr_roundtable_sessions'
 function loadSessions() { try { return JSON.parse(localStorage.getItem(SESSIONS_KEY) || '[]') } catch { return [] } }
 function saveSessions(s) { localStorage.setItem(SESSIONS_KEY, JSON.stringify(s.slice(0, 20))) }
 
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 const MONO = 'Consolas, Menlo, Monaco, monospace'
 
 // Parse bullet text → array of clean strings

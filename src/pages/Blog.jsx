@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import BackToHome from '../components/BackToHome'
 import {
   PenLine, Heart, Clock, Tag, ChevronDown, X, AlertCircle,
@@ -342,7 +342,7 @@ function PostModal({ post, onClose, onLike, liked }) {
 
 /* ── write post modal ── */
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function WriteModal({ onClose, onPublish, user }) {
   const [title,      setTitle]      = useState('')

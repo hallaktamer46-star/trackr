@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Inter, -apple-system, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
 
 const DURATION_PRESETS = [4, 6, 8, 10]
 const TIME_PRESETS = [
@@ -84,9 +84,6 @@ export default function SetShiftModal({ open, onClose, onSave, current }) {
 
         {/* Header */}
         <div style={{ padding: '28px 28px 0' }}>
-          <p style={{ fontFamily: MONO, fontSize: 8, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 8 }}>
-            Shift
-          </p>
           <h2 style={{ fontFamily: SANS, fontSize: 22, fontWeight: 700, color: '#e8f0fe', margin: '0 0 4px', letterSpacing: '-0.02em' }}>
             Set your shift
           </h2>

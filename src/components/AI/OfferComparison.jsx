@@ -1,9 +1,9 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Plus, Trash2, Loader2, Trophy, AlertTriangle, Lightbulb, ChevronDown, RotateCcw } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const LABEL = {
   fontFamily: MONO, fontSize: 9, fontWeight: 600,

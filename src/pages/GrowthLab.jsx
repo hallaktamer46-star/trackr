@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import {
   Telescope, Target, Zap, BookOpen, ArrowRight, ChevronRight,
   Loader2, Check, Star, TrendingUp, Clock, Flame,
@@ -7,7 +7,7 @@ import {
 import { apiFetch } from '../lib/api'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 /* ── colours per horizon ── */
 const HORIZON_CFG = {

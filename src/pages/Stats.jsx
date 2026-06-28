@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+﻿import { useMemo } from 'react'
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { Lock, TrendingUp, Zap, Target, Clock, AlertTriangle, Flame, Plus } from 'lucide-react'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const SC = {
   wishlist:  '#8a919f',

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useSidebar } from '../../contexts/SidebarContext'
 import {
@@ -8,7 +8,7 @@ import {
   PenLine, FileText, Mail, DollarSign,
 } from 'lucide-react'
 
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 const MONO = 'Consolas, Menlo, Monaco, monospace'
 
 const GAP = 8

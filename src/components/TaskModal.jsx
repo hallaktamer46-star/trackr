@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 
 const NUM  = 'Consolas, Menlo, Monaco, monospace'
-const BODY = 'Geist, Inter, -apple-system, sans-serif'
+const BODY = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
 
 const IMP_COLORS = { 1: '#4edea3', 2: '#a3c9ff', 3: '#fbbf24', 4: '#ffb689', 5: '#ffb4ab' }
 const priorityToImp = p => p === 'low' ? 1 : p === 'high' ? 5 : 3

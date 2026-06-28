@@ -1,10 +1,10 @@
-import { useMemo } from 'react'
+﻿import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CheckCircle2, ArrowLeft, Calendar } from 'lucide-react'
 import { format, parseISO, isWithinInterval, subDays, startOfDay } from 'date-fns'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 const BG   = '#070a0f'
 
 const PRIORITY_COLOR = { high: '#ffb4ab', medium: '#ffb689', low: '#4edea3' }

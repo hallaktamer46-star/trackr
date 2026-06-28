@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Loader2, ArrowRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -34,7 +34,7 @@ export default function Onboarding({ onComplete }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(13,17,23,0.95)', backdropFilter: 'blur(8px)' }}>
 
-      <div className="w-full max-w-md" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+      <div className="w-full max-w-md" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
 
         {/* Progress dots */}
         <div className="flex items-center gap-2 mb-8 justify-center">
@@ -74,7 +74,7 @@ export default function Onboarding({ onComplete }) {
                   style={{
                     width: '100%', padding: '10px 14px', background: '#161b22',
                     border: '0.5px solid rgba(48,54,61,0.9)', color: '#e2e2e8',
-                    fontSize: 14, outline: 'none', fontFamily: 'Geist, Inter, sans-serif',
+                    fontSize: 14, outline: 'none', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                   }}
                 />
               </div>
@@ -90,7 +90,7 @@ export default function Onboarding({ onComplete }) {
                   style={{
                     width: '100%', padding: '10px 14px', background: '#161b22',
                     border: '0.5px solid rgba(48,54,61,0.9)', color: '#e2e2e8',
-                    fontSize: 14, outline: 'none', fontFamily: 'Geist, Inter, sans-serif',
+                    fontSize: 14, outline: 'none', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                   }}
                 />
               </div>
@@ -131,7 +131,7 @@ export default function Onboarding({ onComplete }) {
                     color: form.profession === p ? '#a3c9ff' : '#c0c7d5',
                     fontSize: 12, fontWeight: form.profession === p ? 600 : 400,
                     textAlign: 'left', transition: 'all 0.15s',
-                    fontFamily: 'Geist, Inter, sans-serif',
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                   }}
                 >
                   {p}
@@ -142,7 +142,7 @@ export default function Onboarding({ onComplete }) {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setStep(1)}
-                style={{ padding: '11px 20px', background: '#161b22', border: '0.5px solid rgba(48,54,61,0.9)', color: '#8a919f', fontSize: 13, fontFamily: 'Geist, Inter, sans-serif' }}
+                style={{ padding: '11px 20px', background: '#161b22', border: '0.5px solid rgba(48,54,61,0.9)', color: '#8a919f', fontSize: 13, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
               >
                 Back
               </button>

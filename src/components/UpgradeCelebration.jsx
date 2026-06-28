@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { X, Rocket, Crown, Zap, Check, Sparkles, ArrowRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const PLAN_CONFIG = {
   pro: {

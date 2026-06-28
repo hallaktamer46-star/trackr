@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import {
   ChevronDown, ChevronUp, AlertTriangle, CheckCircle2,
   TrendingUp, TrendingDown, Minus, Loader2, RotateCcw,
@@ -9,7 +9,7 @@ import {
 import { apiFetch } from '../lib/api'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const STAGES = ['Idea', 'MVP', 'Early Revenue', 'Growth', 'Pre-IPO']
 const INDUSTRIES = [

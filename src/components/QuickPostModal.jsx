@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { X, PenLine, Loader2, AlertCircle } from 'lucide-react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -9,7 +9,7 @@ const CATEGORIES = [
 ]
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 export default function QuickPostModal({ onClose, onPublished }) {
   const { user } = useAuth()

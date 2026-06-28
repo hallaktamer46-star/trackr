@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+﻿import { useState, useEffect, useRef } from 'react'
 import { X, Trash2, Briefcase, Building2, Link2, DollarSign, FileText, Bell, Calendar, ChevronDown, Sparkles } from 'lucide-react'
 import { STATUSES, STATUS_CONFIG } from '../../contexts/ApplicationContext'
 import { format, subDays } from 'date-fns'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const STATUS_ACCENT = {
   wishlist:  { color: '#8a919f', bg: 'rgba(138,145,159,0.12)', border: 'rgba(138,145,159,0.3)',  dot: '#8a919f'  },

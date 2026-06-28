@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check, Zap, Loader2, Crown, Rocket } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -97,7 +97,7 @@ export default function Plans() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div className="max-w-5xl mx-auto" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
 
       {/* Header */}
       <div className="text-center mb-12 pt-4">

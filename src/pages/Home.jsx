@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react' // v2
+﻿import { useState, useEffect, useMemo } from 'react' // v2
 import { useNavigate } from 'react-router-dom'
 import {
   Plus, Bell, AlertTriangle, ChevronRight, Sparkles,
@@ -23,7 +23,7 @@ import ApplicationModal from '../components/Modals/ApplicationModal'
 import QuickPostModal from '../components/QuickPostModal'
 
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 const IMP_COLORS = { 1:'#4edea3', 2:'#a3c9ff', 3:'#fbbf24', 4:'#ffb689', 5:'#ffb4ab' }
 
 const STATUS_CONFIG = {

@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+﻿import { useState, useRef, useEffect } from 'react'
 import { Send, Loader2, RotateCcw, Flag, Mic } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 
 // ── design tokens ─────────────────────────────────────────────────
 const MONO = 'Consolas, Menlo, Monaco, monospace'
-const SANS = 'Geist, Inter, sans-serif'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const LABEL = {
   fontFamily: MONO, fontSize: 9, fontWeight: 600,

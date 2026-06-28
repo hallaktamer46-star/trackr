@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+﻿import { useState, useRef } from 'react'
 import BackToHome from '../components/BackToHome'
 import {
   Briefcase, Banknote, Heart, Activity, Compass, Users, User, Zap,
@@ -206,7 +206,7 @@ function ResultItem({ text, type, index }) {
         : <XCircle size={15} style={{ color, marginTop: 1, flexShrink: 0 }} />
       }
       <span style={{
-        fontFamily: 'Geist, Inter, sans-serif',
+        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
         fontSize: 13,
         color: '#c8d0e0',
         lineHeight: 1.5,
@@ -247,7 +247,7 @@ function ActionStep({ step, color, index }) {
       </div>
       <div style={{ flex: 1 }}>
         <div style={{
-          fontFamily: 'Geist, Inter, sans-serif',
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
           fontSize: 14,
           fontWeight: 700,
           color: color,
@@ -257,7 +257,7 @@ function ActionStep({ step, color, index }) {
           {step.title}
         </div>
         <div style={{
-          fontFamily: 'Geist, Inter, sans-serif',
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
           fontSize: 13,
           color: '#c8d0e0',
           lineHeight: 1.55,
@@ -445,7 +445,7 @@ export default function MentalClarity() {
           </div>
 
           <h1 style={{
-            fontFamily: 'Geist, Inter, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
             fontSize: 'clamp(36px, 6vw, 56px)',
             fontWeight: 800,
             letterSpacing: '-0.04em',
@@ -461,7 +461,7 @@ export default function MentalClarity() {
           </h1>
 
           <p style={{
-            fontFamily: 'Geist, Inter, sans-serif',
+            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
             fontSize: 15,
             color: '#60718a',
             margin: 0,
@@ -484,7 +484,7 @@ export default function MentalClarity() {
                 }}>
                   <span style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 10, fontWeight: 800, color: '#000' }}>1</span>
                 </div>
-                <span style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 600, color: '#8899b4', letterSpacing: '-0.01em' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 13, fontWeight: 600, color: '#8899b4', letterSpacing: '-0.01em' }}>
                   What's weighing on you? <span style={{ color: '#4a5568', fontWeight: 400 }}>(pick all that apply)</span>
                 </span>
               </div>
@@ -516,7 +516,7 @@ export default function MentalClarity() {
                 }}>
                   <span style={{ fontFamily: 'Consolas, Menlo, Monaco, monospace', fontSize: 10, fontWeight: 800, color: '#fff' }}>2</span>
                 </div>
-                <span style={{ fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 600, color: '#8899b4', letterSpacing: '-0.01em' }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 13, fontWeight: 600, color: '#8899b4', letterSpacing: '-0.01em' }}>
                   Now dump it all out — hold mic to speak, or type
                 </span>
               </div>
@@ -547,7 +547,7 @@ export default function MentalClarity() {
                       border: 'none',
                       outline: 'none',
                       resize: 'vertical',
-                      fontFamily: 'Geist, Inter, sans-serif',
+                      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                       fontSize: 14,
                       color: '#c8d0e0',
                       lineHeight: 1.65,
@@ -655,7 +655,7 @@ export default function MentalClarity() {
                 : <Sparkles size={18} style={{ color: text.trim() ? '#60a5fa' : '#2d3748' }} />
               }
               <span style={{
-                fontFamily: 'Geist, Inter, sans-serif',
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                 fontSize: 15,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
@@ -704,7 +704,7 @@ export default function MentalClarity() {
               </div>
 
               <p style={{
-                fontFamily: 'Geist, Inter, sans-serif',
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                 fontSize: 15,
                 color: '#c8d0e0',
                 lineHeight: 1.65,

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Plus, Trash2, Loader2, Copy, Check, ChevronRight, ChevronLeft, User, Briefcase, GraduationCap, Zap, FileText } from 'lucide-react'
 import { apiFetch } from '../../lib/api'
 
@@ -13,7 +13,7 @@ const S = {
     width: '100%', padding: '10px 14px',
     background: '#0d1117', border: '0.5px solid rgba(48,54,61,0.9)',
     color: '#e2e2e8', fontSize: 13, outline: 'none',
-    fontFamily: 'Geist, Inter, sans-serif',
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
   },
   section: {
     background: '#0c1d35', border: '0.5px solid rgba(20,60,110,0.6)',
@@ -382,7 +382,7 @@ export default function CVBuilder() {
   ]
 
   return (
-    <div style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
 
       {/* Step progress bar */}
       <div style={{ display: 'flex', gap: 0, marginBottom: 24, background: 'rgba(20,60,110,0.3)' }}>

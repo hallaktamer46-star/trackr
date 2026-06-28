@@ -1,4 +1,4 @@
-import { useParams, NavLink } from 'react-router-dom'
+﻿import { useParams, NavLink } from 'react-router-dom'
 import BackToHome from '../components/BackToHome'
 import { PenLine, FileText, Mail } from 'lucide-react'
 import CVBuilder from '../components/AI/CVBuilder'
@@ -17,7 +17,7 @@ export default function CVHub() {
   const ActiveComponent = active.component
 
   return (
-    <div className="max-w-4xl mx-auto" style={{ fontFamily: 'Geist, Inter, sans-serif' }}>
+    <div className="max-w-4xl mx-auto" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
 
       <BackToHome />
 
@@ -65,7 +65,7 @@ export default function CVHub() {
               </div>
               <div>
                 <p style={{
-                  fontFamily: 'Geist, Inter, sans-serif', fontSize: 13, fontWeight: 600,
+                  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 13, fontWeight: 600,
                   color: isActive ? '#e2e2e8' : '#c0c7d5', lineHeight: 1.2, marginBottom: 2,
                 }}>
                   {t.label}
