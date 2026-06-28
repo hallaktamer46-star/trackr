@@ -3,6 +3,7 @@ import ProfileDropdown from './ProfileDropdown'
 
 const CHECKIN_KEY = 'trackr_checkin_pending'
 const MONO = 'Consolas, Menlo, Monaco, monospace'
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function fmtCountdown(ms) {
   if (!ms || ms <= 0) return '0:00'
@@ -78,32 +79,53 @@ export default function Header() {
       {/* Check-in notification */}
       {checkInData && (
         <div style={{
-          position: 'fixed', top: 60, right: 12, width: 288, zIndex: 9997,
-          background: '#07090f', border: '1px solid rgba(255,107,107,0.45)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,107,107,0.15)',
+          position: 'fixed', top: 60, right: 14, width: 300, zIndex: 9997,
+          background: '#0b0f1c',
+          border: '1px solid rgba(96,165,250,0.18)',
+          borderRadius: 12,
+          boxShadow: '0 12px 48px rgba(0,0,0,0.65)',
           animation: 'checkin-slide-in 0.22s cubic-bezier(0.22,1,0.36,1)',
         }}>
-          <div style={{ padding: '12px 14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-              <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 800, color: '#ff6b6b', letterSpacing: '0.12em' }}>STILL WORKING?</span>
-              <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 800, color: '#ff6b6b' }}>{fmtCountdown(msLeft)}</span>
+          <div style={{ padding: '16px 16px 14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: '#e8f0fe', letterSpacing: '-0.01em' }}>Still working?</span>
+              <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: '#60a5fa' }}>{fmtCountdown(msLeft)}</span>
             </div>
-            <p style={{ fontSize: 11, color: 'rgba(255,140,140,0.6)', fontFamily: 'Geist, sans-serif', margin: '0 0 10px', lineHeight: 1.5 }}>
-              No response in 30 min → 30 min deducted &amp; auto clock-out.
+            <p style={{ fontSize: 13, color: 'rgba(180,210,255,0.7)', fontFamily: SANS, fontWeight: 400, margin: '0 0 14px', lineHeight: 1.55 }}>
+              No response in 30 min — your shift will auto clock-out and 30 min will be deducted.
             </p>
-            <button
-              onClick={confirmFromHeader}
-              style={{
-                width: '100%', padding: '9px 0',
-                background: 'rgba(78,222,163,0.1)', border: '1px solid rgba(78,222,163,0.35)',
-                color: '#4edea3', fontSize: 11, fontFamily: 'Geist, sans-serif', fontWeight: 700,
-                cursor: 'pointer', letterSpacing: '0.04em', transition: 'background 0.15s',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = 'rgba(78,222,163,0.2)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'rgba(78,222,163,0.1)'}
-            >
-              ✓ &nbsp;I'm still here
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => window.dispatchEvent(new Event('trackr-clockout'))}
+                style={{
+                  flex: 1, padding: '9px 0',
+                  background: 'rgba(96,165,250,0.07)',
+                  border: '1px solid rgba(96,165,250,0.22)',
+                  borderRadius: 8,
+                  color: '#7ab0f0', fontSize: 12, fontFamily: SANS, fontWeight: 600,
+                  cursor: 'pointer', transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(96,165,250,0.14)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(96,165,250,0.07)'}
+              >
+                Clock out
+              </button>
+              <button
+                onClick={confirmFromHeader}
+                style={{
+                  flex: 1, padding: '9px 0',
+                  background: 'rgba(96,165,250,0.14)',
+                  border: '1px solid rgba(96,165,250,0.38)',
+                  borderRadius: 8,
+                  color: '#a8d0ff', fontSize: 12, fontFamily: SANS, fontWeight: 600,
+                  cursor: 'pointer', transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(96,165,250,0.24)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(96,165,250,0.14)'}
+              >
+                I'm still here
+              </button>
+            </div>
           </div>
         </div>
       )}

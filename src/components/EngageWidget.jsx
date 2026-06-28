@@ -182,6 +182,13 @@ export default function EngageWidget() {
     return () => window.removeEventListener('trackr-checkin-confirm', handler)
   }, []) // eslint-disable-line
 
+  // Listen for clock-out triggered from the check-in notification in the header
+  useEffect(() => {
+    const handler = () => doEndShift(logRef.current, Date.now(), shiftStartRef.current, sessionDateRef.current)
+    window.addEventListener('trackr-clockout', handler)
+    return () => window.removeEventListener('trackr-clockout', handler)
+  }, []) // eslint-disable-line
+
   useEffect(() => { save({ status, log, custom, shiftStart, sessionDate, date: today }) }, [status, log, custom, shiftStart, sessionDate])
   useEffect(() => { saveTasks(tasks) }, [tasks])
 
