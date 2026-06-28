@@ -108,8 +108,9 @@ export default function EngageWidget() {
   const sessionDateRef = useRef(null)
 
   const navigate  = useNavigate()
-  const timer     = useRef(null)
-  const widgetRef = useRef(null)
+  const timer          = useRef(null)
+  const widgetRef      = useRef(null)
+  const statusListRef  = useRef(null)
 
   // Computed values needed in useEffect dependency arrays — must be declared before useEffect calls
   const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, color:'#60a5fa' }))]
@@ -361,6 +362,9 @@ export default function EngageWidget() {
   function addCustom() {
     const lbl = newLabel.trim(); if (!lbl) return
     setCustom(c=>[...c,lbl]); setNewLabel(''); setShowAdd(false)
+    requestAnimationFrame(() => {
+      if (statusListRef.current) statusListRef.current.scrollTop = statusListRef.current.scrollHeight
+    })
   }
 
   function removeCustom(idx) {
@@ -590,7 +594,7 @@ export default function EngageWidget() {
                 )}
 
                 {/* Status list */}
-                <div style={{ maxHeight: 260, overflowY: 'auto' }}>
+                <div ref={statusListRef} style={{ maxHeight: 260, overflowY: 'auto', scrollbarWidth:'thin', scrollbarColor:'rgba(96,165,250,0.2) transparent' }}>
                   {allStatuses.filter(s => s.key !== status).map((s, i, arr) => (
                     <div key={s.key} onClick={() => status !== null ? pickStatus(s.key) : null}
                       style={{
@@ -635,18 +639,18 @@ export default function EngageWidget() {
                     <button onClick={()=>{setShowAdd(false);setNewLabel('')}} style={{padding:'6px 8px',background:'transparent',border:`1px solid rgba(60,120,255,0.25)`,color:'#60a5fa',cursor:'pointer',display:'flex',alignItems:'center'}}><X size={11}/></button>
                   </div>
                 ) : (
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 14px',borderTop:`1px solid ${DIVIDER}`}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
                     <button onClick={()=>setShowSetShift(true)}
-                      style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:shiftGoal?'rgba(96,165,250,0.08)':'transparent',border:`1px solid ${shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)'}`,color:shiftGoal?'#60a5fa':'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s',whiteSpace:'nowrap'}}
-                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
-                      onMouseLeave={e=>{e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.3)':'rgba(60,100,200,0.2)';e.currentTarget.style.color=shiftGoal?'#60a5fa':'#3a6090'}}>
-                      {!shiftGoal && <Plus size={9}/>} {shiftGoalLabel || 'Add shift'}
+                      style={{display:'flex',alignItems:'center',gap:5,padding:'5px 11px',background:shiftGoal?'rgba(96,165,250,0.1)':'rgba(96,165,250,0.05)',border:`1px solid ${shiftGoal?'rgba(96,165,250,0.35)':'rgba(96,165,250,0.18)'}`,color:shiftGoal?'#8ec4ff':'#6a96d0',fontSize:10,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.01em',transition:'all 0.15s',whiteSpace:'nowrap'}}
+                      onMouseEnter={e=>{e.currentTarget.style.background='rgba(96,165,250,0.15)';e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#a8d4ff'}}
+                      onMouseLeave={e=>{e.currentTarget.style.background=shiftGoal?'rgba(96,165,250,0.1)':'rgba(96,165,250,0.05)';e.currentTarget.style.borderColor=shiftGoal?'rgba(96,165,250,0.35)':'rgba(96,165,250,0.18)';e.currentTarget.style.color=shiftGoal?'#8ec4ff':'#6a96d0'}}>
+                      {!shiftGoal && <Plus size={10}/>} {shiftGoalLabel || 'Set goal'}
                     </button>
                     <button onClick={()=>setShowAdd(true)}
-                      style={{display:'flex',alignItems:'center',gap:4,padding:'4px 9px',background:'transparent',border:'1px solid rgba(60,100,200,0.2)',color:'#3a6090',fontSize:9,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.04em',transition:'all 0.15s'}}
-                      onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(96,165,250,0.5)';e.currentTarget.style.color='#60a5fa'}}
-                      onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(60,100,200,0.2)';e.currentTarget.style.color='#3a6090'}}>
-                      <Plus size={9}/> Add status
+                      style={{display:'flex',alignItems:'center',gap:5,padding:'5px 11px',background:'rgba(78,222,163,0.05)',border:'1px solid rgba(78,222,163,0.2)',color:'#4a9e7a',fontSize:10,fontFamily:BODY,fontWeight:600,cursor:'pointer',letterSpacing:'0.01em',transition:'all 0.15s'}}
+                      onMouseEnter={e=>{e.currentTarget.style.background='rgba(78,222,163,0.12)';e.currentTarget.style.borderColor='rgba(78,222,163,0.45)';e.currentTarget.style.color='#4edea3'}}
+                      onMouseLeave={e=>{e.currentTarget.style.background='rgba(78,222,163,0.05)';e.currentTarget.style.borderColor='rgba(78,222,163,0.2)';e.currentTarget.style.color='#4a9e7a'}}>
+                      <Plus size={10}/> New status
                     </button>
                   </div>
                 )}
@@ -671,15 +675,15 @@ export default function EngageWidget() {
                   <button
                     onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
                     style={{
-                      display:'flex',alignItems:'center',gap:4,padding:'4px 9px',
-                      background:'transparent',
-                      border:'1px solid rgba(60,100,200,0.2)',
-                      color:'#3a6090',
-                      fontSize:9,fontFamily:BODY,fontWeight:700,cursor:'pointer',transition:'all 0.15s',letterSpacing:'0.04em',
+                      display:'flex',alignItems:'center',gap:5,padding:'5px 11px',
+                      background:'rgba(96,165,250,0.08)',
+                      border:'1px solid rgba(96,165,250,0.28)',
+                      color:'#7ab0f0',
+                      fontSize:10,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'all 0.15s',letterSpacing:'0.01em',
                     }}
-                    onMouseEnter={e=>{ e.currentTarget.style.borderColor='rgba(96,165,250,0.45)'; e.currentTarget.style.color='#60a5fa' }}
-                    onMouseLeave={e=>{ e.currentTarget.style.borderColor='rgba(60,100,200,0.2)'; e.currentTarget.style.color='#3a6090' }}>
-                    <Plus size={9}/> Add
+                    onMouseEnter={e=>{ e.currentTarget.style.background='rgba(96,165,250,0.16)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.55)'; e.currentTarget.style.color='#a8d0ff' }}
+                    onMouseLeave={e=>{ e.currentTarget.style.background='rgba(96,165,250,0.08)'; e.currentTarget.style.borderColor='rgba(96,165,250,0.28)'; e.currentTarget.style.color='#7ab0f0' }}>
+                    <Plus size={10}/> Add task
                   </button>
                 </div>
 
