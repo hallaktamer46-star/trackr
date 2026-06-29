@@ -647,14 +647,14 @@ export default function EngageWidget() {
                   </div>
                 ) : (
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
-                    <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'5px 12px',background:'rgba(180,200,255,0.08)',border:'none',borderRadius:6,color:'#b0c8f0',fontSize:11,fontFamily:BODY,fontWeight:500,cursor:'pointer',transition:'background 0.15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(180,200,255,0.14)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='rgba(180,200,255,0.08)'}>
+                    <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
                       {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
                     </button>
-                    <button onClick={()=>setShowAdd(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'5px 12px',background:'rgba(180,200,255,0.08)',border:'none',borderRadius:6,color:'#b0c8f0',fontSize:11,fontFamily:BODY,fontWeight:500,cursor:'pointer',transition:'background 0.15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(180,200,255,0.14)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='rgba(180,200,255,0.08)'}>
+                    <button onClick={()=>setShowAdd(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(78,222,163,0.15)',border:'none',borderRadius:8,color:'#9eecd4',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(78,222,163,0.25)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(78,222,163,0.15)'}>
                       <Plus size={11}/> New status
                     </button>
                   </div>
@@ -679,9 +679,9 @@ export default function EngageWidget() {
                   </button>
                   <button
                     onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
-                    style={{display:'flex',alignItems:'center',gap:5,padding:'5px 12px',background:'rgba(180,200,255,0.08)',border:'none',borderRadius:6,color:'#b0c8f0',fontSize:11,fontFamily:BODY,fontWeight:500,cursor:'pointer',transition:'background 0.15s'}}
-                    onMouseEnter={e=>e.currentTarget.style.background='rgba(180,200,255,0.14)'}
-                    onMouseLeave={e=>e.currentTarget.style.background='rgba(180,200,255,0.08)'}>
+                    style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
                     <Plus size={11}/> Add task
                   </button>
                 </div>
