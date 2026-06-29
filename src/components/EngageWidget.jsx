@@ -499,9 +499,11 @@ export default function EngageWidget() {
           cursor:'pointer', transition:'all 0.15s',
         }}>
           {cur && tab !== 'engage' ? (
-            <span style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
-              <span style={{fontSize:12,fontWeight:600,color:cur.color}}>Engage</span>
-              <span style={{fontSize:9,color:cur.color,fontFamily:NUM,opacity:0.8}}>{cur.label} · {fmt(curSecs)}</span>
+            <span style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',padding:'0 14px'}}>
+              <span style={{fontSize:12,fontWeight:600,color:cur.color,fontFamily:BODY}}>Engage</span>
+              <span style={{background:'rgba(148,180,255,0.1)',borderRadius:20,padding:'2px 9px',fontSize:10,fontWeight:600,color:'rgba(148,180,255,0.5)',fontFamily:NUM,letterSpacing:'0.02em'}}>
+                {fmt(curSecs)}
+              </span>
             </span>
           ) : (
             <span style={{fontSize:12,fontWeight:600,color: tab==='engage' ? (cur?.color||'#4edea3') : '#4a70b0'}}>Engage</span>
