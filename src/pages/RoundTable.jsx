@@ -781,7 +781,7 @@ export default function RoundTable() {
                   onClick={convene}
                   disabled={!canConvene}
                   style={{
-                    position: 'relative', zIndex: 1,
+                    position: 'relative', zIndex: 1, overflow: 'hidden',
                     width: '100%', padding: '22px 32px',
                     background: canConvene
                       ? 'linear-gradient(135deg, #0a1a3a 0%, #110830 35%, #1a0440 65%, #0a1a3a 100%)'
@@ -789,7 +789,6 @@ export default function RoundTable() {
                     border: 'none',
                     cursor: canConvene ? 'pointer' : 'not-allowed',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    position: 'relative', overflow: 'hidden',
                     transition: 'transform 0.2s cubic-bezier(0.34,1.56,0.64,1), filter 0.2s',
                   }}
                   onMouseEnter={e => { if (canConvene) { e.currentTarget.style.transform = 'scale(1.015)'; e.currentTarget.style.filter = 'brightness(1.25)' }}}
