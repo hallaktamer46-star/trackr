@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useRef, useMemo } from 'react'
-import { Power, Play, Plus, X, Check, Circle, CheckCircle2, GripVertical } from 'lucide-react'
+import { Power, Play, Plus, X, Check, Circle, CheckCircle2, GripVertical, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import SetShiftModal from './SetShiftModal'
@@ -81,6 +81,9 @@ export default function EngageWidget() {
   const [custom, setCustom]         = useState([])
   const [showAdd, setShowAdd]       = useState(false)
   const [newLabel, setNewLabel]     = useState('')
+  const [newColor, setNewColor]     = useState('#60a5fa')
+  const [newType, setNewType]       = useState('fixed')
+  const [scrollBelow, setScrollBelow] = useState(false)
   const [shiftStart, setShiftStart] = useState(null)
   const [sessionDate, setSessionDate] = useState(null)
   const [, setTick]                 = useState(0)
@@ -113,7 +116,10 @@ export default function EngageWidget() {
   const statusListRef  = useRef(null)
 
   // Computed values needed in useEffect dependency arrays — must be declared before useEffect calls
-  const allStatuses = [...STATUSES, ...custom.map((l,i) => ({ key:'c'+i, label:l, color:'#60a5fa' }))]
+  const allStatuses = [...STATUSES, ...custom.map((item,i) => {
+    const isObj = item && typeof item === 'object'
+    return { key:'c'+i, label: isObj ? item.label : item, color: isObj ? item.color : '#60a5fa', type: isObj ? item.type : 'fixed' }
+  })]
   const cur = allStatuses.find(s => s.key === status)
   const T = (() => {
     const now = Date.now(), t = {}
@@ -368,7 +374,8 @@ export default function EngageWidget() {
 
   function addCustom() {
     const lbl = newLabel.trim(); if (!lbl) return
-    setCustom(c=>[...c,lbl]); setNewLabel(''); setShowAdd(false)
+    setCustom(c => [...c, { label: lbl, color: newColor, type: newType }])
+    setNewLabel(''); setNewColor('#60a5fa'); setNewType('fixed'); setShowAdd(false)
     requestAnimationFrame(() => {
       if (statusListRef.current) statusListRef.current.scrollTop = statusListRef.current.scrollHeight
     })
@@ -604,50 +611,109 @@ export default function EngageWidget() {
                   </div>
                 )}
 
-                {/* Status list */}
-                <div ref={statusListRef} style={{ maxHeight: 260, overflowY: 'auto', scrollbarWidth:'thin', scrollbarColor:'rgba(96,165,250,0.2) transparent' }}>
-                  {allStatuses.filter(s => s.key !== status).map((s, i, arr) => (
-                    <div key={s.key} onClick={() => status !== null ? pickStatus(s.key) : null}
-                      style={{
-                        display:'flex', alignItems:'center', justifyContent:'space-between',
-                        padding:'9px 14px',
-                        borderBottom: i < arr.length-1 ? `1px solid ${DIVIDER}` : 'none',
-                        cursor: status!==null ? 'pointer' : 'default',
-                        opacity: status===null ? 0.3 : 1,
-                        transition:'background 0.12s',
-                      }}
-                      onMouseEnter={e=>{ if(status!==null) e.currentTarget.style.background=`${s.color}10` }}
-                      onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
-                      <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <div style={{width:7,height:7,borderRadius:'50%',background:s.color,boxShadow:`0 0 5px ${s.color}80`}}/>
-                        <span style={{fontSize:12,fontWeight:600,color:'#d0e4ff'}}>{s.label}</span>
+                {/* Status list + scroll affordance */}
+                <div style={{position:'relative'}}>
+                  <div ref={statusListRef} onScroll={()=>{
+                    const el = statusListRef.current; if (!el) return
+                    setScrollBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 12)
+                  }} style={{ maxHeight:220, overflowY:'auto', scrollbarWidth:'none' }}>
+                    {allStatuses.filter(s => s.key !== status).map((s, i, arr) => (
+                      <div key={s.key} onClick={() => status !== null ? pickStatus(s.key) : null}
+                        style={{
+                          display:'flex', alignItems:'center', justifyContent:'space-between',
+                          padding:'9px 14px',
+                          borderBottom: i < arr.length-1 ? `1px solid ${DIVIDER}` : 'none',
+                          cursor: status!==null ? 'pointer' : 'default',
+                          opacity: status===null ? 0.3 : 1,
+                          transition:'background 0.12s',
+                        }}
+                        onMouseEnter={e=>{ if(status!==null) e.currentTarget.style.background=`${s.color}10` }}
+                        onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+                        <div style={{display:'flex',alignItems:'center',gap:8}}>
+                          <div style={{width:7,height:7,borderRadius:'50%',background:s.color,boxShadow:`0 0 5px ${s.color}80`}}/>
+                          <span style={{fontSize:12,fontWeight:600,color:'#d0e4ff'}}>{s.label}</span>
+                        </div>
+                        <div style={{display:'flex',alignItems:'center',gap:8}}>
+                          <span style={{fontFamily:NUM,fontSize:10,fontWeight:600,color: T[s.key] ? s.color+'cc' : '#2a4898'}}>
+                            {fmt(T[s.key]||0)}
+                          </span>
+                          {s.key.startsWith('c') && (
+                            <button onClick={e=>{ e.stopPropagation(); removeCustom(parseInt(s.key.slice(1))) }}
+                              style={{background:'none',border:'none',padding:0,cursor:'pointer',color:'#2a4070',display:'flex',lineHeight:1,transition:'color 0.15s'}}
+                              onMouseEnter={e=>e.currentTarget.style.color='#ff6b6b'}
+                              onMouseLeave={e=>e.currentTarget.style.color='#2a4070'}>
+                              <X size={10}/>
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <span style={{fontFamily:NUM,fontSize:10,fontWeight:600,color: T[s.key] ? s.color+'cc' : '#2a4898'}}>
-                          {fmt(T[s.key]||0)}
-                        </span>
-                        {s.key.startsWith('c') && (
-                          <button onClick={e=>{ e.stopPropagation(); removeCustom(parseInt(s.key.slice(1))) }}
-                            style={{background:'none',border:'none',padding:0,cursor:'pointer',color:'#2a4070',display:'flex',lineHeight:1,transition:'color 0.15s'}}
-                            onMouseEnter={e=>e.currentTarget.style.color='#ff6b6b'}
-                            onMouseLeave={e=>e.currentTarget.style.color='#2a4070'}>
-                            <X size={10}/>
-                          </button>
-                        )}
+                    ))}
+                  </div>
+                  {/* Scroll affordance */}
+                  {scrollBelow && (
+                    <div onClick={()=>{ if(statusListRef.current) statusListRef.current.scrollBy({top:80,behavior:'smooth'}) }}
+                      style={{position:'absolute',bottom:0,left:0,right:0,height:36,
+                        background:`linear-gradient(to bottom, transparent, ${BG})`,
+                        display:'flex',alignItems:'flex-end',justifyContent:'center',paddingBottom:5,
+                        cursor:'pointer',pointerEvents:'all',
+                      }}>
+                      <div style={{display:'flex',alignItems:'center',gap:4,background:'rgba(96,165,250,0.12)',borderRadius:20,padding:'2px 10px',backdropFilter:'blur(4px)'}}>
+                        <span style={{fontSize:9,fontWeight:700,color:'rgba(148,180,255,0.6)',letterSpacing:'0.06em',fontFamily:BODY}}>more</span>
+                        <ChevronDown size={9} color="rgba(148,180,255,0.5)"/>
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
 
-                {/* Add custom status */}
+                {/* Add custom status — Framer property panel */}
                 {showAdd ? (
-                  <div style={{display:'flex',alignItems:'center',gap:5,padding:'8px 14px',borderTop:`1px solid ${DIVIDER}`}}>
-                    <input autoFocus value={newLabel} onChange={e=>setNewLabel(e.target.value)}
-                      onKeyDown={e=>{if(e.key==='Enter')addCustom();if(e.key==='Escape'){setShowAdd(false);setNewLabel('')}}}
-                      placeholder="Status name…"
-                      style={{flex:1,padding:'6px 8px',background:'rgba(40,80,200,0.1)',border:`1px solid rgba(60,120,255,0.25)`,color:'#d0e4ff',fontSize:11,fontFamily:BODY,outline:'none'}}/>
-                    <button onClick={addCustom} style={{padding:'6px 8px',background:'#4edea3',border:'none',color:'#07090f',cursor:'pointer',display:'flex',alignItems:'center'}}><Check size={11}/></button>
-                    <button onClick={()=>{setShowAdd(false);setNewLabel('')}} style={{padding:'6px 8px',background:'transparent',border:`1px solid rgba(60,120,255,0.25)`,color:'#60a5fa',cursor:'pointer',display:'flex',alignItems:'center'}}><X size={11}/></button>
+                  <div style={{borderTop:`1px solid ${DIVIDER}`}}>
+                    {/* Name */}
+                    <div style={{display:'flex',alignItems:'center',minHeight:36,borderBottom:`1px solid ${DIVIDER}`,padding:'0 14px',gap:10}}>
+                      <span style={{width:52,flexShrink:0,fontSize:9,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(148,180,255,0.38)'}}>Name</span>
+                      <input autoFocus value={newLabel} onChange={e=>setNewLabel(e.target.value)}
+                        onKeyDown={e=>{if(e.key==='Enter')addCustom();if(e.key==='Escape'){setShowAdd(false);setNewLabel('')}}}
+                        placeholder="Status name…"
+                        style={{flex:1,background:'transparent',border:'none',color:'#d8ecff',fontSize:12,fontWeight:500,outline:'none',fontFamily:BODY}}/>
+                    </div>
+                    {/* Color */}
+                    <div style={{display:'flex',alignItems:'center',minHeight:36,borderBottom:`1px solid ${DIVIDER}`,padding:'0 14px',gap:10}}>
+                      <span style={{width:52,flexShrink:0,fontSize:9,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(148,180,255,0.38)'}}>Color</span>
+                      <div style={{display:'flex',gap:6}}>
+                        {['#60a5fa','#4edea3','#a78bfa','#f97316','#fb7185','#fbbf24','#38bdf8','#c084fc'].map(c=>(
+                          <div key={c} onClick={()=>setNewColor(c)} style={{width:15,height:15,borderRadius:'50%',background:c,cursor:'pointer',flexShrink:0,
+                            outline:newColor===c?`2px solid ${c}`:undefined,outlineOffset:newColor===c?2:undefined,
+                            boxShadow:newColor===c?`0 0 7px ${c}90`:undefined,transition:'all 0.12s'}}/>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Type */}
+                    <div style={{display:'flex',alignItems:'center',minHeight:36,borderBottom:`1px solid ${DIVIDER}`,padding:'0 14px',gap:10}}>
+                      <span style={{width:52,flexShrink:0,fontSize:9,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(148,180,255,0.38)'}}>Type</span>
+                      <div style={{display:'flex',gap:2}}>
+                        {['fixed','temporary'].map(t=>(
+                          <button key={t} onClick={()=>setNewType(t)} style={{padding:'3px 11px',borderRadius:20,border:'none',
+                            background:newType===t?'rgba(96,165,250,0.18)':'transparent',
+                            color:newType===t?'#c0dcff':'rgba(148,180,255,0.35)',
+                            fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:BODY,transition:'all 0.12s',
+                            textTransform:'capitalize'}}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Actions */}
+                    <div style={{display:'flex',gap:6,padding:'8px 14px'}}>
+                      <button onClick={addCustom} style={{flex:1,padding:'6px 0',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:7,color:'#c0dcff',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:BODY,transition:'background 0.15s'}}
+                        onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
+                        onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
+                        Add status
+                      </button>
+                      <button onClick={()=>{setShowAdd(false);setNewLabel('');setNewColor('#60a5fa');setNewType('fixed')}}
+                        style={{padding:'6px 12px',background:'transparent',border:`1px solid rgba(96,165,250,0.14)`,borderRadius:7,color:'rgba(148,180,255,0.4)',fontSize:11,cursor:'pointer',fontFamily:BODY}}>
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
@@ -656,9 +722,9 @@ export default function EngageWidget() {
                       onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
                       {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
                     </button>
-                    <button onClick={()=>setShowAdd(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(78,222,163,0.15)',border:'none',borderRadius:8,color:'#9eecd4',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(78,222,163,0.25)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='rgba(78,222,163,0.15)'}>
+                    <button onClick={()=>setShowAdd(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
                       <Plus size={11}/> New status
                     </button>
                   </div>
