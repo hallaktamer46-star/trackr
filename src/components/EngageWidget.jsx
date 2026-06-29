@@ -486,13 +486,15 @@ export default function EngageWidget() {
         background: BG,
         borderTop: `1px solid ${BORDER}`,
         borderLeft: `1px solid ${BORDER}`,
+        borderTopLeftRadius: 12,
         backdropFilter: 'blur(24px)',
         boxShadow: status && cur ? `0 -3px 24px ${cur.color}25` : '0 -2px 16px rgba(0,0,0,0.5)',
         transition: 'box-shadow 0.4s',
+        overflow: 'hidden',
       }}>
         <button onClick={() => openTab('engage')} style={{
           flex: tab === 'engage' ? '0 0 300px' : 1,
-          padding:'12px 0', border:'none',
+          padding:'8px 0', border:'none',
           background: tab==='engage' ? `${cur?.color || '#4edea3'}10` : 'transparent',
           borderBottom: tab==='engage' ? `2px solid ${cur?.color || '#4edea3'}` : '2px solid transparent',
           borderRight: tab === 'engage' ? `1px solid ${DIVIDER}` : 'none',
@@ -510,7 +512,7 @@ export default function EngageWidget() {
           )}
         </button>
         <button onClick={() => openTab('activity')} style={{
-          flex:1, padding:'12px 0', border:'none',
+          flex:1, padding:'8px 0', border:'none',
           background: tab==='activity' ? 'rgba(96,165,250,0.08)' : 'transparent',
           borderBottom: tab==='activity' ? '2px solid #60a5fa' : '2px solid transparent',
           cursor:'pointer', transition:'all 0.15s',
