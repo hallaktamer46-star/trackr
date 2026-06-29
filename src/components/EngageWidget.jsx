@@ -647,7 +647,7 @@ export default function EngageWidget() {
                   </div>
                 ) : (
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
-                    <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                    <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(255,80,80,0.6)',border:'none',borderRadius:8,color:'#fff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
                       onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
                       onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
                       {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
