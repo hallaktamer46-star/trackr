@@ -4,7 +4,6 @@ import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import SetShiftModal from './SetShiftModal'
 import TaskModal from './TaskModal'
-import { Button } from '@/components/ui/button'
 
 const NUM  = 'Consolas, Menlo, Monaco, monospace'
 const BODY = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
@@ -648,12 +647,16 @@ export default function EngageWidget() {
                   </div>
                 ) : (
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
-                    <Button variant="notion" size="sm" onClick={()=>setShowSetShift(true)}>
+                    <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'5px 12px',background:'rgba(180,200,255,0.08)',border:'none',borderRadius:6,color:'#b0c8f0',fontSize:11,fontFamily:BODY,fontWeight:500,cursor:'pointer',transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(180,200,255,0.14)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(180,200,255,0.08)'}>
                       {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
-                    </Button>
-                    <Button variant="notion" size="sm" onClick={()=>setShowAdd(true)}>
+                    </button>
+                    <button onClick={()=>setShowAdd(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'5px 12px',background:'rgba(180,200,255,0.08)',border:'none',borderRadius:6,color:'#b0c8f0',fontSize:11,fontFamily:BODY,fontWeight:500,cursor:'pointer',transition:'background 0.15s'}}
+                      onMouseEnter={e=>e.currentTarget.style.background='rgba(180,200,255,0.14)'}
+                      onMouseLeave={e=>e.currentTarget.style.background='rgba(180,200,255,0.08)'}>
                       <Plus size={11}/> New status
-                    </Button>
+                    </button>
                   </div>
                 )}
               </div>
@@ -674,12 +677,13 @@ export default function EngageWidget() {
                     onMouseLeave={e=>{ e.currentTarget.style.color='#5090d8' }}>
                     Tasks
                   </button>
-                  <Button
-                    variant="notion"
-                    size="sm"
-                    onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}>
+                  <button
+                    onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
+                    style={{display:'flex',alignItems:'center',gap:5,padding:'5px 12px',background:'rgba(180,200,255,0.08)',border:'none',borderRadius:6,color:'#b0c8f0',fontSize:11,fontFamily:BODY,fontWeight:500,cursor:'pointer',transition:'background 0.15s'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(180,200,255,0.14)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='rgba(180,200,255,0.08)'}>
                     <Plus size={11}/> Add task
-                  </Button>
+                  </button>
                 </div>
 
                 {/* Task list */}
