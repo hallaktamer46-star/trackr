@@ -672,10 +672,11 @@ export default function EngageWidget() {
                   flexShrink: 0,
                 }}>
                   <button onClick={() => { navigate('/calendar'); setTab(null) }}
-                    style={{display:'flex',alignItems:'center',gap:6,fontFamily:NUM,fontSize:9,fontWeight:800,color:'#5090d8',letterSpacing:'0.12em',textTransform:'uppercase',background:'none',border:'none',cursor:'pointer',padding:0,transition:'color 0.15s'}}
-                    onMouseEnter={e=>{ e.currentTarget.style.color='#60a5fa' }}
-                    onMouseLeave={e=>{ e.currentTarget.style.color='#5090d8' }}>
-                    Tasks
+                    style={{display:'flex',alignItems:'center',gap:9,background:'none',border:'none',cursor:'pointer',padding:0,transition:'opacity 0.15s'}}
+                    onMouseEnter={e=>{ e.currentTarget.style.opacity='0.75' }}
+                    onMouseLeave={e=>{ e.currentTarget.style.opacity='1' }}>
+                    <span style={{fontFamily:BODY,fontSize:14,fontWeight:500,color:'rgba(220,235,255,0.85)',letterSpacing:'-0.01em'}}>Tasks</span>
+                    {pending.length > 0 && <span style={{fontFamily:BODY,fontSize:11,fontWeight:400,color:'rgba(148,180,255,0.4)'}}>{pending.length} {pending.length === 1 ? 'item' : 'items'}</span>}
                   </button>
                   <button
                     onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}
