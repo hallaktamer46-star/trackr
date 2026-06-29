@@ -24,6 +24,7 @@ import LifePlan from './pages/LifePlan'
 import DailyDebrief from './pages/DailyDebrief'
 import Library from './pages/Library'
 import CompletedTasks from './pages/CompletedTasks'
+import NewStatus from './pages/NewStatus'
 import Auth from './pages/Auth'
 
 function ProtectedRoute({ children }) {
@@ -228,6 +229,11 @@ function AppRoutes() {
               <CompletedTasks />
             </Layout>
           </ApplicationProvider>
+        </ProtectedRoute>
+      } />
+      <Route path="/new-status" element={
+        <ProtectedRoute>
+          <NewStatus />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/" replace />} />

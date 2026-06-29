@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect, useRef, useMemo } from 'react'
-import { Power, Play, Plus, X, Check, Circle, CheckCircle2, GripVertical, ChevronDown } from 'lucide-react'
+import { Power, Play, Plus, X, Circle, CheckCircle2, GripVertical, ChevronDown } from 'lucide-react'
 import { format } from 'date-fns'
 import { useNavigate } from 'react-router-dom'
 import SetShiftModal from './SetShiftModal'
@@ -79,10 +79,6 @@ export default function EngageWidget() {
   const [status, setStatus]         = useState(null)
   const [log, setLog]               = useState([])
   const [custom, setCustom]         = useState([])
-  const [showAdd, setShowAdd]       = useState(false)
-  const [newLabel, setNewLabel]     = useState('')
-  const [newColor, setNewColor]     = useState('#60a5fa')
-  const [newType, setNewType]       = useState('fixed')
   const [scrollBelow, setScrollBelow] = useState(false)
   const [shiftStart, setShiftStart] = useState(null)
   const [sessionDate, setSessionDate] = useState(null)
@@ -264,6 +260,18 @@ export default function EngageWidget() {
   }, [])
 
   useEffect(() => {
+    const handler = () => {
+      try {
+        const raw = localStorage.getItem(KEY)
+        const data = raw ? JSON.parse(raw) : {}
+        setCustom(data.custom || [])
+      } catch {}
+    }
+    window.addEventListener('trackr-custom-updated', handler)
+    return () => window.removeEventListener('trackr-custom-updated', handler)
+  }, [])
+
+  useEffect(() => {
     if (status !== null) timer.current = setInterval(() => setTick(t => t+1), 1000)
     else clearInterval(timer.current)
     return () => clearInterval(timer.current)
@@ -372,14 +380,6 @@ export default function EngageWidget() {
   }
 
 
-  function addCustom() {
-    const lbl = newLabel.trim(); if (!lbl) return
-    setCustom(c => [...c, { label: lbl, color: newColor, type: newType }])
-    setNewLabel(''); setNewColor('#60a5fa'); setNewType('fixed'); setShowAdd(false)
-    requestAnimationFrame(() => {
-      if (statusListRef.current) statusListRef.current.scrollTop = statusListRef.current.scrollHeight
-    })
-  }
 
   function removeCustom(idx) {
     setCustom(c => c.filter((_,i) => i !== idx))
@@ -665,70 +665,19 @@ export default function EngageWidget() {
                   )}
                 </div>
 
-                {/* Add custom status — Framer property panel */}
-                {showAdd ? (
-                  <div style={{borderTop:`1px solid ${DIVIDER}`}}>
-                    {/* Name */}
-                    <div style={{display:'flex',alignItems:'center',minHeight:36,borderBottom:`1px solid ${DIVIDER}`,padding:'0 14px',gap:10}}>
-                      <span style={{width:52,flexShrink:0,fontSize:9,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(148,180,255,0.38)'}}>Name</span>
-                      <input autoFocus value={newLabel} onChange={e=>setNewLabel(e.target.value)}
-                        onKeyDown={e=>{if(e.key==='Enter')addCustom();if(e.key==='Escape'){setShowAdd(false);setNewLabel('')}}}
-                        placeholder="Status name…"
-                        style={{flex:1,background:'transparent',border:'none',color:'#d8ecff',fontSize:12,fontWeight:500,outline:'none',fontFamily:BODY}}/>
-                    </div>
-                    {/* Color */}
-                    <div style={{display:'flex',alignItems:'center',minHeight:36,borderBottom:`1px solid ${DIVIDER}`,padding:'0 14px',gap:10}}>
-                      <span style={{width:52,flexShrink:0,fontSize:9,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(148,180,255,0.38)'}}>Color</span>
-                      <div style={{display:'flex',gap:6}}>
-                        {['#60a5fa','#4edea3','#a78bfa','#f97316','#fb7185','#fbbf24','#38bdf8','#c084fc'].map(c=>(
-                          <div key={c} onClick={()=>setNewColor(c)} style={{width:15,height:15,borderRadius:'50%',background:c,cursor:'pointer',flexShrink:0,
-                            outline:newColor===c?`2px solid ${c}`:undefined,outlineOffset:newColor===c?2:undefined,
-                            boxShadow:newColor===c?`0 0 7px ${c}90`:undefined,transition:'all 0.12s'}}/>
-                        ))}
-                      </div>
-                    </div>
-                    {/* Type */}
-                    <div style={{display:'flex',alignItems:'center',minHeight:36,borderBottom:`1px solid ${DIVIDER}`,padding:'0 14px',gap:10}}>
-                      <span style={{width:52,flexShrink:0,fontSize:9,fontWeight:700,letterSpacing:'0.1em',textTransform:'uppercase',color:'rgba(148,180,255,0.38)'}}>Type</span>
-                      <div style={{display:'flex',gap:2}}>
-                        {['fixed','temporary'].map(t=>(
-                          <button key={t} onClick={()=>setNewType(t)} style={{padding:'3px 11px',borderRadius:20,border:'none',
-                            background:newType===t?'rgba(96,165,250,0.18)':'transparent',
-                            color:newType===t?'#c0dcff':'rgba(148,180,255,0.35)',
-                            fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:BODY,transition:'all 0.12s',
-                            textTransform:'capitalize'}}>
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    {/* Actions */}
-                    <div style={{display:'flex',gap:6,padding:'8px 14px'}}>
-                      <button onClick={addCustom} style={{flex:1,padding:'6px 0',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:7,color:'#c0dcff',fontSize:11,fontWeight:600,cursor:'pointer',fontFamily:BODY,transition:'background 0.15s'}}
-                        onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
-                        onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
-                        Add status
-                      </button>
-                      <button onClick={()=>{setShowAdd(false);setNewLabel('');setNewColor('#60a5fa');setNewType('fixed')}}
-                        style={{padding:'6px 12px',background:'transparent',border:`1px solid rgba(96,165,250,0.14)`,borderRadius:7,color:'rgba(148,180,255,0.4)',fontSize:11,cursor:'pointer',fontFamily:BODY}}>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
-                    <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
-                      {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
-                    </button>
-                    <button onClick={()=>setShowAdd(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
-                      onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
-                      onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
-                      <Plus size={11}/> New status
-                    </button>
-                  </div>
-                )}
+                {/* Bottom action bar */}
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
+                  <button onClick={()=>setShowSetShift(true)} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
+                    {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
+                  </button>
+                  <button onClick={()=>navigate('/new-status')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 13px',background:'rgba(96,165,250,0.18)',border:'none',borderRadius:8,color:'#c0dcff',fontSize:11,fontFamily:BODY,fontWeight:600,cursor:'pointer',transition:'background 0.15s'}}
+                    onMouseEnter={e=>e.currentTarget.style.background='rgba(96,165,250,0.28)'}
+                    onMouseLeave={e=>e.currentTarget.style.background='rgba(96,165,250,0.18)'}>
+                    <Plus size={11}/> New status
+                  </button>
+                </div>
               </div>
 
               {/* ── RIGHT: Today's Tasks ── */}
