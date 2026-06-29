@@ -648,10 +648,10 @@ export default function EngageWidget() {
                   </div>
                 ) : (
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',borderTop:`1px solid ${DIVIDER}`,gap:8}}>
-                    <Button variant="default" size="sm" onClick={()=>setShowSetShift(true)}>
+                    <Button variant="notion" size="sm" onClick={()=>setShowSetShift(true)}>
                       {!shiftGoal && <Plus size={11}/>} {shiftGoalLabel || 'Set goal'}
                     </Button>
-                    <Button variant="teal" size="sm" onClick={()=>setShowAdd(true)}>
+                    <Button variant="notion" size="sm" onClick={()=>setShowAdd(true)}>
                       <Plus size={11}/> New status
                     </Button>
                   </div>
@@ -675,7 +675,7 @@ export default function EngageWidget() {
                     Tasks
                   </button>
                   <Button
-                    variant="default"
+                    variant="notion"
                     size="sm"
                     onClick={() => openEdit({ id: null, title: '', due: todayStr, note: '', priority: 'medium' })}>
                     <Plus size={11}/> Add task

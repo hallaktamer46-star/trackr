@@ -14,6 +14,8 @@ const buttonVariants = cva(
           'bg-teal-500/10 border border-teal-400/25 text-teal-400/80 hover:bg-teal-500/20 hover:border-teal-400/50 hover:text-teal-300',
         ghost:
           'border border-transparent text-blue-400/60 hover:bg-blue-500/10 hover:border-blue-400/25 hover:text-blue-300',
+        notion:
+          'bg-[rgba(180,200,255,0.07)] border-0 text-[#b0c8f0] font-medium hover:bg-[rgba(180,200,255,0.13)] hover:text-[#ccdeff]',
         destructive:
           'bg-red-500/10 border border-red-400/25 text-red-400/80 hover:bg-red-500/20 hover:border-red-400/45 hover:text-red-300',
       },
