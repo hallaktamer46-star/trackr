@@ -272,6 +272,12 @@ export default function EngageWidget() {
   }, [])
 
   useEffect(() => {
+    const el = statusListRef.current
+    if (!el) return
+    setScrollBelow(el.scrollHeight - el.scrollTop - el.clientHeight > 12)
+  }, [allStatuses, status])
+
+  useEffect(() => {
     if (status !== null) timer.current = setInterval(() => setTick(t => t+1), 1000)
     else clearInterval(timer.current)
     return () => clearInterval(timer.current)
