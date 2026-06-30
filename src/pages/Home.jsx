@@ -7,8 +7,9 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail, Brain, Users, LayoutList, Flame, X, Settings
+  FileText, Mail, Brain, Users, LayoutList, Flame, X, SlidersHorizontal
 } from 'lucide-react'
+import TaskModal from '../components/TaskModal'
 import { useAuth } from '../contexts/AuthContext'
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -214,23 +215,20 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingApp, setEditingApp] = useState(null)
   const [quickPostOpen, setQuickPostOpen] = useState(false)
-  const [eventModal, setEventModal] = useState(false)
-  const [eventForm, setEventForm] = useState({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
+  const [taskModalOpen, setTaskModalOpen] = useState(false)
   const [kpiConfig, setKpiConfig] = useState(() => {
     try { const s = JSON.parse(localStorage.getItem('trackr_kpi_config')); if (Array.isArray(s) && s.length === 4) return s } catch {}
     return DEFAULT_KPIS
   })
   const [kpiCustomizeOpen, setKpiCustomizeOpen] = useState(false)
   const [kpiDraft, setKpiDraft] = useState([])
-  function saveEvent() {
-    if (!eventForm.title.trim()) return
-    const impToPriority = n => n <= 2 ? 'low' : n === 3 ? 'medium' : 'high'
+  function handleTaskSave(taskData) {
     const task = {
-      id: Date.now().toString(),
-      title: eventForm.title,
-      due: eventForm.date,
-      priority: impToPriority(eventForm.importance),
-      note: eventForm.desc,
+      id: taskData.id || Date.now().toString(),
+      title: taskData.title,
+      due: taskData.due,
+      priority: taskData.priority,
+      note: taskData.note,
       done: false,
       createdAt: new Date().toISOString(),
     }
@@ -239,8 +237,7 @@ export default function Home() {
       localStorage.setItem('trackr_tasks', JSON.stringify([...existing, task]))
       window.dispatchEvent(new CustomEvent('trackr-tasks-updated'))
     } catch {}
-    setEventModal(false)
-    setEventForm({ title:'', date:format(new Date(),'yyyy-MM-dd'), desc:'', importance:3 })
+    setTaskModalOpen(false)
   }
 
   const firstName = user?.user_metadata?.first_name || null
@@ -443,19 +440,20 @@ export default function Home() {
         <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, justifyContent:'space-between', alignSelf:'stretch' }}>
           <button
             onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
-            style={{ display:'flex', alignItems:'center', justifyContent:'center', padding:'4px 8px', background:'rgba(163,201,255,0.04)', border:'0.5px solid rgba(163,201,255,0.1)', cursor:'pointer', color:'rgba(163,201,255,0.4)', transition:'all 0.15s' }}
-            onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.09)'; e.currentTarget.style.color='rgba(163,201,255,0.75)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.22)' }}
-            onMouseLeave={e => { e.currentTarget.style.background='rgba(163,201,255,0.04)'; e.currentTarget.style.color='rgba(163,201,255,0.4)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.1)' }}
+            style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 10px 5px 8px', background:'rgba(0,212,255,0.04)', border:'1px solid rgba(0,212,255,0.12)', borderRadius:6, cursor:'pointer', color:'rgba(0,212,255,0.45)', fontFamily:"'Geist Mono','Consolas',monospace", fontSize:8, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.15s' }}
+            onMouseEnter={e => { e.currentTarget.style.background='rgba(0,212,255,0.1)'; e.currentTarget.style.color='rgba(0,212,255,0.85)'; e.currentTarget.style.borderColor='rgba(0,212,255,0.3)'; e.currentTarget.style.boxShadow='0 0 12px rgba(0,212,255,0.1)' }}
+            onMouseLeave={e => { e.currentTarget.style.background='rgba(0,212,255,0.04)'; e.currentTarget.style.color='rgba(0,212,255,0.45)'; e.currentTarget.style.borderColor='rgba(0,212,255,0.12)'; e.currentTarget.style.boxShadow='none' }}
           >
-            <Settings size={11}/>
+            <SlidersHorizontal size={10}/>
+            <span>Customize</span>
           </button>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <button onClick={() => setEventModal(true)}
-              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
+            <button onClick={() => setTaskModalOpen(true)}
+              style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', borderRadius:8, cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
               onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
               onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
-              <CalendarDays size={13} color="#fff" strokeWidth={2.5}/>
-              <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Add Event</span>
+              <Plus size={13} color="#fff" strokeWidth={2.5}/>
+              <span style={{ fontFamily:MONO, fontSize:10, fontWeight:700, color:'#fff', letterSpacing:'0.06em', textTransform:'uppercase', whiteSpace:'nowrap' }}>Add Task</span>
             </button>
             {canAddMore && (
               <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
@@ -700,48 +698,7 @@ export default function Home() {
       <ApplicationModal open={modalOpen} onClose={()=>setModalOpen(false)} onSave={handleSave} onDelete={deleteApplication} initial={editingApp??{status:'wishlist'}}/>
       {quickPostOpen && <QuickPostModal onClose={()=>setQuickPostOpen(false)} onPublished={()=>{}}/>}
 
-      {/* Add Event Modal */}
-      {eventModal && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:9000 }}
-          onClick={() => setEventModal(false)}>
-          <div style={{ background:'#0d1420', border:'0.5px solid rgba(163,201,255,0.15)', padding:28, width:440, maxWidth:'90vw', display:'flex', flexDirection:'column', gap:16 }}
-            onClick={e => e.stopPropagation()}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-              <h2 style={{ fontFamily:MONO, fontSize:14, fontWeight:800, color:'#d0e4f0', letterSpacing:'-0.02em', margin:0 }}>Add Event</h2>
-              <button onClick={() => setEventModal(false)} style={{ background:'none', border:'none', color:'#2a5070', cursor:'pointer', display:'flex', padding:4 }}><X size={16}/></button>
-            </div>
-            <input value={eventForm.title} onChange={e => setEventForm(f=>({...f,title:e.target.value}))}
-              onKeyDown={e => e.key==='Enter' && saveEvent()}
-              placeholder="Event title…"
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#d0e4f0', fontSize:14, fontFamily:SANS, outline:'none' }}/>
-            <input type="date" value={eventForm.date} onChange={e => setEventForm(f=>({...f,date:e.target.value}))}
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#5878b0', fontSize:13, fontFamily:MONO, outline:'none', colorScheme:'dark' }}/>
-            <textarea value={eventForm.desc} onChange={e => setEventForm(f=>({...f,desc:e.target.value}))}
-              placeholder="Description (optional)…" rows={3}
-              style={{ padding:'10px 14px', background:'rgba(255,255,255,0.03)', border:'0.5px solid rgba(163,201,255,0.15)', color:'#98b8cc', fontSize:13, fontFamily:SANS, outline:'none', resize:'none' }}/>
-            <div>
-              <p style={{ fontFamily:MONO, fontSize:9, color:'#404753', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:8 }}>Importance</p>
-              <div style={{ display:'flex', gap:6 }}>
-                {[1,2,3,4,5].map(n => (
-                  <button key={n} onClick={() => setEventForm(f=>({...f,importance:n}))}
-                    style={{
-                      flex:1, padding:'9px 0', border:`0.5px solid ${eventForm.importance===n ? IMP_COLORS[n]+'80' : 'rgba(163,201,255,0.1)'}`,
-                      background: eventForm.importance===n ? `${IMP_COLORS[n]}18` : 'rgba(255,255,255,0.02)',
-                      color: eventForm.importance===n ? IMP_COLORS[n] : 'rgba(163,201,255,0.3)',
-                      fontFamily:MONO, fontSize:13, fontWeight:700, cursor:'pointer', transition:'all .12s',
-                    }}>
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button onClick={saveEvent}
-              style={{ padding:'12px 0', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', color:'#fff', fontFamily:MONO, fontSize:11, fontWeight:700, letterSpacing:'0.06em', textTransform:'uppercase', cursor:'pointer' }}>
-              Save Event
-            </button>
-          </div>
-        </div>
-      )}
+      <TaskModal open={taskModalOpen} onClose={() => setTaskModalOpen(false)} onSave={handleTaskSave} />
 
       {/* ══ KPI Customize Modal ══ */}
       {kpiCustomizeOpen && (
