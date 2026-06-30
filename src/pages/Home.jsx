@@ -353,10 +353,7 @@ export default function Home() {
   function handleRefresh() {
     if (isRefreshing) return
     setIsRefreshing(true)
-    setTimeout(() => {
-      setRefreshKey(k => k + 1)
-      setIsRefreshing(false)
-    }, 600)
+    setTimeout(() => window.location.reload(), 600)
   }
 
   function saveKpiConfig(config) {
