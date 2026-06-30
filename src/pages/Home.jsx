@@ -459,9 +459,9 @@ export default function Home() {
             <button
               onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
               title="Customize KPIs"
-              style={{ width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,212,255,0.08)', border:'1px solid rgba(0,212,255,0.28)', borderRadius:8, cursor:'pointer', color:'rgba(0,212,255,0.75)', transition:'all 0.15s' }}
-              onMouseEnter={e => { e.currentTarget.style.background='rgba(0,212,255,0.15)'; e.currentTarget.style.color='#00d4ff'; e.currentTarget.style.borderColor='rgba(0,212,255,0.5)'; e.currentTarget.style.boxShadow='0 0 14px rgba(0,212,255,0.15)' }}
-              onMouseLeave={e => { e.currentTarget.style.background='rgba(0,212,255,0.08)'; e.currentTarget.style.color='rgba(0,212,255,0.75)'; e.currentTarget.style.borderColor='rgba(0,212,255,0.28)'; e.currentTarget.style.boxShadow='none' }}
+              style={{ width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(163,201,255,0.12)', borderRadius:8, cursor:'pointer', color:'rgba(163,201,255,0.45)', transition:'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.07)'; e.currentTarget.style.color='rgba(163,201,255,0.8)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.25)' }}
+              onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.03)'; e.currentTarget.style.color='rgba(163,201,255,0.45)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.12)' }}
             >
               <SlidersHorizontal size={14}/>
             </button>
