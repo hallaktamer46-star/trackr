@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 
-const MONO = "'Geist Mono', 'Consolas', monospace"
-const BODY = "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
+const DISPLAY = "'Nunito', 'Plus Jakarta Sans', system-ui, sans-serif"
+const MONO    = "'Geist Mono', 'Consolas', monospace"
 
 const IMP_COLORS = { 1: '#4edea3', 2: '#a3c9ff', 3: '#fbbf24', 4: '#ffb689', 5: '#ffb4ab' }
 const IMP_LABELS = { 1: 'min', 2: 'low', 3: 'mid', 4: 'high', 5: 'max' }
@@ -27,17 +27,26 @@ function ChevronUp() {
   )
 }
 
+function CloseIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  )
+}
+
 function FieldLabel({ children }) {
   return (
     <span style={{
-      fontFamily: MONO,
-      fontSize: 9,
-      fontWeight: 600,
-      color: 'rgba(96,165,250,0.55)',
+      fontFamily:    MONO,
+      fontSize:      9,
+      fontWeight:    600,
+      color:         'rgba(96,165,250,0.55)',
       letterSpacing: '0.13em',
       textTransform: 'uppercase',
-      display: 'block',
-      marginBottom: 7,
+      display:       'block',
+      marginBottom:  7,
     }}>
       {children}
     </span>
@@ -100,17 +109,19 @@ export default function TaskModal({ open, task, onClose, onSave }) {
 
   function inputStyle(isFocused, extra = {}) {
     return {
-      background:  isFocused ? 'rgba(0,212,255,0.025)' : 'rgba(255,255,255,0.025)',
-      border:      `1px solid ${isFocused ? 'rgba(0,212,255,0.5)' : 'rgba(163,201,255,0.11)'}`,
-      boxShadow:   isFocused ? '0 0 0 3px rgba(0,212,255,0.07)' : 'none',
-      color:       '#dce5f3',
-      fontSize:    14,
-      fontFamily:  BODY,
-      outline:     'none',
-      width:       '100%',
-      boxSizing:   'border-box',
-      padding:     '11px 36px 11px 14px',
-      transition:  'border-color 0.15s, box-shadow 0.15s, background 0.15s',
+      background:   isFocused ? 'rgba(0,212,255,0.03)' : 'rgba(255,255,255,0.04)',
+      border:       `1px solid ${isFocused ? 'rgba(0,212,255,0.5)' : 'rgba(163,201,255,0.13)'}`,
+      boxShadow:    isFocused ? '0 0 0 3px rgba(0,212,255,0.07)' : 'none',
+      borderRadius: 8,
+      color:        '#dce5f3',
+      fontSize:     14,
+      fontFamily:   DISPLAY,
+      fontWeight:   500,
+      outline:      'none',
+      width:        '100%',
+      boxSizing:    'border-box',
+      padding:      '11px 36px 11px 14px',
+      transition:   'border-color 0.15s, box-shadow 0.15s, background 0.15s',
       ...extra,
     }
   }
@@ -118,32 +129,33 @@ export default function TaskModal({ open, task, onClose, onSave }) {
   return (
     <div
       style={{
-        position: 'fixed', inset: 0,
-        background:    visible ? 'rgba(0,0,0,0.82)' : 'rgba(0,0,0,0)',
-        backdropFilter: visible ? 'blur(3px)' : 'blur(0px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        zIndex: 99999, padding: 20,
-        transition: 'background 0.22s, backdrop-filter 0.22s',
+        position:       'fixed', inset: 0,
+        background:     visible ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0)',
+        backdropFilter: visible ? 'blur(4px)' : 'blur(0px)',
+        display:        'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex:         99999, padding: 20,
+        transition:     'background 0.22s, backdrop-filter 0.22s',
       }}
       onClick={onClose}
     >
       <div
         style={{
-          width: '100%', maxWidth: 400,
-          background: '#080c18',
-          border: '1px solid rgba(0,212,255,0.14)',
-          overflow: 'hidden',
-          display: 'flex', flexDirection: 'column',
-          transform: visible ? 'translateY(0) scale(1)' : 'translateY(22px) scale(0.96)',
-          opacity: visible ? 1 : 0,
-          transition: 'transform 0.28s cubic-bezier(0.22,1,0.36,1), opacity 0.22s',
+          width:        '100%', maxWidth: 400,
+          background:   '#0d1117',
+          border:       '1px solid rgba(163,201,255,0.12)',
+          borderRadius: 16,
+          overflow:     'hidden',
+          display:      'flex', flexDirection: 'column',
+          transform:    visible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.96)',
+          opacity:      visible ? 1 : 0,
+          transition:   'transform 0.28s cubic-bezier(0.22,1,0.36,1), opacity 0.22s',
         }}
         onClick={e => e.stopPropagation()}
       >
         {/* Top accent stripe */}
         <div style={{
-          height: 2,
-          background: 'linear-gradient(90deg, #00d4ff 0%, rgba(96,165,250,0.45) 55%, transparent 100%)',
+          height:     2,
+          background: 'linear-gradient(90deg, #00d4ff 0%, rgba(96,165,250,0.4) 55%, transparent 100%)',
           flexShrink: 0,
         }} />
 
@@ -152,48 +164,40 @@ export default function TaskModal({ open, task, onClose, onSave }) {
 
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <div style={{
-                width: 6, height: 6,
-                background: '#00d4ff',
-                boxShadow: '0 0 10px rgba(0,212,255,0.9)',
-                flexShrink: 0,
-              }} />
-              <h2 style={{
-                fontFamily: BODY,
-                fontSize: 15,
-                fontWeight: 700,
-                color: '#e6edf8',
-                letterSpacing: '-0.01em',
-                margin: 0,
-              }}>
-                {isNew ? 'New Task' : 'Edit Task'}
-              </h2>
-            </div>
+            <h2 style={{
+              fontFamily:    DISPLAY,
+              fontSize:      17,
+              fontWeight:    800,
+              color:         '#e8edf8',
+              letterSpacing: '-0.02em',
+              margin:        0,
+            }}>
+              {isNew ? 'New Task' : 'Edit Task'}
+            </h2>
             <button
               onClick={onClose}
               style={{
-                background:  'rgba(163,201,255,0.06)',
-                border:      '1px solid rgba(163,201,255,0.1)',
-                color:       'rgba(163,201,255,0.45)',
+                background:  'none',
+                border:      'none',
+                color:       'rgba(163,201,255,0.4)',
                 cursor:      'pointer',
-                width: 28, height: 28,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 17, lineHeight: 1,
-                fontFamily: MONO,
-                transition: 'all .15s',
+                width:       32, height: 32,
+                display:     'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: 8,
+                padding:     0,
+                transition:  'color 0.15s, background 0.15s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.color = '#00d4ff'
-                e.currentTarget.style.borderColor = 'rgba(0,212,255,0.3)'
-                e.currentTarget.style.background = 'rgba(0,212,255,0.09)'
+                e.currentTarget.style.color       = '#e8edf8'
+                e.currentTarget.style.background  = 'rgba(163,201,255,0.08)'
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.color = 'rgba(163,201,255,0.45)'
-                e.currentTarget.style.borderColor = 'rgba(163,201,255,0.1)'
-                e.currentTarget.style.background = 'rgba(163,201,255,0.06)'
+                e.currentTarget.style.color       = 'rgba(163,201,255,0.4)'
+                e.currentTarget.style.background  = 'none'
               }}
-            >×</button>
+            >
+              <CloseIcon />
+            </button>
           </div>
 
           {/* Title */}
@@ -230,13 +234,13 @@ export default function TaskModal({ open, task, onClose, onSave }) {
                   onClick={() => setExpanded(v => !v)}
                   title={expanded ? 'Collapse' : 'Expand'}
                   style={{
-                    position: 'absolute',
-                    right: 8,
-                    top: expanded ? 10 : '50%',
+                    position:  'absolute',
+                    right:     8,
+                    top:       expanded ? 10 : '50%',
                     transform: expanded ? 'none' : 'translateY(-50%)',
                     background: 'none', border: 'none', cursor: 'pointer',
-                    color: 'rgba(163,201,255,0.3)',
-                    display: 'flex', padding: 2,
+                    color:      'rgba(163,201,255,0.3)',
+                    display:    'flex', padding: 2,
                     transition: 'color 0.15s',
                   }}
                   onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
@@ -297,15 +301,16 @@ export default function TaskModal({ open, task, onClose, onSave }) {
                     key={n}
                     onClick={() => setForm(f => ({ ...f, importance: n }))}
                     style={{
-                      flex: 1,
-                      padding: '10px 0 8px',
-                      border:  `1px solid ${sel ? col : 'rgba(163,201,255,0.1)'}`,
-                      background: sel ? `${col}1c` : 'transparent',
-                      cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', gap: 4,
-                      transition: 'all .13s ease',
-                      position: 'relative', overflow: 'hidden',
+                      flex:         1,
+                      padding:      '10px 0 8px',
+                      border:       `1px solid ${sel ? col : 'rgba(163,201,255,0.1)'}`,
+                      borderRadius: 8,
+                      background:   sel ? `${col}1c` : 'transparent',
+                      cursor:       'pointer',
+                      display:      'flex', flexDirection: 'column',
+                      alignItems:   'center', gap: 4,
+                      transition:   'all .13s ease',
+                      position:     'relative', overflow: 'hidden',
                     }}
                     onMouseEnter={e => {
                       if (!sel) {
@@ -322,10 +327,10 @@ export default function TaskModal({ open, task, onClose, onSave }) {
                   >
                     {sel && (
                       <div style={{
-                        position: 'absolute', top: 0, left: 0, right: 0,
-                        height: 2,
+                        position:   'absolute', top: 0, left: 0, right: 0,
+                        height:     2,
                         background: col,
-                        boxShadow: `0 0 8px ${col}`,
+                        boxShadow:  `0 0 8px ${col}`,
                       }} />
                     )}
                     <span style={{
@@ -362,23 +367,23 @@ export default function TaskModal({ open, task, onClose, onSave }) {
               padding:       '13px 0',
               background:    '#00d4ff',
               border:        'none',
+              borderRadius:  10,
               color:         '#04111e',
-              fontFamily:    MONO,
-              fontSize:      11,
-              fontWeight:    700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
+              fontFamily:    DISPLAY,
+              fontSize:      14,
+              fontWeight:    800,
+              letterSpacing: '0.01em',
               cursor:        'pointer',
               transition:    'background 0.18s, box-shadow 0.18s',
               marginTop:     2,
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.background  = '#2adcff'
-              e.currentTarget.style.boxShadow   = '0 0 28px rgba(0,212,255,0.38)'
+              e.currentTarget.style.background = '#2adcff'
+              e.currentTarget.style.boxShadow  = '0 0 28px rgba(0,212,255,0.38)'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.background  = '#00d4ff'
-              e.currentTarget.style.boxShadow   = 'none'
+              e.currentTarget.style.background = '#00d4ff'
+              e.currentTarget.style.boxShadow  = 'none'
             }}
           >
             {isNew ? 'Add Task' : 'Save Changes'}
