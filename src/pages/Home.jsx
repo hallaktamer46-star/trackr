@@ -7,7 +7,7 @@ import {
   Clock, CalendarDays, DollarSign, BarChart3, Zap,
   BookOpen, Building2, MessageSquare, Link2, Activity,
   PenSquare, Library, GraduationCap, Newspaper, LayoutGrid,
-  FileText, Mail, Brain, Users, LayoutList, Flame, X, SlidersHorizontal
+  FileText, Mail, Brain, Users, LayoutList, Flame, X, SlidersHorizontal, RefreshCw
 } from 'lucide-react'
 import TaskModal from '../components/TaskModal'
 import { useAuth } from '../contexts/AuthContext'
@@ -216,6 +216,8 @@ export default function Home() {
   const [editingApp, setEditingApp] = useState(null)
   const [quickPostOpen, setQuickPostOpen] = useState(false)
   const [taskModalOpen, setTaskModalOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [kpiConfig, setKpiConfig] = useState(() => {
     try { const s = JSON.parse(localStorage.getItem('trackr_kpi_config')); if (Array.isArray(s) && s.length === 4) return s } catch {}
     return DEFAULT_KPIS
@@ -344,9 +346,18 @@ export default function Home() {
         return { day: format(date, 'EEE'), hours: record ? +(record.total/3600).toFixed(1) : 0 }
       }),
     }
-  }, [applications, tasks, goals, sessions, todaySess, todayStr, stats, thisWeek, lastWeek, responseRate, offerRate])
+  }, [applications, tasks, goals, sessions, todaySess, todayStr, stats, thisWeek, lastWeek, responseRate, offerRate, refreshKey])
 
   const maxHours     = Math.max(...(kpiData.weeklyHoursChart||[]).map(d=>d.hours), 0.1)
+
+  function handleRefresh() {
+    if (isRefreshing) return
+    setIsRefreshing(true)
+    setTimeout(() => {
+      setRefreshKey(k => k + 1)
+      setIsRefreshing(false)
+    }, 600)
+  }
 
   function saveKpiConfig(config) {
     localStorage.setItem('trackr_kpi_config', JSON.stringify(config))
@@ -438,15 +449,26 @@ export default function Home() {
           </h1>
         </div>
         <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, justifyContent:'space-between', alignSelf:'stretch' }}>
-          <button
-            onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
-            style={{ display:'flex', alignItems:'center', gap:5, padding:'5px 10px 5px 8px', background:'rgba(0,212,255,0.04)', border:'1px solid rgba(0,212,255,0.12)', borderRadius:6, cursor:'pointer', color:'rgba(0,212,255,0.45)', fontFamily:"'Geist Mono','Consolas',monospace", fontSize:8, fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.15s' }}
-            onMouseEnter={e => { e.currentTarget.style.background='rgba(0,212,255,0.1)'; e.currentTarget.style.color='rgba(0,212,255,0.85)'; e.currentTarget.style.borderColor='rgba(0,212,255,0.3)'; e.currentTarget.style.boxShadow='0 0 12px rgba(0,212,255,0.1)' }}
-            onMouseLeave={e => { e.currentTarget.style.background='rgba(0,212,255,0.04)'; e.currentTarget.style.color='rgba(0,212,255,0.45)'; e.currentTarget.style.borderColor='rgba(0,212,255,0.12)'; e.currentTarget.style.boxShadow='none' }}
-          >
-            <SlidersHorizontal size={10}/>
-            <span>Customize</span>
-          </button>
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <button
+              onClick={handleRefresh}
+              title="Refresh dashboard"
+              style={{ width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(255,255,255,0.03)', border:'1px solid rgba(163,201,255,0.12)', borderRadius:8, cursor:'pointer', color:'rgba(163,201,255,0.45)', transition:'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background='rgba(163,201,255,0.07)'; e.currentTarget.style.color='rgba(163,201,255,0.8)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.25)' }}
+              onMouseLeave={e => { e.currentTarget.style.background='rgba(255,255,255,0.03)'; e.currentTarget.style.color='rgba(163,201,255,0.45)'; e.currentTarget.style.borderColor='rgba(163,201,255,0.12)' }}
+            >
+              <RefreshCw size={13} style={{ transition:'transform 0.6s ease', transform: isRefreshing ? 'rotate(-360deg)' : 'rotate(0deg)' }}/>
+            </button>
+            <button
+              onClick={() => { setKpiDraft(kpiConfig); setKpiCustomizeOpen(true) }}
+              title="Customize KPIs"
+              style={{ width:34, height:34, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,212,255,0.08)', border:'1px solid rgba(0,212,255,0.28)', borderRadius:8, cursor:'pointer', color:'rgba(0,212,255,0.75)', transition:'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.background='rgba(0,212,255,0.15)'; e.currentTarget.style.color='#00d4ff'; e.currentTarget.style.borderColor='rgba(0,212,255,0.5)'; e.currentTarget.style.boxShadow='0 0 14px rgba(0,212,255,0.15)' }}
+              onMouseLeave={e => { e.currentTarget.style.background='rgba(0,212,255,0.08)'; e.currentTarget.style.color='rgba(0,212,255,0.75)'; e.currentTarget.style.borderColor='rgba(0,212,255,0.28)'; e.currentTarget.style.boxShadow='none' }}
+            >
+              <SlidersHorizontal size={14}/>
+            </button>
+          </div>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
             <button onClick={() => setTaskModalOpen(true)}
               style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#10b981,#4edea3)', border:'none', borderRadius:8, cursor:'pointer', boxShadow:'0 0 0 1px rgba(78,222,163,0.4),0 4px 20px rgba(16,185,129,0.3)', transition:'transform 0.15s,filter 0.15s' }}
@@ -457,7 +479,7 @@ export default function Home() {
             </button>
             {canAddMore && (
               <button onClick={()=>{ setEditingApp(null); setModalOpen(true) }}
-                style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
+                style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px', background:'linear-gradient(135deg,#1493ff,#6366f1)', border:'none', borderRadius:8, cursor:'pointer', boxShadow:'0 0 0 1px rgba(99,102,241,0.4),0 4px 20px rgba(20,147,255,0.3)', transition:'transform 0.15s,filter 0.15s', position:'relative', overflow:'hidden' }}
                 onMouseEnter={e=>{ e.currentTarget.style.filter='brightness(1.1)'; e.currentTarget.style.transform='translateY(-1px)' }}
                 onMouseLeave={e=>{ e.currentTarget.style.filter='none'; e.currentTarget.style.transform='none' }}>
                 <Plus size={13} color="#fff" strokeWidth={2.5}/>
