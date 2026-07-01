@@ -1,49 +1,39 @@
-﻿import { useState, useEffect, useRef } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { useSidebar } from '../../contexts/SidebarContext'
-import {
-  Home, Briefcase, Building2, User, Users, Settings, Activity,
+import { ChevronRight, Home, Briefcase, Building2, User, Users, Settings, Activity,
   LayoutDashboard, Telescope, Rocket, CalendarDays, BarChart3,
   Clock, BookOpen, Map, Newspaper, LayoutList, Flame, Brain,
-  PenLine, FileText, Mail, DollarSign,
+  PenLine, FileText, Mail, DollarSign, LayoutGrid,
 } from 'lucide-react'
+import { NavLink, useLocation } from 'react-router-dom'
+import {
+  Sidebar as SidebarPrimitive,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from '../ui/sidebar'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
 
-const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
-const MONO = 'Consolas, Menlo, Monaco, monospace'
+const MONO = "'Geist Mono', 'Consolas', monospace"
 
-const GAP = 8
-const W   = 64
-export const SIDEBAR_W = W + GAP
-
-const TOP    = 56 + GAP
-const BOTTOM = GAP
-const BG     = '#020617'
-
-function GridIcon({ size = 16, color = 'currentColor' }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      {[2, 8, 14].flatMap(cx =>
-        [2, 8, 14].map(cy => (
-          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={1.4} fill={color} />
-        ))
-      )}
-    </svg>
-  )
-}
-
-const NAV_ITEMS = [
+const NAV_GROUPS = [
   {
-    label: 'Home', icon: Home, to: '/',
-    matches: ['/'],
-    items: null,
-  },
-  {
-    label: 'Jobs', icon: Briefcase, to: null,
-    matches: ['/board', '/jobs', '/ai', '/cv', '/stats'],
+    label: 'Jobs', icon: Briefcase,
     items: [
       { to: '/board',           icon: LayoutDashboard, label: 'Dashboard'    },
       { to: '/jobs',            icon: Briefcase,       label: 'Jobs'         },
-      { to: '/ai',              icon: Briefcase,       label: 'Job Toolkit'  },
+      { to: '/ai',              icon: LayoutGrid,      label: 'Job Toolkit'  },
       { to: '/cv/builder',      icon: PenLine,         label: 'CV Builder'   },
       { to: '/cv/reviewer',     icon: FileText,        label: 'CV Reviewer'  },
       { to: '/cv/cover-letter', icon: Mail,            label: 'Cover Letter' },
@@ -51,8 +41,7 @@ const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Business', icon: Building2, to: null,
-    matches: ['/growth', '/startup', '/pitch'],
+    label: 'Business', icon: Building2,
     items: [
       { to: '/growth',  icon: Telescope, label: 'Growth Lab'     },
       { to: '/startup', icon: Rocket,    label: 'Startup Studio' },
@@ -60,8 +49,7 @@ const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Personal', icon: User, to: null,
-    matches: ['/life', '/debrief', '/clarity', '/roundtable', '/calendar'],
+    label: 'Personal', icon: User,
     items: [
       { to: '/life',       icon: LayoutList,   label: 'Life Plan'      },
       { to: '/debrief',    icon: Flame,        label: 'Daily Debrief'  },
@@ -71,8 +59,7 @@ const NAV_ITEMS = [
     ],
   },
   {
-    label: 'Community', icon: Users, to: null,
-    matches: ['/blog', '/roadmap', '/library', '/plans'],
+    label: 'Community', icon: Users,
     items: [
       { to: '/blog',    icon: Newspaper,  label: 'Community' },
       { to: '/roadmap', icon: Map,        label: 'Roadmap'   },
@@ -80,250 +67,112 @@ const NAV_ITEMS = [
       { to: '/plans',   icon: DollarSign, label: 'Pricing'   },
     ],
   },
-  {
-    label: 'More', icon: null, to: null,
-    matches: ['/time-report'],
-    items: [
-      { to: '/time-report', icon: Clock, label: 'Time Report' },
-    ],
-  },
 ]
 
-function iconBoxStyle(isActive, flyoutOpen, hovered) {
-  if (isActive) return {
-    background: 'rgba(255,255,255,0.16)',
-    boxShadow: '0 0 22px rgba(255,255,255,0.22), inset 0 0 10px rgba(255,255,255,0.06)',
-    border: '0.5px solid rgba(255,255,255,0.22)',
-    transform: 'scale(1.07)',
-  }
-  if (flyoutOpen) return {
-    background: 'rgba(255,255,255,0.06)',
-    boxShadow: 'none',
-    border: '0.5px solid rgba(255,255,255,0.14)',
-    transform: 'scale(1)',
-  }
-  if (hovered) return {
-    background: 'transparent',
-    boxShadow: '0 0 20px rgba(255,255,255,0.25)',
-    border: '0.5px solid transparent',
-    transform: 'scale(1.06)',
-  }
-  return {
-    background: 'transparent', boxShadow: 'none',
-    border: '0.5px solid transparent', transform: 'scale(1)',
-  }
-}
-
-function NavItem({ item, openFlyout, onToggle }) {
+function NavGroup({ group }) {
   const { pathname } = useLocation()
-  const navigate = useNavigate()
-  const [hovered, setHovered] = useState(false)
-
-  const isActive = item.matches
-    ? item.matches.some(m => pathname === m || pathname.startsWith(m + '/'))
-    : pathname === item.to
-  const flyoutOpen = openFlyout === item.label
-
-  function handleClick() {
-    if (item.to) {
-      navigate(item.to)
-      onToggle(null)
-    } else {
-      onToggle(flyoutOpen ? null : item.label)
-    }
-  }
+  const isGroupActive = group.items.some(i => pathname === i.to || pathname.startsWith(i.to + '/'))
 
   return (
-    <button onClick={handleClick} style={{ background: 'none', border: 'none', padding: 0, width: '100%', cursor: 'pointer' }}>
-      <div
-        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '5px 0' }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-      >
-        <div style={{
-          width: 40, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: 9, transition: 'all 0.18s cubic-bezier(0.22,1,0.36,1)',
-          ...iconBoxStyle(isActive, flyoutOpen, hovered),
-        }}>
-          {item.icon
-            ? <item.icon size={16} color="#ffffff" />
-            : <GridIcon size={15} color="#ffffff" />
-          }
-        </div>
-        <span style={{
-          fontFamily: SANS, fontSize: 9, fontWeight: isActive ? 700 : flyoutOpen ? 600 : 400,
-          color: '#ffffff', letterSpacing: '0.01em', userSelect: 'none',
-        }}>{item.label}</span>
-      </div>
-    </button>
+    <Collapsible defaultOpen={isGroupActive} className="group/collapsible">
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton isActive={isGroupActive} tooltip={group.label}>
+            <group.icon />
+            <span>{group.label}</span>
+            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {group.items.map(sub => {
+              const active = pathname === sub.to || pathname.startsWith(sub.to + '/')
+              return (
+                <SidebarMenuSubItem key={sub.to}>
+                  <SidebarMenuSubButton asChild isActive={active}>
+                    <NavLink to={sub.to}>
+                      <sub.icon />
+                      <span>{sub.label}</span>
+                    </NavLink>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              )
+            })}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
   )
 }
 
-function BottomItem({ label, icon: Icon, to, onClick, accent }) {
+function AppSidebar() {
   const { pathname } = useLocation()
-  const isActive = to ? (pathname === to || pathname.startsWith(to + '/')) : false
-  const [hovered, setHovered] = useState(false)
-  const col = accent || '#ffffff'
-
-  const inner = (
-    <div
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '5px 0', cursor: 'pointer' }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div style={{
-        width: 40, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        borderRadius: 9, transition: 'all 0.18s cubic-bezier(0.22,1,0.36,1)',
-        ...iconBoxStyle(isActive, hovered),
-      }}>
-        <Icon size={16} color={col} />
-      </div>
-      <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: isActive ? 700 : 400, color: col, letterSpacing: '0.01em', userSelect: 'none' }}>
-        {label}
-      </span>
-    </div>
-  )
-
-  if (to) return <NavLink to={to} style={{ textDecoration: 'none', display: 'block', width: '100%' }}>{inner}</NavLink>
-  return <button onClick={onClick} style={{ background: 'none', border: 'none', padding: 0, width: '100%', cursor: 'pointer' }}>{inner}</button>
-}
-
-function Flyout({ item, panelRef, onClose }) {
-  if (!item?.items) return null
-  return (
-    <div
-      ref={panelRef}
-      style={{
-        position: 'fixed',
-        top: TOP,
-        bottom: BOTTOM,
-        left: W + GAP * 2,
-        width: 200,
-        background: BG,
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 14,
-        zIndex: 19,
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        scrollbarWidth: 'none',
-      }}
-    >
-      {/* Header */}
-      <div style={{ padding: '20px 16px 12px', flexShrink: 0 }}>
-        <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', margin: '0 0 12px', lineHeight: 1 }}>
-          {item.label}
-        </p>
-        <div style={{ height: '0.5px', background: 'rgba(255,255,255,0.08)' }} />
-      </div>
-
-      {/* Nav items */}
-      <div style={{ flex: 1, paddingBottom: 16 }}>
-        {item.items.map(sub => (
-          <NavLink
-            key={sub.to} to={sub.to}
-            onClick={onClose}
-            style={{ textDecoration: 'none', display: 'block' }}
-          >
-            {({ isActive }) => (
-              <FlyoutItem sub={sub} isActive={isActive} />
-            )}
-          </NavLink>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function FlyoutItem({ sub, isActive }) {
-  const [hovered, setHovered] = useState(false)
-  return (
-    <div
-      style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '10px 20px',
-        margin: '2px 8px',
-        borderRadius: 9,
-        background: isActive
-          ? 'rgba(255,255,255,0.1)'
-          : hovered ? 'rgba(255,255,255,0.055)' : 'transparent',
-        transition: 'background 0.14s',
-        cursor: 'pointer',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <sub.icon
-        size={14}
-        color={isActive ? '#ffffff' : hovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.55)'}
-        strokeWidth={isActive ? 2.2 : 1.8}
-      />
-      <span style={{
-        fontFamily: SANS,
-        fontSize: 13.5,
-        fontWeight: isActive ? 650 : 430,
-        color: isActive ? '#ffffff' : hovered ? '#ffffff' : 'rgba(255,255,255,0.82)',
-        letterSpacing: '-0.01em',
-        lineHeight: 1,
-        transition: 'color 0.14s',
-      }}>
-        {sub.label}
-      </span>
-    </div>
-  )
-}
-
-export default function Sidebar() {
-  const { openFlyout, setOpenFlyout } = useSidebar()
-  const sidebarRef = useRef(null)
-  const panelRef   = useRef(null)
-
-  const openItem = NAV_ITEMS.find(n => n.label === openFlyout) || null
-
-  useEffect(() => {
-    if (!openFlyout) return
-    function onDown(e) {
-      if (
-        sidebarRef.current && !sidebarRef.current.contains(e.target) &&
-        panelRef.current   && !panelRef.current.contains(e.target)
-      ) setOpenFlyout(null)
-    }
-    document.addEventListener('mousedown', onDown)
-    return () => document.removeEventListener('mousedown', onDown)
-  }, [openFlyout])
+  const homeActive = pathname === '/'
 
   return (
-    <>
-      <div
-        ref={sidebarRef}
-        style={{
-          position: 'fixed', top: TOP, left: GAP, bottom: BOTTOM,
-          width: W,
-          background: BG,
-          border: '1px solid rgba(255,255,255,0.07)',
-          borderRadius: 14,
-          zIndex: 20,
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          paddingTop: 8,
-        }}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 1, flex: 1 }}>
-          {NAV_ITEMS.map(item => (
-            <NavItem key={item.label} item={item} openFlyout={openFlyout} onToggle={setOpenFlyout} />
-          ))}
+    <SidebarPrimitive collapsible="icon" variant="floating">
+      <SidebarHeader>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px' }}>
+          <div style={{
+            width: 22, height: 22, flexShrink: 0,
+            background: 'linear-gradient(135deg,#00d4ff,#60a5fa)',
+            borderRadius: 6,
+            boxShadow: '0 0 12px rgba(0,212,255,0.35)',
+          }} />
+          <span style={{
+            fontFamily: MONO, fontSize: 13, fontWeight: 700, color: '#eaf4ff',
+            letterSpacing: '0.02em', whiteSpace: 'nowrap',
+          }} className="group-data-[collapsible=icon]:hidden">
+            TRACKR
+          </span>
         </div>
+      </SidebarHeader>
 
-        <div style={{
-          width: '100%', paddingBottom: 10, paddingTop: 6, flexShrink: 0,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1,
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-        }}>
-          <BottomItem label="Settings" icon={Settings} onClick={() => {}} />
-          <BottomItem label="Report"   icon={Activity}  to="/time-report" />
-        </div>
-      </div>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={homeActive} tooltip="Home">
+                  <NavLink to="/">
+                    <Home />
+                    <span>Home</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
-      <Flyout item={openItem} panelRef={panelRef} onClose={() => setOpenFlyout(null)} />
-    </>
+              {NAV_GROUPS.map(group => (
+                <NavGroup key={group.label} group={group} />
+              ))}
+
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Time Report">
+                  <NavLink to="/time-report">
+                    <Clock />
+                    <span>Time Report</span>
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Settings">
+              <Settings />
+              <span>Settings</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </SidebarPrimitive>
   )
 }
+
+export default AppSidebar
+export { SidebarProvider, SidebarInset, SidebarTrigger }

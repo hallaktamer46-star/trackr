@@ -1,46 +1,60 @@
-import * as React from 'react'
-import { Slot } from '@radix-ui/react-slot'
-import { cva } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
+import * as React from "react"
+import { cva } from "class-variance-authority";
+import { Slot } from "radix-ui"
+
+import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-1.5 whitespace-nowrap text-xs font-semibold tracking-wide transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400/50 focus-visible:ring-offset-1 focus-visible:ring-offset-[#07090f] disabled:pointer-events-none disabled:opacity-40 cursor-pointer',
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default:
-          'bg-blue-500/15 border border-blue-400/30 text-blue-300 hover:bg-blue-500/25 hover:border-blue-400/55 hover:text-blue-200',
-        teal:
-          'bg-teal-500/10 border border-teal-400/25 text-teal-400/80 hover:bg-teal-500/20 hover:border-teal-400/50 hover:text-teal-300',
-        ghost:
-          'border border-transparent text-blue-400/60 hover:bg-blue-500/10 hover:border-blue-400/25 hover:text-blue-300',
-        notion:
-          'bg-[rgba(180,200,255,0.07)] border-0 text-[#b0c8f0] font-medium hover:bg-[rgba(180,200,255,0.13)] hover:text-[#ccdeff]',
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
         destructive:
-          'bg-red-500/10 border border-red-400/25 text-red-400/80 hover:bg-red-500/20 hover:border-red-400/45 hover:text-red-300',
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: 'h-7 px-3 rounded-md',
-        sm:      'h-6 px-2.5 rounded',
-        lg:      'h-8 px-4 rounded-md',
-        icon:    'h-7 w-7 rounded-md',
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+        "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-8",
+        "icon-lg": "size-10",
       },
     },
     defaultVariants: {
-      variant: 'default',
-      size: 'default',
+      variant: "default",
+      size: "default",
     },
   }
 )
 
-function Button({ className, variant, size, asChild = false, ...props }) {
-  const Comp = asChild ? Slot : 'button'
+function Button({
+  className,
+  variant = "default",
+  size = "default",
+  asChild = false,
+  ...props
+}) {
+  const Comp = asChild ? Slot.Root : "button"
+
   return (
     <Comp
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
       className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    />
-  )
+      {...props} />
+  );
 }
 
 export { Button, buttonVariants }

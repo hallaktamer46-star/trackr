@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Header from './Header'
-import Sidebar, { SIDEBAR_W } from './Sidebar'
+import AppSidebar, { SidebarProvider, SidebarInset } from './Sidebar'
 import Onboarding from '../Onboarding'
 import UpgradeCelebration from '../UpgradeCelebration'
 import EngageWidget from '../EngageWidget'
 import { useAuth } from '../../contexts/AuthContext'
 import { isSupabaseConfigured } from '../../lib/supabase'
-import { SidebarProvider, useSidebar } from '../../contexts/SidebarContext'
 
 function LayoutInner({ children }) {
   const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const { flyoutWidth } = useSidebar()
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [upgradePlan, setUpgradePlan] = useState(null)
 
@@ -33,29 +31,26 @@ function LayoutInner({ children }) {
   }, [])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#000000' }}>
-      <Header />
-      <Sidebar />
-      <main style={{
-        marginLeft: SIDEBAR_W + flyoutWidth,
-        transition: 'margin-left 0.22s cubic-bezier(0.22,1,0.36,1)',
-        padding: '20px 24px',
-        minHeight: 'calc(100vh - 56px)',
-      }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          {children}
-        </div>
-      </main>
+    <>
+      <AppSidebar />
+      <SidebarInset style={{ background: '#000000' }}>
+        <Header />
+        <main style={{ padding: '20px 24px', minHeight: 'calc(100vh - 56px)' }}>
+          <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+            {children}
+          </div>
+        </main>
+      </SidebarInset>
       {showOnboarding && <Onboarding onComplete={() => setShowOnboarding(false)} />}
       {upgradePlan && <UpgradeCelebration plan={upgradePlan} onClose={() => setUpgradePlan(null)} />}
       <EngageWidget />
-    </div>
+    </>
   )
 }
 
 export default function Layout({ children }) {
   return (
-    <SidebarProvider>
+    <SidebarProvider style={{ '--sidebar-width': '15rem', background: '#000000' }}>
       <LayoutInner>{children}</LayoutInner>
     </SidebarProvider>
   )
