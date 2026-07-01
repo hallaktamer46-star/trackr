@@ -25,7 +25,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/colla
 import ProfileDropdown from './ProfileDropdown'
 import { useCheckIn } from '../../hooks/useCheckIn'
 
-const MONO = "'Geist Mono', 'Consolas', monospace"
+const MONO = "'Mona Sans', 'Geist Mono', 'Consolas', monospace"
 
 const NAV_GROUPS = [
   {

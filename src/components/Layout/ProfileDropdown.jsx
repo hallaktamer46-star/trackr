@@ -60,14 +60,14 @@ export default function ProfileDropdown() {
         <div
           className="avatar-ring"
           style={{
-            width: 34, height: 34, borderRadius: 8,
-            background: '#1d3a5f',
+            width: 20, height: 20, borderRadius: 5,
+            background: 'rgba(255,255,255,0.08)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 0 1px rgba(255,255,255,0.08)',
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.1)',
             transition: 'box-shadow 0.2s',
-            overflow: 'hidden',
-            fontFamily: "'Geist Mono', Consolas, monospace",
-            fontSize: 13, fontWeight: 700, color: '#7ec8ff', letterSpacing: '0.01em',
+            overflow: 'hidden', flexShrink: 0,
+            fontFamily: "'Mona Sans', 'Geist Mono', Consolas, monospace",
+            fontSize: 9, fontWeight: 700, color: '#eaf4ff', letterSpacing: '0.01em',
           }}
         >
           {initials}
