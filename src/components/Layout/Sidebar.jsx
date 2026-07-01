@@ -1,4 +1,4 @@
-import { ChevronRight, Home, Briefcase, Building2, User, Users, Settings, Activity,
+import { ChevronRight, Home, Briefcase, Building2, User, Users, Settings,
   LayoutDashboard, Telescope, Rocket, CalendarDays, BarChart3,
   Clock, BookOpen, Map, Newspaper, LayoutList, Flame, Brain,
   PenLine, FileText, Mail, DollarSign, LayoutGrid,
@@ -10,8 +10,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -24,6 +22,8 @@ import {
   SidebarTrigger,
 } from '../ui/sidebar'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible'
+import ProfileDropdown from './ProfileDropdown'
+import { useCheckIn } from '../../hooks/useCheckIn'
 
 const MONO = "'Geist Mono', 'Consolas', monospace"
 
@@ -108,26 +108,10 @@ function NavGroup({ group }) {
 function AppSidebar() {
   const { pathname } = useLocation()
   const homeActive = pathname === '/'
+  const checkInData = useCheckIn()
 
   return (
-    <SidebarPrimitive collapsible="icon" variant="floating">
-      <SidebarHeader>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px' }}>
-          <div style={{
-            width: 22, height: 22, flexShrink: 0,
-            background: 'linear-gradient(135deg,#00d4ff,#60a5fa)',
-            borderRadius: 6,
-            boxShadow: '0 0 12px rgba(0,212,255,0.35)',
-          }} />
-          <span style={{
-            fontFamily: MONO, fontSize: 13, fontWeight: 700, color: '#eaf4ff',
-            letterSpacing: '0.02em', whiteSpace: 'nowrap',
-          }} className="group-data-[collapsible=icon]:hidden">
-            TRACKR
-          </span>
-        </div>
-      </SidebarHeader>
-
+    <SidebarPrimitive collapsible="icon" variant="floating" style={{ fontFamily: MONO }}>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -159,6 +143,30 @@ function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px' }}>
+          <div style={{ position: 'relative' }}>
+            <ProfileDropdown />
+            {checkInData && (
+              <span style={{
+                position: 'absolute', top: 0, right: 0,
+                width: 10, height: 10, borderRadius: '50%',
+                background: '#ff6b6b', border: '2px solid #060a14',
+                boxShadow: '0 0 8px #ff6b6b',
+                animation: 'checkin-pulse 1.4s ease-in-out infinite',
+                pointerEvents: 'none',
+              }} />
+            )}
+          </div>
+          <span style={{ fontFamily: MONO, fontSize: 13, color: '#b9cbe8' }} className="group-data-[collapsible=icon]:hidden">
+            Profile
+          </span>
+        </div>
+        <style>{`
+          @keyframes checkin-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+          }
+        `}</style>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="Settings">
