@@ -60,18 +60,17 @@ export default function ProfileDropdown() {
         <div
           className="avatar-ring"
           style={{
-            width: 34, height: 34, borderRadius: '50%',
-            background: 'linear-gradient(160deg, #1a2744 0%, #0f172a 100%)',
+            width: 34, height: 34, borderRadius: 8,
+            background: '#1d3a5f',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 0 0 1px rgba(255,255,255,0.08)',
             transition: 'box-shadow 0.2s',
             overflow: 'hidden',
+            fontFamily: "'Geist Mono', Consolas, monospace",
+            fontSize: 13, fontWeight: 700, color: '#7ec8ff', letterSpacing: '0.01em',
           }}
         >
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="8" r="3.8" fill="rgba(255,255,255,0.6)"/>
-            <path d="M3.5 21c0-4.694 3.806-8 8.5-8s8.5 3.306 8.5 8" fill="rgba(255,255,255,0.6)"/>
-          </svg>
+          {initials}
         </div>
       </button>
 
